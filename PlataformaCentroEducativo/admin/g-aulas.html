@@ -39,7 +39,17 @@
                     <legend>Alta</legend>
                     <fieldset>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        <p>Edificio: <input type="number" id="Edificio" name="Edificio" required placeholder="Inserta el edificio de la aula"></p>
+                        <p>Planta: <input type="number" id="Planta" name="Planta" required placeholder="Inserta la planta de la aula"></p>
+                        <p>Capacidad: <input type="number" id="Capacidad" name="Capacidad" required placeholder="Inserta la capacidad de la aula"></p>
+                        <p>Equipamiento disponible: <textarea id="Equipamiento" name="Equipamiento" rows="5" cols="50" required placeholder="Inserta el equipamiento disponible en la aula"></textarea></p>
+                        <p>Estado: <select id="estado" name="estado" required>
+                                    <option value="" selected disabled>Selecciona un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                        </p>
+                        <button type="submit"> Registrar</button>
                     </fieldset>
                 </form>
             </section> 
@@ -48,8 +58,22 @@
                 <form action="#" method="post">
                     <legend>Modificación</legend>
                     <fieldset>
+                        <p>Identificador: <select id="id" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </p>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        <p>Edificio: <input type="number" id="Edificio" name="Edificio" required placeholder="Inserta el edificio de la aula"></p>
+                        <p>Planta: <input type="number" id="Planta" name="Planta" required placeholder="Inserta la planta de la aula"></p>
+                        <p>Capacidad: <input type="number" id="Capacidad" name="Capacidad" required placeholder="Inserta la capacidad de la aula"></p>
+                        <p>Equipamiento disponible: <textarea id="Equipamiento" name="Equipamiento" rows="5" cols="50" required placeholder="Inserta el equipamiento disponible en la aula"></textarea></p>
+                        <p>Estado: <select id="estado" name="estado" required>
+                                    <option value="" selected disabled>Selecciona un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                        </p>
+                        <button type="submit"> Modificar</button>
                     </fieldset>
                 </form>
             </section>
@@ -58,8 +82,11 @@
                 <form action="#" method="post">
                     <legend>Eliminación</legend>
                     <fieldset>
-                        <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        <p>Identificador: <select id="id" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </p>
+                        <button type="submit"> Eliminar</button>
                     </fieldset>
                 </form>
             </section>
@@ -69,6 +96,8 @@
                     <legend>Consulta</legend>
                     <fieldset>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        <p>Edificio: <input type="number" id="Edificio" name="Edificio" required placeholder="Inserta el edificio de la aula"></p>
+                        <p>Planta: <input type="number" id="Planta" name="Planta" required placeholder="Inserta la planta de la aula"></p>
                         <button type="submit"> Registrarme</button>
                     </fieldset>
                 </form>

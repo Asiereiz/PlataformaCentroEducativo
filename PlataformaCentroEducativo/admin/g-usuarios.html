@@ -39,27 +39,66 @@
                     <legend>Alta</legend>
                     <fieldset>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
+                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
+                        <p>Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
+                        <p>Contraseña: <input type="password" id="Contraseña" name="Contraseña" required placeholder="Inserta tu contraseña"></p>
+                        <p>Rol: <select id="rol" name="rol" required>
+                                    <option value="" selected disabled>Selecciona un rol</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="alumno">Alumno</option>
+                                </select>
+                        </p>
+                        <p>Estado: <select id="estado" name="estado" required>
+                                    <option value="" selected disabled>Selecciona un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                        </p>
+                        <button type="submit"> Registrar</button>
                     </fieldset>
                 </form>
             </section> 
             
             <section id="mod_user">
                 <form action="#" method="post">
-                    <legend>Modificación</legend>
+                    <legend>Modificar</legend>
                     <fieldset>
+                        <p>Identificador: <select id="id" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </p>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
+                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
+                        <p>Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
+                        <p>Contraseña: <input type="password" id="Contraseña" name="Contraseña" required placeholder="Inserta tu contraseña"></p>
+                        <p>Rol: <select id="rol" name="rol" required>
+                                    <option value="" selected disabled>Selecciona un rol</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="alumno">Alumno</option>
+                                </select>
+                        </p>
+                        <p>Estado: <select id="estado" name="estado" required>
+                                    <option value="" selected disabled>Selecciona un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                        </p>
+                        <button type="submit"> Modificar</button>
                     </fieldset>
                 </form>
             </section>
 
             <section id="del_user">
                 <form action="#" method="post">
-                    <legend>Eliminación</legend>
+                    <legend>Eliminar</legend>
                     <fieldset>
-                        <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        <p>Identificador: <select id="id" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </p>
+                        <button type="submit"> Eliminar</button>
                     </fieldset>
                 </form>
             </section>
@@ -69,7 +108,9 @@
                     <legend>Consulta</legend>
                     <fieldset>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <button type="submit"> Registrarme</button>
+                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
+                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
+                        <button type="submit"> Consultar</button>
                     </fieldset>
                 </form>
             </section>                                
