@@ -112,3 +112,39 @@ section{
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+@media (max-width: 1600px) {
+    header {
+        position: static;
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+    }
+
+    header nav {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        margin: 8px 0 0;
+    }
+
+    nav ul {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+
+    nav li {
+        flex: 1 1 140px;
+        width: auto;
+    }
+
+    .logout {
+        position: static;
+        grid-column: 3;
+        grid-row: 1 / span 2;
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    main {
+        padding-top: 20px;
+    }
+}
