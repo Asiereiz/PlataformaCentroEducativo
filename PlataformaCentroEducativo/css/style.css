@@ -115,9 +115,12 @@ section{
 
 @media (max-width: 1600px) {
     header {
-        position: static;
+        position: fixed;
         grid-template-columns: auto 1fr auto;
         gap: 8px;
+        height: auto;
+        z-index: 1000;
+        padding: 8px 20px;
     }
 
     header nav {
@@ -144,7 +147,4 @@ section{
         margin-top: 8px;
     }
 
-    main {
-        padding-top: 20px;
-    }
 }
