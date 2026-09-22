@@ -1,391 +1,114 @@
-
-body {
-    margin: 0;
+body{
+    background-color: #f2f2f2;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: #f5f7fa;
-    color: #1e293b;
-}
-
-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-
-    background-color: #17263a;
-    color: white;
-
-    min-height: 75px;
-    padding: 0 40px;
-
-    display: flex;
-    align-items: center;
-    gap: 35px;
-
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-
-header h1 {
-    margin: 0;
-    font-size: 20px;
-    white-space: nowrap;
-}
-
-header h2 {
-    display: none;
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-.logout {
-    margin-left: auto;
-
-    color: white;
-    text-decoration: none;
-
-    background-color: #ef4444;
-
-    padding: 10px 18px;
-    border-radius: 8px;
-
-    font-size: 14px;
-    font-weight: bold;
-
-    transition: 0.2s;
-}
-
-.logout:hover {
-    background-color: #dc2626;
-}
-
-
-/* =========================
-   MENÚ DE NAVEGACIÓN
-========================= */
-
-nav ul {
-    list-style: none;
-
-    margin: 0;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-nav li {
     margin: 0;
 }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-
-    transition: color 0.2s;
+main{
+    padding-top: 80px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
-nav a:hover {
-    color: #a78bfa;
-}
-
-
-/* =========================
-   CONTENIDO PRINCIPAL
-========================= */
-
-main {
-    width: 90%;
-    max-width: 1100px;
-
-    margin: 40px auto;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px;
-}
-
-
-/* =========================
-   SECCIONES / TARJETAS
-========================= */
-
-main section {
-    background-color: white;
-
-    border-radius: 15px;
-
-    padding: 25px;
-
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-
-    position: relative;
-}
-
-
-/* Títulos de cada sección */
-
-legend {
-    display: block;
-
-    font-size: 22px;
-    font-weight: bold;
-
-    color: #17263a;
-
-    margin-bottom: 20px;
-}
-
-
-/* =========================
-   FIELDSET
-========================= */
-
-fieldset {
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
-
-/* =========================
-   PÁRRAFOS
-========================= */
-
-form p {
-    margin: 0 0 18px 0;
-
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    font-size: 14px;
-}
-
-
-/* =========================
-   INPUTS
-========================= */
-
-input,
-select {
-    border: 1px solid #d1d5db;
-
-    border-radius: 7px;
-
-    padding: 10px 12px;
-
-    font-size: 14px;
-
-    background-color: #fff;
-
-    outline: none;
-
-    transition: 0.2s;
-}
-
-input:focus,
-select:focus {
-    border-color: #6366f1;
-
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-}
-
-
-/* Ancho de los campos */
-
-input[type="text"],
-input[type="email"],
-input[type="tel"] {
-    width: 100%;
-}
-
-
-/* =========================
-   SELECT
-========================= */
-
-select {
-    min-width: 180px;
-    cursor: pointer;
-}
-
-
-/* =========================
-   BOTONES
-========================= */
-
-button {
-    border: none;
-
-    background-color: #5b4de8;
-    color: white;
-
-    padding: 11px 22px;
-
-    border-radius: 7px;
-
-    font-size: 14px;
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-button:hover {
-    background-color: #493bd0;
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================
-   BOTÓN DE ELIMINAR
-========================= */
-
-#del_doc button {
-    background-color: #ef4444;
-}
-
-#del_doc button:hover {
-    background-color: #dc2626;
-}
-
-
-/* =========================
-   SECCIÓN CONSULTA
-========================= */
-
-#info_doc {
-    grid-column: 1 / -1;
-}
-
-
-/* =========================
-   TARJETA DESTACADA
-   Simula el elemento "absolute"
-   de la imagen
-========================= */
-
-#mod_doc::before {
-    content: "Modificar";
-
-    position: absolute;
-
-    top: -12px;
-    right: 20px;
-
-    background-color: #ef4444;
-    color: white;
-
-    padding: 5px 13px;
-
-    border-radius: 15px;
-
-    font-size: 12px;
-    font-weight: bold;
-}
-
-
-/* =========================
-   ELEMENTO FIXED
-   Botón flotante
-========================= */
-
-body::after {
-    content: "💬";
-
+header{
+    background-color: #36477e;
     position: fixed;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+    padding: 8px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr 100px;
+    grid-template-rows: auto;
+    align-items: center;
+}
 
-    right: 25px;
-    bottom: 25px;
+header nav{
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-left: 20px;
+    margin-right: 20px;
+}
 
-    width: 55px;
-    height: 55px;
+h1, h2{
+    margin: 0;
+    grid-column: 1;
+    color:#ffffff;
+}
 
-    background-color: #6d5ce7;
+h1{
+    font-size: 1.5rem;
+}
 
-    color: white;
+h2{
+    font-size: 1rem;
+}
 
-    border-radius: 50%;
-
+nav ul{
+    list-style: none;
     display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+nav li{
+    flex-wrap: wrap;
+    background-color: #93a4db;
+    border-radius: 4px;
+    width: 150px;
+    height: 42px;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+nav li a {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+nav li a:hover{
+    background-color: #6275a5;
+    color: rgb(201, 201, 201);
+    border-radius: 4px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.logout{
+    position: absolute;
+    display: flex;
+    right: 20px;
+    top: 15px;
+    background-color:#7ba4f1;
+    color: rgb(0, 0, 0);
+    width: 110px;
+    height: 30px;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
     align-items: center;
     justify-content: center;
-
-    font-size: 23px;
-
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
-
-    z-index: 2000;
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 900px) {
-
-    header {
-        height: auto;
-
-        padding: 20px;
-
-        flex-wrap: wrap;
-    }
-
-    nav {
-        width: 100%;
-    }
-
-    nav ul {
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    main {
-        grid-template-columns: 1fr;
-    }
-
-    #info_doc {
-        grid-column: auto;
-    }
+.logout:hover{
+    background-color:#681f1f;
+    color: rgb(185, 185, 185);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
 }
 
+.login{
+    background-color:#5367a8;
+}
 
-@media (max-width: 600px) {
-
-    header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .logout {
-        margin-left: 0;
-    }
-
-    main {
-        width: 95%;
-        margin: 20px auto;
-    }
-
-    main section {
-        padding: 18px;
-    }
-
-    form p {
-        display: block;
-    }
-
-    input,
-    select {
-        margin-top: 6px;
-    }
+section{
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
