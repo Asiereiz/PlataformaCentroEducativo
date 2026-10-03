@@ -6,7 +6,7 @@
         <title>Plataforma Centro Educativo</title>
         <meta charset= "UTF-8">
         <link rel="stylesheet" href="../css/style.css">
-
+        <script src="js/script.js"></script>
     </head>
 
     <body>
@@ -32,12 +32,11 @@
             <a class="logout" href="../index.html">Cerrar sesión</a>
         </header>
 
-        <main>
+        <main class="gestion">
 
-            <section id="alta_doc">
+            <section class="alta" id="alta_doc">
                 <form action="#" method="post">
                     <legend>Alta</legend>
-                    <fieldset>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
                         Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
                         Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
@@ -52,14 +51,12 @@
                                 </select>
                         </p>
                             <button type="submit"> Registrar</button>
-                    </fieldset>
                 </form>
             </section> 
             
-            <section id="mod_doc">
+            <section class="mod" id="mod_doc">
                 <form action="#" method="post">
                     <legend>Modificar</legend>
-                    <fieldset>
                         <p>Identificador: <select id="id" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
@@ -78,32 +75,27 @@
                                 </select>
                         </p>
                         <button type="submit"> Modificar</button>
-                    </fieldset>
                 </form>
             </section>
 
-            <section id="del_doc">
+            <section class="del" id="del_doc">
                 <form action="#" method="post">
                     <legend>Eliminar</legend>
-                    <fieldset>
                         <p>Identificador: <select id="id" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </p>
                         <button type="submit"> Eliminar</button>
-                    </fieldset>
                 </form>
             </section>
 
-            <section id="info_doc">
+            <section class="info" id="info_doc">
                 <form action="#" method="post">
                     <legend>Consulta</legend>
-                    <fieldset>
                         <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
                         Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
                         Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
                         <button type="submit"> Consultar</button>
-                    </fieldset>
                 </form>
             </section>
 
