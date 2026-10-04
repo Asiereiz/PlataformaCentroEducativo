@@ -37,18 +37,18 @@
             <section class="alta" id="alta_user">
                 <form action="#" method="post">
                     <legend>Alta</legend>
-                        <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
-                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
-                        <p>Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
-                        <p>Contraseña: <input type="password" id="Contraseña" name="Contraseña" required placeholder="Inserta tu contraseña"></p>
-                        <p>Rol: <select id="rol" name="rol" required>
+                        <p>Nombre: <input type="text" id="nombre_alta_user" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        Primer apellido: <input type="text" id="primer_apellido_alta_user" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
+                        Segundo apellido: <input type="text" id="segundo_apellido_alta_user" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
+                        <p>Correo electrónico: <input type="email" id="correo_alta_user" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
+                        <p>Contraseña: <input type="password" id="contraseña_alta_user" name="Contraseña" required placeholder="Inserta tu contraseña"></p>
+                        <p>Rol: <select id="rol_alta_user" name="rol" required>
                                     <option value="" selected disabled>Selecciona un rol</option>
                                     <option value="admin">Admin</option>
                                     <option value="alumno">Alumno</option>
                                 </select>
                         </p>
-                        <p>Estado: <select id="estado" name="estado" required>
+                        <p>Estado: <select id="estado_alta_user" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
@@ -61,22 +61,22 @@
             <section class="mod" id="mod_user">
                 <form action="#" method="post">
                     <legend>Modificar</legend>
-                        <p>Identificador: <select id="id" name="id" required>
+                        <p>Identificador: <select id="id_mod_user" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </p>
-                        <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
-                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
-                        <p>Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
-                        <p>Contraseña: <input type="password" id="Contraseña" name="Contraseña" required placeholder="Inserta tu contraseña"></p>
-                        <p>Rol: <select id="rol" name="rol" required>
+                        <p>Nombre: <input type="text" id="nombre_mod_user" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        Primer apellido: <input type="text" id="primer_apellido_mod_user" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
+                        Segundo apellido: <input type="text" id="segundo_apellido_mod_user" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
+                        <p>Correo electrónico: <input type="email" id="correo_mod_user" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
+                        <p>Contraseña: <input type="password" id="contraseña_mod_user" name="Contraseña" required placeholder="Inserta tu contraseña"></p>
+                        <p>Rol: <select id="rol_mod_user" name="rol" required>
                                     <option value="" selected disabled>Selecciona un rol</option>
                                     <option value="admin">Admin</option>
                                     <option value="alumno">Alumno</option>
                                 </select>
                         </p>
-                        <p>Estado: <select id="estado" name="estado" required>
+                        <p>Estado: <select id="estado_mod_user" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
@@ -89,7 +89,7 @@
             <section class="del" id="del_user">
                 <form action="#" method="post">
                     <legend>Eliminar</legend>
-                        <p>Identificador: <select id="id" name="id" required>
+                        <p>Identificador: <select id="id_del_user" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </p>
@@ -100,9 +100,9 @@
             <section class="info" id="info_user">
                 <form action="#" method="post">
                     <legend>Consulta</legend>
-                        <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
-                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
+                        <p>Nombre: <input type="text" id="nombre_info_user" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        Primer apellido: <input type="text" id="primer_apellido_info_user" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
+                        Segundo apellido: <input type="text" id="segundo_apellido_info_user" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
                         <button type="submit"> Consultar</button>
                 </form>
             </section>                                
