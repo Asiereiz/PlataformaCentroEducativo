@@ -1,77 +1,36 @@
+console.log("JavaScript funcionando");
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("JavaScript funcionando");
 
-    // Inicializar las funcionalidades de cada página.
     inicializarCursos();
-    inicializarDocentes();
-    inicializarAulas();
-    inicializarUsuarios();
-    inicializarMatriculas();
+
 });
 
+
 function inicializarCursos() {
-    const paginaCursos = document.getElementById("alta_curso");
 
-    // Si no estamos en la página de cursos, no hacemos nada.
-    if (!paginaCursos) {
+    // Buscamos el formulario de alta de cursos
+    const formularioAlta = document.getElementById("alta_curso");
+
+    // Si no existe, significa que esta página no tiene
+    // el formulario de alta de cursos.
+    if (!formularioAlta) {
         return;
     }
 
-    console.log("Página de gestión de cursos detectada");
+    console.log("Formulario de cursos encontrado");
 
-    validarFormularioCursos();
+    formularioAlta.addEventListener("submit", registrarCurso);
+
 }
 
-function validarFormularioCursos() {
-    const formulario = document.querySelector("#alta_curso form");
 
-    if (!formulario) {
-        return;
-    }
+function registrarCurso(event) {
 
-    const fechaInicio = formulario.querySelector(
-        '[name="Fecha_inicio"]'
-    );
+    // Evita que el formulario recargue la página
+    event.preventDefault();
 
-    const fechaFin = formulario.querySelector(
-        '[name="Fecha_finalizacion"]'
-    );
+    console.log("Registrando curso...");
 
-    const plazas = formulario.querySelector(
-        '[name="Max_plazas"]'
-    );
-
-    // La fecha final no puede ser anterior a la inicial.
-    function validarFechas() {
-        if (fechaInicio.value && fechaFin.value) {
-            fechaFin.setCustomValidity(
-                fechaFin.value < fechaInicio.value
-                    ? "La fecha final no puede ser anterior a la inicial."
-                    : ""
-            );
-        }
-    }
-
-    fechaInicio.addEventListener("change", validarFechas);
-    fechaFin.addEventListener("change", validarFechas);
-
-    // Debe existir al menos una plaza.
-    plazas.min = "1";
 }
 
-function inicializarDocentes() {
-    // Aquí añadiremos la gestión de docentes.
-}
-
-function inicializarAulas() {
-    // Aquí añadiremos la gestión de aulas.
-}
-
-function inicializarUsuarios() {
-    // Aquí añadiremos la gestión de usuarios.
-}
-
-function inicializarMatriculas() {
-    // Aquí añadiremos la gestión de matrículas.
-}
