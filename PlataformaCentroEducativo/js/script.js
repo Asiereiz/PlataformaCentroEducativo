@@ -24,13 +24,41 @@ function inicializarCursos() {
 
 }
 
-
 function registrarCurso(event) {
 
     // Evita que el formulario recargue la página
     event.preventDefault();
 
-    console.log("Registrando curso...");
+    // Obtenemos el formulario
+    const formulario = event.target;
+
+    // Creamos un objeto con los datos del curso
+    const curso = {
+
+        nombre: formulario.nombre_alta.value,
+
+        descripcion: formulario.descripcion_alta.value,
+
+        docente: formulario.docente_alta.value,
+
+        aula: formulario.aula_alta.value,
+
+        fechaInicio: formulario.fecha_inicio_alta.value,
+
+        fechaFinalizacion: formulario.fecha_finalizacion_alta.value,
+
+        horario: formulario.horario_alta.value,
+
+        maxPlazas: formulario.max_plazas_alta.value,
+
+        estado: formulario.estado_alta.value
+
+    };
+
+    console.log("Curso creado:");
+    console.log(curso);
 
 }
+
+
 
