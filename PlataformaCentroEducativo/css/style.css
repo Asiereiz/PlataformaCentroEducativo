@@ -161,13 +161,18 @@ section{
 
 @media (max-width: 900px) {
     header {
-        position: fixed;
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
+        position: static;
+        display:block;
         gap: 8px;
         height: auto;
         z-index: 2000;
         padding: 8px 20px;
+    }
+
+    header nav {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 
     .gestion{
@@ -175,14 +180,11 @@ section{
         flex-direction: column;
     }
 
-    header nav {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        margin: 8px 0 0;
-    }
 
     nav ul {
-        flex-wrap: nowrap;
+        display:flex;
+        flex-direction: row;
+        flex-wrap: wrap;
         justify-content: flex-start;
     }
 
