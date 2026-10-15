@@ -10,9 +10,9 @@
 
     <body>
 
-        <header>
-            <h1>Portal Centro Educativo</h1>
-            <h2>Sesión como Administrador</h2>
+        <header class ="adminheader">
+            <h1><a class="titulo" href="../admin.html">Portal Centro Educativo</a></h1>
+            <h2><a class="titulo" href="../admin.html">Sesión como Administrador</a></h2>
 
             <nav>
                 <ul>
@@ -36,19 +36,19 @@
             <section class="alta" id="alta_curso">
                 <form action="#" method="post">
                     <legend>Alta</legend>
-                        <p>Nombre: <input type="text" id="nombre_alta_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <p>Descripción: <textarea id="descripcion_alta_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea> &nbsp;&nbsp;&nbsp;
-                        <p>Docente responsable: <select id="docente_alta_curso" name="docente" required>
+                        <label for="nombre_alta_curso">Nombre: <input type="text" id="nombre_alta_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        <label for="descripcion_alta_curso">Descripción: <textarea id="descripcion_alta_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea> &nbsp;&nbsp;&nbsp;
+                        <label for="docente_alta_curso">Docente responsable: <select id="docente_alta_curso" name="docente" required>
                                     <option value="" selected disabled>Selecciona un docente</option>
                             </select>
                         </p>
-                        <p>Aula: <input type="number" id="aula_alta_curso" name="Aula" required placeholder="Inserta el aula del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Fecha de inicio: <input type="date" id="fecha_inicio_alta_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Fecha de finalización: <input type="date" id="fecha_finalizacion_alta_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Horario: <input type="text" id="horario_alta_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Número máximo de plazas: <input type="number" id="max_plazas_alta_curso" name="Max_plazas" required placeholder="Inserta el número máximo de plazas"> &nbsp;&nbsp;&nbsp;
-                        <p>Imagen representativa: <input type="file" id="foto_alta_curso" name="Fotografia" accept="image/*" required placeholder="Inserta tu fotografía"> &nbsp;&nbsp;&nbsp;
-                        <p>Estado: <select id="estado_alta_curso" name="estado" required>
+                        <label for="aula_alta_curso">Aula: <input type="number" id="aula_alta_curso" name="Aula" required placeholder="Inserta el aula del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_inicio_alta_curso">Fecha de inicio: <input type="date" id="fecha_inicio_alta_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_finalizacion_alta_curso">Fecha de finalización: <input type="date" id="fecha_finalizacion_alta_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="horario_alta_curso">Horario: <input type="text" id="horario_alta_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="max_plazas_alta_curso">Número máximo de plazas: <input type="number" id="max_plazas_alta_curso" name="Max_plazas" required placeholder="Inserta el número máximo de plazas"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="foto_alta_curso">Imagen representativa: <input type="file" id="foto_alta_curso" name="Fotografia" accept="image/*" required placeholder="Inserta tu fotografía"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="estado_alta_curso">Estado: <select id="estado_alta_curso" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
@@ -65,18 +65,18 @@
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </p>
-                        <p>Nombre: <input type="text" id="nombre_mod_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <p>Descripción: <textarea id="descripcion_mod_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea>
-                        <p>Docente responsable: <select id="docente_mod_curso" name="docente" required>
+                        <label for="nombre_mod_curso">Nombre: <input type="text" id="nombre_mod_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="descripcion_mod_curso">Descripción: <textarea id="descripcion_mod_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea></label>
+                        <label for="docente_mod_curso">Docente responsable: <select id="docente_mod_curso" name="docente" required>
                                     <option value="" selected disabled>Selecciona un docente</option>
                             </select>
-                        </p>
-                        <p>Aula: <input type="number" id="aula_mod_curso" name="Aula" required placeholder="Inserta el aula del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Fecha de inicio: <input type="date" id="fecha_inicio_mod_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Fecha de finalización: <input type="date" id="fecha_finalizacion_mod_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Horario: <input type="text" id="horario_mod_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Número máximo de plazas: <input type="number" id="max_plazas_mod_curso" name="Max_plazas" required placeholder="Inserta el número máximo de plazas"> &nbsp;&nbsp;&nbsp;
-                        <p>Imagen representativa: <input type="file" id="foto_mod_curso" name="Fotografia" accept="image/*" required placeholder="Inserta tu fotografía"> &nbsp;&nbsp;&nbsp;
+                        </label>
+                        <label for="aula_mod_curso">Aula: <input type="number" id="aula_mod_curso" name="Aula" required placeholder="Inserta el aula del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_inicio_mod_curso">Fecha de inicio: <input type="date" id="fecha_inicio_mod_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_finalizacion_mod_curso">Fecha de finalización: <input type="date" id="fecha_finalizacion_mod_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="horario_mod_curso">Horario: <input type="text" id="horario_mod_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="max_plazas_mod_curso">Número máximo de plazas: <input type="number" id="max_plazas_mod_curso" name="Max_plazas" required placeholder="Inserta el número máximo de plazas"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="foto_mod_curso">Imagen representativa: <input type="file" id="foto_mod_curso" name="Fotografia" accept="image/*" required placeholder="Inserta tu fotografía"> &nbsp;&nbsp;&nbsp;</label>
                         <p>Estado: <select id="estado_mod_curso" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
@@ -90,10 +90,10 @@
             <section class="del" id="del_curso">
                 <form action="#" method="post">
                     <legend>Eliminar</legend>
-                        <p>Identificador: <select id="id_del_curso" name="id" required>
+                        <label for="id_del_curso">Identificador: <select id="id_del_curso" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
-                        </p>
+                        </label>
                         <button type="submit"> Eliminar</button>
                 </form>
             </section>
@@ -101,7 +101,10 @@
             <section class="info" id="info_curso">
                 <form action="#" method="post">
                     <legend>Consulta</legend>
-                        <p>Nombre: <input type="text" id="nombre_info_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        <label for="id_info_curso">Identificador: <select id="id_info_curso" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </label>
                         <button type="submit"> Consultar</button>
                 </form>
             </section>              

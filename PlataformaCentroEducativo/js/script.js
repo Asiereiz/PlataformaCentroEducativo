@@ -58,3 +58,17 @@ function inicializarUsuarios() {
         guardarDatos(DATOS_USER, user);
     }
 }
+
+function irAlInicio(event) {
+    event.preventDefault();
+
+    const tipoUsuario = sessionStorage.getItem("tipoUsuario");
+
+    if (tipoUsuario === "admin") {
+        window.location.href = "admin.html";
+    } else if (tipoUsuario === "alumno") {
+        window.location.href = "alumno.html";
+    } else {
+        window.location.href = "index.html";
+    }
+}

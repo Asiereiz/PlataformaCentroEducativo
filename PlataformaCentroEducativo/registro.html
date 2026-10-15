@@ -11,10 +11,10 @@
     <body>
 
         <header>
-            <h1>Portal Centro Educativo</h1>
-            <h2>Bienvenido</h2>
+            <h1><a class="titulo" href="index.html">Portal Centro Educativo</a></h1>
+            <h2><a class="titulo" href="index.html">Bienvenido</a></h2>
 
-            <a class = "login" href="login.html">Iniciar sesión</a>
+            <a id="login" href="login.html">Iniciar sesión</a>
 
         </header>
 
@@ -23,12 +23,12 @@
                 <form action="#" method="post">
                     <legend>Datos personales</legend>
                     <fieldset>
-                        <p>Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;
-                        Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></p>
-                        <p>Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></p>
-                        <p>Contraseña: <input type="text" id="Contraseña" name="Contraseña" required placeholder="Inserta tu contraseña"> &nbsp;&nbsp;&nbsp;
-                        Confirmar contraseña: <input type="text" id="Confirmar_contraseña" name="Confirmar_contraseña" required placeholder="Confirma tu contraseña"></p>
+                        <label for="Nombre">Nombre: <input type="text" id="Nombre" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="Primer_apellido">Primer apellido: <input type="text" id="Primer_apellido" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="Segundo_apellido">Segundo apellido: <input type="text" id="Segundo_apellido" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></label>
+                        <label for="Correo">Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></label>
+                        <label for="Contraseña">Contraseña: <input type="text" id="Contraseña" name="Contraseña" required placeholder="Inserta tu contraseña"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="Confirmar_contraseña">Confirmar contraseña: <input type="text" id="Confirmar_contraseña" name="Confirmar_contraseña" required placeholder="Confirma tu contraseña"></label>
                         <button type="submit"> Registrarme</button>
                     </fieldset>
                 </form>

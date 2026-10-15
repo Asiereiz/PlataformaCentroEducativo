@@ -10,9 +10,9 @@
 
     <body>
 
-        <header>
-            <h1>Portal Centro Educativo</h1>
-            <h2>Sesión como Administrador</h2>
+        <header class ="adminheader">
+            <h1><a class="titulo" href="../admin.html">Portal Centro Educativo</a></h1>
+            <h2><a class="titulo" href="../admin.html">Sesión como Administrador</a></h2>
 
             <nav>
                 <ul>
@@ -36,12 +36,12 @@
             <section class="alta" id="alta_aula">
                 <form action="#" method="post">
                     <legend>Alta</legend>
-                        <p>Nombre: <input type="text" id="nombre_alta_aula" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <p>Edificio: <input type="number" id="edificio_alta_aula" name="Edificio" required placeholder="Inserta el edificio de la aula"></p>
-                        <p>Planta: <input type="number" id="planta_alta_aula" name="Planta" required placeholder="Inserta la planta de la aula"></p>
-                        <p>Capacidad: <input type="number" id="capacidad_alta_aula" name="Capacidad" required placeholder="Inserta la capacidad de la aula"></p>
-                        <p>Equipamiento disponible: <textarea id="equipamiento_alta_aula" name="Equipamiento" rows="5" cols="50" required placeholder="Inserta el equipamiento disponible en la aula"></textarea></p>
-                        <p>Estado: <select id="estado_alta_aula" name="estado" required>
+                        <label for="nombre_alta_aula">Nombre: <input type="text" id="nombre_alta_aula" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="edificio_alta_aula">Edificio: <input type="number" id="edificio_alta_aula" name="Edificio" required placeholder="Inserta el edificio de la aula"></label>
+                        <label for="planta_alta_aula">Planta: <input type="number" id="planta_alta_aula" name="Planta" required placeholder="Inserta la planta de la aula"></label>
+                        <label for="capacidad_alta_aula">Capacidad: <input type="number" id="capacidad_alta_aula" name="Capacidad" required placeholder="Inserta la capacidad de la aula"></label>
+                        <label for="equipamiento_alta_aula">Equipamiento disponible: <textarea id="equipamiento_alta_aula" name="Equipamiento" rows="5" cols="50" required placeholder="Inserta el equipamiento disponible en la aula"></textarea></label>
+                        <label for="estado_alta_aula">Estado: <select id="estado_alta_aula" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
@@ -54,21 +54,21 @@
             <section class="mod" id="mod_aula">
                 <form action="#" method="post">
                     <legend>Modificación</legend>
-                        <p>Identificador: <select id="id_mod_aula" name="id" required>
+                        <label for="id_mod_aula">Identificador: <select id="id_mod_aula" name="id" required></label>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </p>
-                        <p>Nombre: <input type="text" id="nombre_mod_aula" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <p>Edificio: <input type="number" id="edificio_mod_aula" name="Edificio" required placeholder="Inserta el edificio de la aula"></p>
-                        <p>Planta: <input type="number" id="planta_mod_aula" name="Planta" required placeholder="Inserta la planta de la aula"></p>
-                        <p>Capacidad: <input type="number" id="capacidad_mod_aula" name="Capacidad" required placeholder="Inserta la capacidad de la aula"></p>
-                        <p>Equipamiento disponible: <textarea id="equipamiento_mod_aula" name="Equipamiento" rows="5" cols="50" required placeholder="Inserta el equipamiento disponible en la aula"></textarea></p>
-                        <p>Estado: <select id="estado_mod_aula" name="estado" required>
+                        <label for="nombre_mod_aula">Nombre: <input type="text" id="nombre_mod_aula" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="edificio_mod_aula">Edificio: <input type="number" id="edificio_mod_aula" name="Edificio" required placeholder="Inserta el edificio de la aula"></label>
+                        <label for="planta_mod_aula">Planta: <input type="number" id="planta_mod_aula" name="Planta" required placeholder="Inserta la planta de la aula"></label>
+                        <label for="capacidad_mod_aula">Capacidad: <input type="number" id="capacidad_mod_aula" name="Capacidad" required placeholder="Inserta la capacidad de la aula"></label>
+                        <label for="equipamiento_mod_aula">Equipamiento disponible: <textarea id="equipamiento_mod_aula" name="Equipamiento" rows="5" cols="50" required placeholder="Inserta el equipamiento disponible en la aula"></textarea></label>
+                        <label for="estado_mod_aula">Estado: <select id="estado_mod_aula" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
                                 </select>
-                        </p>
+                            </label>
                         <button type="submit"> Modificar</button>
                 </form>
             </section>
@@ -76,10 +76,10 @@
             <section class="del" id="del_aula">
                 <form action="#" method="post">
                     <legend>Eliminación</legend>
-                        <p>Identificador: <select id="id_del_aula" name="id" required>
+                        <label for="id_del_aula">Identificador: <select id="id_del_aula" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
-                        </p>
+                        </label>
                         <button type="submit"> Eliminar</button>
                 </form>
             </section>
@@ -87,10 +87,11 @@
             <section class="info" id="info_aula">
                 <form action="#" method="post">
                     <legend>Consulta</legend>
-                        <p>Nombre: <input type="text" id="nombre_info_aula" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
-                        <p>Edificio: <input type="number" id="edificio_info_aula" name="Edificio" required placeholder="Inserta el edificio de la aula"></p>
-                        <p>Planta: <input type="number" id="planta_info_aula" name="Planta" required placeholder="Inserta la planta de la aula"></p>
-                        <button type="submit"> Registrarme</button>
+                        <label for="id_del_aula">Identificador: <select id="id_del_aula" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </label>
+                        <button type="submit"> Consultar</button>
                 </form>
             </section>
 

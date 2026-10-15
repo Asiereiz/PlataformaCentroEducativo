@@ -10,9 +10,9 @@
 
     <body>
 
-        <header>
-            <h1>Portal Centro Educativo</h1>
-            <h2>Sesión como Administrador</h2>
+        <header class ="adminheader">
+            <h1><a class="titulo" href="../admin.html">Portal Centro Educativo</a></h1>
+            <h2><a class="titulo" href="../admin.html">Sesión como Administrador</a></h2>
 
             <nav>
                 <ul>
@@ -36,18 +36,18 @@
             <section class="alta" id="alta_mat">
                 <form action="#" method="post">
                     <legend>Alta</legend>
-                        <p>Alumno: <select id="alumno_alta_mat" name="alumno" required>
+                        <label for="alumno_alta_mat">Alumno: <select id="alumno_alta_mat" name="alumno" required>
                                     <option value="" selected disabled>Selecciona un alumno</option>
                             </select>
-                        </p>
-                        <p>Curso: <input type="number" id="curso_alta_mat" name="Curso" required placeholder="Inserta el curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Fecha de matrícula: <input type="date" id="fecha_matricula_alta_mat" name="Fecha_matricula" required placeholder="Inserta la fecha de matrícula"> &nbsp;&nbsp;&nbsp;
-                        <p>Estado: <select id="estado_alta_mat" name="estado" required>
+                        </label>
+                        <label for="curso_alta_mat">Curso: <input type="number" id="curso_alta_mat" name="Curso" required placeholder="Inserta el curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_matricula_alta_mat">Fecha de matrícula: <input type="date" id="fecha_matricula_alta_mat" name="Fecha_matricula" required placeholder="Inserta la fecha de matrícula"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="estado_alta_mat">Estado: <select id="estado_alta_mat" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
                                 </select>
-                        </p>
+                        </label>
                         <button type="submit"> Registrarme</button>
                 </form>
             </section> 
@@ -55,22 +55,22 @@
             <section class="mod" id="mod_mat">
                 <form action="#" method="post">
                     <legend>Modificar</legend>
-                        <p>Identificador: <select id="id_mod_mat" name="id" required>
+                        <label for="id_mod_mat">Identificador: <select id="id_mod_mat" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
-                        </p>
-                        <p>Alumno: <select id="alumno_mod_mat" name="alumno" required>
+                        </label>
+                        <label for="alumno_mod_mat">Alumno: <select id="alumno_mod_mat" name="alumno" required>
                                     <option value="" selected disabled>Selecciona un alumno</option>
                             </select>
-                        </p>
-                        <p>Curso: <input type="number" id="curso_mod_mat" name="Curso" required placeholder="Inserta el curso"> &nbsp;&nbsp;&nbsp;
-                        <p>Fecha de matrícula: <input type="date" id="fecha_matricula_mod_mat" name="Fecha_matricula" required placeholder="Inserta la fecha de matrícula"> &nbsp;&nbsp;&nbsp;
-                        <p>Estado: <select id="estado_mod_mat" name="estado" required>
+                        </label>
+                        <label for="curso_mod_mat">Curso: <input type="number" id="curso_mod_mat" name="Curso" required placeholder="Inserta el curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_matricula_mod_mat">Fecha de matrícula: <input type="date" id="fecha_matricula_mod_mat" name="Fecha_matricula" required placeholder="Inserta la fecha de matrícula"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="estado_mod_mat">Estado: <select id="estado_mod_mat" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
                                 </select>
-                        </p>
+                        </label>
                         <button type="submit"> Modificar</button>
                 </form>
             </section>
@@ -78,10 +78,10 @@
             <section class="del" id="del_mat">
                 <form action="#" method="post">
                     <legend>Eliminar</legend>
-                        <p>Identificador: <select id="id_del_mat" name="id" required>
+                        <label for="id_del_mat">Identificador: <select id="id_del_mat" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
-                        </p>
+                        </label>
                         <button type="submit"> Eliminar</button>
                 </form>
             </section>
@@ -89,11 +89,11 @@
             <section class="info" id="info_mat">
                 <form action="#" method="post">
                     <legend>Consulta</legend>
-                        <p>Alumno: <select id="alumno_info_mat" name="alumno" required>
+                        <label for="alumno_info_mat">Alumno: <select id="alumno_info_mat" name="alumno" required>
                                     <option value="" selected disabled>Selecciona un alumno</option>
                             </select>
-                        </p>
-                        <p>Curso: <input type="number" id="curso_info_mat" name="Curso" required placeholder="Inserta el curso"> &nbsp;&nbsp;&nbsp;
+                        </label>
+                        <label for="curso_info_mat">Curso: <input type="number" id="curso_info_mat" name="Curso" required placeholder="Inserta el curso"> &nbsp;&nbsp;&nbsp;</label>
                         <button type="submit"> Consultar</button>
                 </form>
             </section>                                    
