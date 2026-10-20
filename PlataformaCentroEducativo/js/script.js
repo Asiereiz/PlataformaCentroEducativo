@@ -1,33 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
-  inicializarUsuarios();
-  inicializarAulas();
-  actualizarSelects();
-  registrarAltaAula();
-  registrarModificacionAula();
-  registrarEliminacionAula();
-  registrarConsultaAula();
 
-const registro = document.getElementById("formregistro").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const user = {
-    id: leerDatos(DATOS_USER).length + 1,
-    Nombre: document.getElementById("Nombre").value,
-    Primer_apellido: document.getElementById("Primer_apellido").value,
-    Segundo_apellido: document.getElementById("Segundo_apellido").value,
-    Correo: document.getElementById("Correo").value,
-    Contraseña: document.getElementById("Contraseña").value,
-    Confirmar_contraseña: document.getElementById("Confirmar_contraseña").value
-  }
+  mostrarSesion();
 
-  guardarDatos(DATOS_USER, user);
+const registro = document.getElementById("formregistro");
+if(registro){
+  registro.addEventListener("submit", registrarUsuario)
+}
 
-})
+const login = document.getElementById("formlogin");
+if(login){
+  login.addEventListener("submit", iniciarSesion)
+}
 
 });
 
 const DATOS_USER = "user";
-const DATOS_CURSO = "curso";
+const DATOS_CURSOS = "cursos";
 const DATOS_AULAS = "aulas";
+const DATOS_DOCENTES = "docentes";
+const DATOS_MATRICULAS = "matriculas";
 
 
 function guardarDatos(array, datos){
@@ -71,4 +62,60 @@ function irAlInicio(event) {
     } else {
         window.location.href = "index.html";
     }
+}
+
+function registrarUsuario(event) {
+  
+  event.preventDefault();
+  const user = {
+    id: leerDatos(DATOS_USER).length + 1,
+    Nombre: document.getElementById("Nombre").value.trim(),
+    Primer_apellido: document.getElementById("Primer_apellido").value.trim(),
+    Segundo_apellido: document.getElementById("Segundo_apellido").value.trim(),
+    Correo: document.getElementById("Correo").value.trim(),
+    Contraseña: document.getElementById("Contraseña").value.trim(),
+    Confirmar_contraseña: document.getElementById("Confirmar_contraseña").value.trim()
+  }
+
+  const usuarios = leerDatos(DATOS_USER);
+  usuarios.push(user);
+  guardarDatos(DATOS_USER, usuarios);
+
+}
+
+function iniciarSesion(event) {
+    event.preventDefault();
+
+    const correo = document.getElementById("Correo").value.trim();
+    const contraseña = document.getElementById("Contraseña").value.trim();
+    
+    const usuarios = leerDatos(DATOS_USER);
+    const usuario = usuarios.find(u => u.Correo === correo && u.Contraseña === contraseña);
+
+    if (usuario) {
+        if (usuario.Correo == "admin@centroeducativo.com") {
+            sessionStorage.setItem("tipoUsuario", "admin");
+            window.location.href = "admin.html";
+        } else {
+            sessionStorage.setItem("tipoUsuario", "alumno");
+            window.location.href = "adlumno.html";
+        }
+    } else {
+        alert("Correo o contraseña incorrectos.");
+    }
+
+}
+
+function mostrarSesion() {
+  const tipoUsuario = sessionStorage.getItem("tipoUsuario");
+
+  const sesionAdmin = document.getElementById("sesionAdmin");
+  const sesionAlumno = document.getElementById("sesionAlumno");
+
+  if (sesionAdmin) {
+    sesionAdmin.hidden = (tipoUsuario !== "admin");
+  }
+  if (sesionAlumno) {
+    sesionAlumno.hidden = (tipoUsuario !== "alumno");
+  }
 }
