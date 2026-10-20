@@ -1,16 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  const registro = document.getElementById("formregistro");
+  if(registro){
+    registro.addEventListener("submit", registrarUsuario)
+  }
+
+  const login = document.getElementById("formlogin");
+  if(login){
+    login.addEventListener("submit", iniciarSesion)
+  }
+
   mostrarSesion();
-
-const registro = document.getElementById("formregistro");
-if(registro){
-  registro.addEventListener("submit", registrarUsuario)
-}
-
-const login = document.getElementById("formlogin");
-if(login){
-  login.addEventListener("submit", iniciarSesion)
-}
 
 });
 
@@ -98,7 +98,7 @@ function iniciarSesion(event) {
             window.location.href = "admin.html";
         } else {
             sessionStorage.setItem("tipoUsuario", "alumno");
-            window.location.href = "adlumno.html";
+            window.location.href = "alumno.html";
         }
     } else {
         alert("Correo o contraseña incorrectos.");
@@ -111,11 +111,15 @@ function mostrarSesion() {
 
   const sesionAdmin = document.getElementById("sesionAdmin");
   const sesionAlumno = document.getElementById("sesionAlumno");
+  const header = document.querySelector("header");
 
-  if (sesionAdmin) {
-    sesionAdmin.hidden = (tipoUsuario !== "admin");
-  }
-  if (sesionAlumno) {
-    sesionAlumno.hidden = (tipoUsuario !== "alumno");
+  if (tipoUsuario === "admin") {
+    sesionAdmin.hidden = false;
+    sesionAlumno.hidden = true;
+    header.classList.add("header-admin");
+  } else {
+    sesionAdmin.hidden = true;
+    sesionAlumno.hidden = false;
+    header.classList.remove("header-admin");
   }
 }

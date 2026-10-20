@@ -23,6 +23,10 @@ header{
     align-items: center;
 }
 
+header.header-admin {
+    background-color: #4e1e1e;
+}
+
 header nav{
     grid-column: 2;
     grid-row: 1 / span 2;
