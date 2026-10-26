@@ -18,7 +18,6 @@
                 <ul>
                     <li><a href="../admin.html">Pantalla principal</a></li>
                     <li><a href="g-cursos.html">Gestionar cursos</a></li>
-                    <li><a href="g-docentes.html">Gestionar docentes</a></li>
                     <li><a href="g-aulas.html">Gestionar aulas</a></li>
                     <li><a href="g-usuarios.html">Gestionar usuarios</a></li>
                     <li><a href="g-matriculas.html">Gestionar matrículas</a></li>
@@ -33,8 +32,8 @@
 
         <main class="gestion">
 
-            <section class="alta" id="alta_doc">
-                <form action="#" method="post">
+            <section class="alta">
+                <form action="#" method="post" id="alta_doc">
                     <legend>Alta</legend>
                         <label for="nombre_alta_doc">Nombre: <input type="text" id="nombre_alta_doc" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="primer_apellido_alta_doc">Primer apellido: <input type="text" id="primer_apellido_alta_doc" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;</label>
@@ -53,8 +52,8 @@
                 </form>
             </section> 
             
-            <section class="mod" id="mod_doc">
-                <form action="#" method="post">
+            <section class="mod">
+                <form action="#" method="post" id="mod_doc">
                     <legend>Modificar</legend>
                         <label for="id_mod_doc">Identificador: <select id="id_mod_doc" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -77,8 +76,8 @@
                 </form>
             </section>
 
-            <section class="del" id="del_doc">
-                <form action="#" method="post">
+            <section class="del">
+                <form action="#" method="post" id="del_doc">
                     <legend>Eliminar</legend>
                         <label for="id_del_doc">Identificador: <select id="id_del_doc" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -88,8 +87,8 @@
                 </form>
             </section>
 
-            <section class="info" id="info_doc">
-                <form action="#" method="post">
+            <section class="info">
+                <form action="#" method="post" id="info_doc">
                     <legend>Consulta</legend>
                         <label for="id_info_doc">Identificador: <select id="id_info_doc" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;

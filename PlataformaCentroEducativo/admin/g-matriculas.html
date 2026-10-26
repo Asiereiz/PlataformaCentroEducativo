@@ -21,7 +21,6 @@
                     <li><a href="g-docentes.html">Gestionar docentes</a></li>
                     <li><a href="g-aulas.html">Gestionar aulas</a></li>
                     <li><a href="g-usuarios.html">Gestionar usuarios</a></li>
-                    <li><a href="g-matriculas.html">Gestionar matrículas</a></li>
                     <li><a href="importar.html">Importar fichero JSON</a></li>
                     <li><a href="dashboard.html">Indicadores y estadísticas</a></li>
                     <li><a href="config-parametros.html">Configurar parámetros</a></li>
@@ -33,8 +32,8 @@
 
         <main class="gestion">
 
-            <section class="alta" id="alta_mat">
-                <form action="#" method="post">
+            <section class="alta">
+                <form action="#" method="post" id="alta_mat">
                     <legend>Alta</legend>
                         <label for="alumno_alta_mat">Alumno: <select id="alumno_alta_mat" name="alumno" required>
                                     <option value="" selected disabled>Selecciona un alumno</option>
@@ -52,8 +51,8 @@
                 </form>
             </section> 
             
-            <section class="mod" id="mod_mat">
-                <form action="#" method="post">
+            <section class="mod">
+                <form action="#" method="post" id="mod_mat">
                     <legend>Modificar</legend>
                         <label for="id_mod_mat">Identificador: <select id="id_mod_mat" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -75,8 +74,8 @@
                 </form>
             </section>
 
-            <section class="del" id="del_mat">
-                <form action="#" method="post">
+            <section class="del">
+                <form action="#" method="post" id="del_mat">
                     <legend>Eliminar</legend>
                         <label for="id_del_mat">Identificador: <select id="id_del_mat" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -86,8 +85,8 @@
                 </form>
             </section>
 
-            <section class="info" id="info_mat">
-                <form action="#" method="post">
+            <section class="info">
+                <form action="#" method="post" id="info_mat">
                     <legend>Consulta</legend>
                         <label for="alumno_info_mat">Alumno: <select id="alumno_info_mat" name="alumno" required>
                                     <option value="" selected disabled>Selecciona un alumno</option>

@@ -19,7 +19,6 @@
                     <li><a href="../admin.html">Pantalla principal</a></li>
                     <li><a href="g-cursos.html">Gestionar cursos</a></li>
                     <li><a href="g-docentes.html">Gestionar docentes</a></li>
-                    <li><a href="g-aulas.html">Gestionar aulas</a></li>
                     <li><a href="g-usuarios.html">Gestionar usuarios</a></li>
                     <li><a href="g-matriculas.html">Gestionar matrículas</a></li>
                     <li><a href="importar.html">Importar fichero JSON</a></li>
@@ -33,8 +32,8 @@
 
         <main class="gestion">
 
-            <section class="alta" id="alta_aula">
-                <form action="#" method="post">
+            <section class="alta">
+                <form action="#" method="post" id="alta_aula">
                     <legend>Alta</legend>
                         <label for="nombre_alta_aula">Nombre: <input type="text" id="nombre_alta_aula" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="edificio_alta_aula">Edificio: <input type="number" id="edificio_alta_aula" name="Edificio" required placeholder="Inserta el edificio de la aula"></label>
@@ -51,8 +50,8 @@
                 </form>
             </section> 
             
-            <section class="mod" id="mod_aula">
-                <form action="#" method="post">
+            <section class="mod">
+                <form action="#" method="post" id="mod_aula">
                     <legend>Modificación</legend>
                         <label for="id_mod_aula">Identificador: <select id="id_mod_aula" name="id" required></label>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -73,8 +72,8 @@
                 </form>
             </section>
 
-            <section class="del" id="del_aula">
-                <form action="#" method="post">
+            <section class="del">
+                <form action="#" method="post" id="del_aula">
                     <legend>Eliminación</legend>
                         <label for="id_del_aula">Identificador: <select id="id_del_aula" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -84,10 +83,10 @@
                 </form>
             </section>
 
-            <section class="info" id="info_aula">
-                <form action="#" method="post">
+            <section class="info">
+                <form action="#" method="post" id="info_aula">
                     <legend>Consulta</legend>
-                        <label for="id_del_aula">Identificador: <select id="id_del_aula" name="id" required>
+                        <label for="id_info_aula">Identificador: <select id="id_info_aula" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </label>

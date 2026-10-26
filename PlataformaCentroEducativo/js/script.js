@@ -12,6 +12,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mostrarSesion();
 
+  const btnCerrarSesion = document.getElementById("cerrarSesion");
+  if(btnCerrarSesion){
+    btnCerrarSesion.addEventListener("click", cerrarSesion)
+  }
+
+  const btnAltaAula = document.getElementById("alta_aula");
+  if(btnAltaAula){
+    btnAltaAula.addEventListener("submit", altaAula);
+  }
+
+  const btnModAula = document.getElementById("mod_aula");
+  if(btnModAula){
+    btnModAula.addEventListener("submit", modAula);
+  }
+
+  const btnDelAula = document.getElementById("del_aula");
+  if(btnDelAula){
+    btnDelAula.addEventListener("submit", delAula);
+  }
+
+  const btnInfoAula = document.getElementById("info_aula");
+  if(btnInfoAula){
+    btnInfoAula.addEventListener("submit", infoAula);
+  }
+
 });
 
 const DATOS_USER = "user";
@@ -33,8 +58,33 @@ function leerDatos(array){
    return datos;
 }
 
-function updateSelect(){
-    
+function updateSelect() {
+  const aulas = leerDatos(DATOS_AULAS);
+
+  const selectMod = document.getElementById("id_mod_aula");
+  const selectDel = document.getElementById("id_del_aula");
+  const selectInfo = document.getElementById("id_info_aula");
+
+  if (selectMod) {
+    selectMod.innerHTML = '<option value="">Selecciona un ID</option>';
+    aulas.forEach(aula => {
+      selectMod.innerHTML += `<option value="${aula.id}">${aula.id} - ${aula.nombre}</option>`;
+    });
+  }
+
+  if (selectDel) {
+    selectDel.innerHTML = '<option value="">Selecciona un ID</option>';
+    aulas.forEach(aula => {
+      selectDel.innerHTML += `<option value="${aula.id}">${aula.id} - ${aula.nombre}</option>`;
+    });
+  }
+
+  if (selectInfo) {
+    selectInfo.innerHTML = '<option value="">Selecciona un ID</option>';
+    aulas.forEach(aula => {
+      selectInfo.innerHTML += `<option value="${aula.id}">${aula.id} - ${aula.nombre}</option>`;
+    });
+  }
 }
 
 function inicializarUsuarios() {
@@ -114,12 +164,111 @@ function mostrarSesion() {
   const header = document.querySelector("header");
 
   if (tipoUsuario === "admin") {
-    sesionAdmin.hidden = false;
-    sesionAlumno.hidden = true;
     header.classList.add("header-admin");
+    if (sesionAdmin) sesionAdmin.hidden = false;
+    if (sesionAlumno) sesionAlumno.hidden = true;
   } else {
-    sesionAdmin.hidden = true;
-    sesionAlumno.hidden = false;
     header.classList.remove("header-admin");
+    if (sesionAdmin) sesionAdmin.hidden = true;
+    if (sesionAlumno) sesionAlumno.hidden = false;
   }
+}
+
+function cerrarSesion(){
+  sessionStorage.removeItem("tipoUsuario");
+  window.location.href = "index.html";
+}
+
+function altaAula(event) {
+  event.preventDefault();
+
+  const aula = {
+    id: leerDatos(DATOS_AULAS).length + 1,
+    nombre: document.getElementById("nombre_alta_aula").value.trim(),
+    edificio: document.getElementById("edificio_alta_aula").value.trim(),
+    planta: document.getElementById("planta_alta_aula").value.trim(),
+    capacidad: document.getElementById("capacidad_alta_aula").value.trim(),
+    equipamiento: document.getElementById("equipamiento_alta_aula").value.trim(),
+    estado: document.getElementById("estado_alta_aula").value.trim()
+  }
+
+  const aulas = leerDatos(DATOS_AULAS);
+  aulas.push(aula);
+  guardarDatos(DATOS_AULAS, aulas);
+
+  updateSelect();
+}
+
+function modAula(event){
+  event.preventDefault();
+
+  const idMod = document.getElementById("id_mod_aula").value;
+
+  const aulas = leerDatos(DATOS_AULAS);
+
+   const aulaModificada = {
+    id: idMod,
+    nombre: document.getElementById("nombre_mod_aula").value.trim(),
+    edificio: document.getElementById("edificio_mod_aula").value.trim(),
+    planta: document.getElementById("planta_mod_aula").value.trim(),
+    capacidad: document.getElementById("capacidad_mod_aula").value.trim(),
+    equipamiento: document.getElementById("equipamiento_mod_aula").value.trim(),
+    estado: document.getElementById("estado_mod_aula").value
+  };
+
+  const aulasActualizadas = aulas.map(aula => aula.id === idMod ? aulaModificada : aula);
+
+  guardarDatos(DATOS_AULAS, aulasActualizadas);
+  updateSelect();
+
+  alert("Aula modificada correctamente.");
+
+}
+
+function delAula(event){
+  event.preventDefault();
+  
+  const idDel = document.getElementById("id_del_aula");
+  const aulas = leerDatos(DATOS_AULAS);
+  const encontrado = aulas.find(aula => aula.id === idDel);
+
+  if (!encontrado) {
+    alert("Selecciona primero un aula.");
+    return;
+  }
+
+  if (!confirm("¿Seguro que quieres eliminar esta aula?")) {
+    return;
+  }
+
+  const aulasActualizadas = aulas.filter(aula => aula.id !== idDel);
+  guardarDatos(DATOS_AULAS, aulasActualizadas);
+  updateSelect();
+
+  alert("Aula eliminada correctamente.");
+
+}
+
+function infoAula(event){
+  event.preventDefault();
+
+  const idInfo = Number(document.getElementById("id_info_aula").value);
+
+  const aulas = leerDatos(DATOS_AULAS);
+  const aula = aulas.find(a => a.id === idInfo);
+
+  if (!aula) {
+    alert("Selecciona primero un aula.");
+    return;
+  }
+
+  const listado = document.getElementById("listado_aula");
+  listado.innerHTML = `
+    <li>Nombre: ${aula.nombre}</li>
+    <li>Edificio: ${aula.edificio}</li>
+    <li>Planta: ${aula.planta}</li>
+    <li>Capacidad: ${aula.capacidad}</li>
+    <li>Equipamiento: ${aula.equipamiento}</li>
+    <li>Estado: ${aula.estado}</li>
+  `;
 }

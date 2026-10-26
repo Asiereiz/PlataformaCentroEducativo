@@ -17,7 +17,6 @@
             <nav>
                 <ul>
                     <li><a href="../admin.html">Pantalla principal</a></li>
-                    <li><a href="g-cursos.html">Gestionar cursos</a></li>
                     <li><a href="g-docentes.html">Gestionar docentes</a></li>
                     <li><a href="g-aulas.html">Gestionar aulas</a></li>
                     <li><a href="g-usuarios.html">Gestionar usuarios</a></li>
@@ -33,8 +32,8 @@
 
         <main class="gestion">
 
-            <section class="alta" id="alta_curso">
-                <form action="#" method="post">
+            <section class="alta">
+                <form action="#" method="post" id="alta_curso">
                     <legend>Alta</legend>
                         <label for="nombre_alta_curso">Nombre: <input type="text" id="nombre_alta_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
                         <label for="descripcion_alta_curso">Descripción: <textarea id="descripcion_alta_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea> &nbsp;&nbsp;&nbsp;
@@ -58,8 +57,8 @@
                 </form>
             </section> 
             
-            <section class="mod" id="mod_curso">
-                <form action="#" method="post">
+            <section class="mod">
+                <form action="#" method="post" id="mod_curso">
                     <legend>Modificar</legend>
                         <p>Identificador: <select id="id_mod_curso" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -87,8 +86,8 @@
                 </form>
             </section>
 
-            <section class="del" id="del_curso">
-                <form action="#" method="post">
+            <section class="del">
+                <form action="#" method="post" id="del_curso">
                     <legend>Eliminar</legend>
                         <label for="id_del_curso">Identificador: <select id="id_del_curso" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
@@ -98,8 +97,8 @@
                 </form>
             </section>
 
-            <section class="info" id="info_curso">
-                <form action="#" method="post">
+            <section class="info">
+                <form action="#" method="post" id="info_curso">
                     <legend>Consulta</legend>
                         <label for="id_info_curso">Identificador: <select id="id_info_curso" name="id" required>
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
