@@ -159,18 +159,21 @@ function iniciarSesion(event) {
 function mostrarSesion() {
   const tipoUsuario = sessionStorage.getItem("tipoUsuario");
 
-  const sesionAdmin = document.getElementById("sesionAdmin");
-  const sesionAlumno = document.getElementById("sesionAlumno");
+  const sesionAdmin = document.querySelectorAll(".sesionAdmin");
+  const sesionAlumno = document.querySelectorAll(".sesionAlumno");
   const header = document.querySelector("header");
+  const footer = document.querySelector("footer");
 
   if (tipoUsuario === "admin") {
     header.classList.add("header-admin");
-    if (sesionAdmin) sesionAdmin.hidden = false;
-    if (sesionAlumno) sesionAlumno.hidden = true;
+    footer.classList.add("footer-admin");
+    sesionAdmin.forEach(el => el.hidden = false);
+    sesionAlumno.forEach(el => el.hidden = true);
   } else {
     header.classList.remove("header-admin");
-    if (sesionAdmin) sesionAdmin.hidden = true;
-    if (sesionAlumno) sesionAlumno.hidden = false;
+    footer.classList.remove("footer-admin");
+    sesionAdmin.forEach(el => el.hidden = true);
+    sesionAlumno.forEach(el => el.hidden = false);
   }
 }
 

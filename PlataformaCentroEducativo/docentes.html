@@ -12,8 +12,8 @@
 
         <header>
             <h1><a class="titulo" href="#" onclick="irAlInicio(event)">Portal Centro Educativo</a></h1>
-            <h2 id="sesionAdmin" hidden><a class="titulo" href="admin.html">Sesión como Administrador</a></h2>
-            <h2 id="sesionAlumno" hidden><a class="titulo" href="alumno.html">Sesión como Alumno</a></h2>
+            <h2 class="sesionAdmin" hidden><a class="titulo" href="admin.html">Sesión como Administrador</a></h2>
+            <h2 class="sesionAlumno" hidden><a class="titulo" href="alumno.html">Sesión como Alumno</a></h2>
 
             <nav>
                 <ul>
@@ -26,6 +26,14 @@
             </nav>
 
             <a class="logout" href="index.html">Cerrar sesión</a>
+
+            <nav id="migapan">
+                <a href="alumno.html" class="sesionAlumno" hidden>Inicio</a>
+                <a href="admin.html" class="sesionAdmin" hidden>Inicio</a>
+                <span>&nbsp;&gt;&nbsp;</span>
+                <a href="docentes.html">Docentes</a>
+            </nav>
+
         </header>
 
         <main>
