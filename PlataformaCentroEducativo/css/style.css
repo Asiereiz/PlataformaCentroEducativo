@@ -40,6 +40,10 @@ header{
     align-self: end;
 }
 
+#migapan a{
+    text-decoration: none;
+    list-style: none;
+}
 
 header.header-admin, footer.footer-admin {
     background-color: #396b31;
@@ -250,6 +254,7 @@ footer{
     font-size: 1.1rem;
     
 }
+
 
 @media (max-width: 1800px) {
     header {
