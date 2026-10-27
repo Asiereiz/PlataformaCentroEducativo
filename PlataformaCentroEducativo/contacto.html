@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+
+        <title>Plataforma Centro Educativo</title>
+        <meta charset= "UTF-8">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+
+        <header>
+            <h1><a class="titulo" href="index.html">Portal Centro Educativo</a></h1>
+            <h2><a class="titulo" href="index.html">Bienvenido</a></h2>
+
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="irAlInicio(event)">Inicio</a></li>
+                </ul>
+            </nav>
+
+            <nav id="migapan">
+                <a href="alumno.html" class="sesionAlumno" hidden>Inicio</a>
+                <a href="admin.html" class="sesionAdmin" hidden>Inicio</a>
+                <span class="sesionAlumno" hidden>&nbsp;&gt;&nbsp;</span>
+                <span class="sesionAdmin" hidden>&nbsp;&gt;&nbsp;</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+        </header>
+
+        <main>
+            <section id="loggear">
+                <form id="formlogin" action="#" method="post">
+                    <legend>Contáctanos</legend>
+                    <fieldset>
+                        <label for="Correo">Correo electrónico: <input type="email" id="Correo" name="Correo" required placeholder="Inserta tu correo electrónico"></label>
+                        <label for="mensaje_contacto">Mensaje: <textarea id="mensaje_contacto" name="mensaje_contacto" required placeholder="Escribe el mensaje" rows="10" cols="100"> &nbsp;&nbsp;&nbsp;</textarea></label>
+                        <button type="submit"> Enviar</button>
+                    </fieldset>
+                </form>
+            </section>
+        </main>
+        <script src="js/script.js"></script>
+    </body>
+
+</html>
