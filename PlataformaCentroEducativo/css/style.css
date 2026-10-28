@@ -4,10 +4,38 @@ body{
     margin: 0;
 }
 
+#config{
+    display:flex;
+    flex-direction: column;
+    gap:10px;
+}
+
+
+body.oscuro{
+    background-color: rgb(12, 10, 43);
+    color:rgb(239, 235, 255);
+}
+
+body.contraste{
+    background-color: black;
+    color:white;
+}
+
+body.oscuro nav li a, body.contraste nav li a {
+    color: #ffffff;
+}
+
+body.large{
+    font-size: 1.25rem;
+}
+
+body.small{
+    font-size: 0.75rem;
+}
+
 main{
-    padding-top: 100px;
-    margin-left: 20px;
-    margin-right: 20px;
+    padding-top: 120px;
+    margin: 0 20px 20px 20px;
 }
 
 header{

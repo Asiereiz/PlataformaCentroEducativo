@@ -11,13 +11,13 @@
     <body>
 
         <header>    
-            <h1><a class="titulo" href="#" onclick="irAlInicio(event)">Portal Centro Educativo</a></h1>
+            <h1><a class="titulo" id="tituloInicio" href="#">Portal Centro Educativo</a></h1>
             <h2 class="sesionAdmin" hidden><a class="titulo" href="admin.html">Sesión como Administrador</a></h2>
             <h2 class="sesionAlumno" hidden><a class="titulo" href="alumno.html">Sesión como Alumno</a></h2>
 
             <nav>
                 <ul>
-                    <li><a href="#" onclick="irAlInicio(event)">Inicio</a></li>
+                    <li><a href="#" id="botonInicio">Inicio</a></li>
                     <li><a href="cursos.html">Cursos</a></li>
                     <li><a href="docentes.html">Docentes</a></li>
                     <li><a href="mis_matriculas.html">Mis matrículas</a></li>
@@ -36,9 +36,23 @@
         </header>
 
         <main>
-
-
-            
+            <div id="config">
+                <label for="modoPantalla">Seleccionar Tema:   
+                    <select id="modoPantalla">
+                        <option value="claro">Modo claro</option>
+                        <option value="oscuro">Modo oscuro</option>
+                        <option value="contraste">Modo contraste</option>
+                    </select>
+                </label>
+                
+                <label for="sizeLetra">Seleccionar tamaño de letra:   
+                    <select id="sizeLetra">
+                        <option value="small">Pequeño</option>
+                        <option value="medium">Mediano</option>
+                        <option value="large">Grande</option>
+                    </select>
+                </label>
+            </div>
         </main>
 
         <footer>
