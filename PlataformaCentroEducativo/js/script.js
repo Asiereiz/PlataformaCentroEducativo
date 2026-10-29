@@ -200,15 +200,7 @@ function inicializarUsuarios() {
 function irAlInicio(event) {
     event.preventDefault();
 
-    const tipoUsuario = sessionStorage.getItem("tipoUsuario");
-
-    if (tipoUsuario === "admin") {
-        window.location.href = "admin.html";
-    } else if (tipoUsuario === "alumno") {
-        window.location.href = "alumno.html";
-    } else {
-        window.location.href = "index.html";
-    }
+    window.location.href = "portal.html";
 }
 
 function registrarUsuario(event) {
@@ -242,10 +234,10 @@ function iniciarSesion(event) {
     if (usuario) {
         if (usuario.Correo == "admin@centroeducativo.com") {
             sessionStorage.setItem("tipoUsuario", "admin");
-            window.location.href = "admin.html";
+            window.location.href = "portal.html";
         } else {
             sessionStorage.setItem("tipoUsuario", "alumno");
-            window.location.href = "alumno.html";
+            window.location.href = "portal.html";
         }
     } else {
         alert("Correo o contraseña incorrectos.");
