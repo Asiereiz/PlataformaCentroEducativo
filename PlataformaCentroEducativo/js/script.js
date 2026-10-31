@@ -200,7 +200,15 @@ function inicializarUsuarios() {
 function irAlInicio(event) {
     event.preventDefault();
 
-    window.location.href = "portal.html";
+    const logged = sessionStorage.getItem("loggeado");
+
+    if(logged === "true"){
+      window.location.href = "portal.html";
+    }else{
+      window.location.href = "index.html";
+    }
+
+    
 }
 
 function registrarUsuario(event) {
@@ -222,6 +230,7 @@ function registrarUsuario(event) {
 
 }
 
+
 function iniciarSesion(event) {
     event.preventDefault();
 
@@ -239,6 +248,7 @@ function iniciarSesion(event) {
             sessionStorage.setItem("tipoUsuario", "alumno");
             window.location.href = "portal.html";
         }
+        sessionStorage.setItem("loggeado", "true");
     } else {
         alert("Correo o contraseña incorrectos.");
     }
@@ -267,6 +277,7 @@ function mostrarSesion() {
 
 function cerrarSesion(){
   sessionStorage.removeItem("tipoUsuario");
+  sessionStorage.setItem("loggeado", false);
   window.location.href = "index.html";
 }
 
