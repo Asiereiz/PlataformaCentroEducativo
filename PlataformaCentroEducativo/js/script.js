@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarCatalogo();
   mostrarDocentes();
   mostrarHistorial();
+  saludo();
 
   const campoBusqueda = document.getElementById("busqueda_curso");
   if(campoBusqueda){
@@ -179,6 +180,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+function saludo(){
+  const saludo = document.getElementById("saludo");
+  const usuarioActual = sessionStorage.getItem("usuarioActual");
+
+  if(saludo && usuarioActual){
+    saludo.innerHTML = usuarioActual;
+  }
+}
 
 const CLAVE_TEMA = "tema";
 const CLAVE_TAMFUENTE = "tamfuente";
@@ -583,6 +593,7 @@ function iniciarSesion(event) {
     
     const usuarios = leerDatos(DATOS_USER);
     const usuario = usuarios.find(u => u.Correo === correo && u.Contraseña === contraseña);
+    sessionStorage.setItem("usuarioActual", usuario.Nombre);
 
     if(usuario.estado === "inactivo") {
       alert("Tu cuenta está inactiva. Por favor, contacta con el administrador.");
