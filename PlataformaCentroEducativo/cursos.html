@@ -16,6 +16,7 @@
 
             <nav>
                 <ul>
+                    <li><a href="portal.html">Inicio</a></li>
                     <li><a href="#catalogo">Catálogo de cursos</a></li>
                     <li><a href="#buscar_cursos">Buscar cursos</a></li>
                     <li><a href="#info_curso">Información del curso</a></li>
@@ -38,18 +39,26 @@
 
             <section id="catalogo">
                 <h3>Catálogo de cursos</h3>
+                <div id="lista_cursos"></div>
             </section>
 
             <section id="buscar_cursos">
                 <h3>Buscar cursos</h3>
+                <label for="busqueda_curso">Nombre, descripción o docente:</label>
+                <input type="search" id="busqueda_curso" placeholder="Escribe para buscar">
+                <div id="resultados_busqueda" aria-live="polite"></div>
             </section>
 
             <section id="info_curso">
                 <h3>Información del curso</h3>
+                <label for="detalles_curso">Nombre, descripción o docente:</label>
+                <input type="search" id="detalles_curso" placeholder="Escribe para buscar">
+                <div id="detalles_busqueda" aria-live="polite"></div>
             </section>
             
             <section id="historial">
                 <h3>Historial</h3>
+                <div id="historial_cursos"></div>
             </section>
 
         </main>

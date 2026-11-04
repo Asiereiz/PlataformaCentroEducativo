@@ -12,6 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mostrarSesion();
   updateSelect();
+  mostrarCatalogo();
+  mostrarDocentes();
+  mostrarHistorial();
+
+  const campoBusqueda = document.getElementById("busqueda_curso");
+  if(campoBusqueda){
+    campoBusqueda.addEventListener("input", buscarCursos);
+  }
+
+  const campoDetalles = document.getElementById("detalles_curso");
+  if(campoDetalles){
+    campoDetalles.addEventListener("input", mostrarDetallesCurso);
+  }
+
   aplicarPreferencias();
 
   const btnCerrarSesion = document.getElementById("cerrarSesion");
@@ -291,6 +305,9 @@ function updateSelect() {
   actualizarOpciones("alumno_alta_mat", alumnos, "Nombre", "Selecciona un alumno");
   actualizarOpciones("alumno_mod_mat", alumnos, "Nombre", "Selecciona un alumno");
   actualizarOpciones("alumno_info_mat", alumnos, "Nombre", "Selecciona un alumno");
+  actualizarOpciones("curso_alta_mat", cursos, "nombre", "Selecciona un curso");
+  actualizarOpciones("curso_mod_mat", cursos, "nombre", "Selecciona un curso");
+  actualizarOpciones("curso_info_mat", cursos, "nombre", "Selecciona un curso");
 }
 
 function actualizarOpciones(id, datos, campo, texto = "Selecciona un ID") {
@@ -302,6 +319,212 @@ function actualizarOpciones(id, datos, campo, texto = "Selecciona un ID") {
   select.innerHTML = `<option value="">${texto}</option>`;
   datos.forEach(dato => {
     select.innerHTML += `<option value="${dato.id}">${dato.id} - ${dato[campo]}</option>`;
+  });
+}
+
+function mostrarDocentes() {
+  const listado = document.getElementById("lista_docentes");
+  if (!listado) {
+    return;
+  }
+
+  listado.innerHTML = "";
+  const docentes = leerDatos(DATOS_DOCENTES).filter(docente => docente.estado === "activo");
+
+  if (docentes.length === 0) {
+    listado.textContent = "No hay docentes disponibles.";
+    return;
+  }
+
+  docentes.forEach(d => {
+    const tarjeta = document.createElement("article");
+    const nombre = document.createElement("h4");
+    nombre.textContent = d.Nombre;
+    tarjeta.appendChild(nombre);
+    listado.appendChild(tarjeta);
+
+    const detalles = [
+      `Nombre: ${d.Nombre}`,
+      `Primer apellido: ${d.Primer_apellido}`,
+      `Segundo apellido: ${d.Segundo_apellido}`,
+      `Correo: ${d.Correo}`,
+      `Teléfono: ${d.Telefono}`,
+      `Especialidad: ${d.Especialidad}`,
+      `Estado: ${d.estado}`,
+      `Fotografía: ${d.Fotografia}`
+    ];
+
+    detalles.forEach(detalle => {
+      const parrafo = document.createElement("p");
+      parrafo.textContent = detalle;
+      tarjeta.appendChild(parrafo);
+    });
+  });
+
+}
+
+function mostrarCatalogo() {
+  const listado = document.getElementById("lista_cursos");
+  if (!listado) {
+    return;
+  }
+
+  const cursos = leerDatos(DATOS_CURSOS).filter(curso => curso.estado === "activo");
+  listado.innerHTML = "";
+
+  if (cursos.length === 0) {
+    listado.textContent = "No hay cursos disponibles.";
+    return;
+  }
+
+  cursos.forEach(curso => {
+    const tarjeta = document.createElement("article");
+    const nombre = document.createElement("h4");
+    nombre.textContent = curso.nombre;
+    tarjeta.appendChild(nombre);
+
+    const detalles = [
+      `Descripción: ${curso.descripcion}`,
+      `Docente: ${curso.docente}`,
+      `Fecha de inicio: ${curso.fecha_inicio}`,
+      `Fecha de finalización: ${curso.fecha_fin}`,
+      `Horario: ${curso.horario}`,
+      `Plazas máximas: ${curso.max_plazas}`
+    ];
+
+    detalles.forEach(detalle => {
+      const parrafo = document.createElement("p");
+      parrafo.textContent = detalle;
+      tarjeta.appendChild(parrafo);
+    });
+
+    listado.appendChild(tarjeta);
+  });
+}
+
+function buscarCursos() {
+  const texto = document.getElementById("busqueda_curso").value.trim().toLowerCase();
+  const listado = document.getElementById("resultados_busqueda");
+  const cursos = leerDatos(DATOS_CURSOS).filter(curso =>
+    curso.estado === "activo" &&
+    `${curso.nombre || ""} ${curso.descripcion || ""} ${curso.docente || ""}`.toLowerCase().includes(texto)
+  );
+
+  listado.innerHTML = "";
+  if (texto === "") {
+    return;
+  }
+
+  if (cursos.length === 0) {
+    listado.textContent = "No se encontraron cursos.";
+    return;
+  }
+
+  cursos.forEach(curso => {
+    const tarjeta = document.createElement("article");
+    const nombre = document.createElement("h4");
+    nombre.textContent = curso.nombre;
+    tarjeta.appendChild(nombre);
+
+    const detalles = [
+      `Descripción: ${curso.descripcion}`,
+      `Docente: ${curso.docente}`,
+      `Fecha de inicio: ${curso.fecha_inicio}`,
+      `Fecha de finalización: ${curso.fecha_fin}`,
+      `Horario: ${curso.horario}`,
+      `Plazas máximas: ${curso.max_plazas}`
+    ];
+
+    detalles.forEach(detalle => {
+      const parrafo = document.createElement("p");
+      parrafo.textContent = detalle;
+      tarjeta.appendChild(parrafo);
+    });
+
+    listado.appendChild(tarjeta);
+  });
+}
+
+function mostrarDetallesCurso() {
+  const busqueda = document.getElementById("detalles_curso").value.toLowerCase().trim();
+  const listado = document.getElementById("detalles_busqueda");
+  listado.innerHTML = "";
+
+  if (busqueda === "") {
+    return;
+  }
+
+  const cursos = leerDatos(DATOS_CURSOS).filter(curso => curso.estado === "activo" && `${curso.nombre || ""} ${curso.descripcion || ""} ${curso.docente || ""}`.toLowerCase().includes(busqueda));
+
+  if (cursos.length > 0) {
+    cursos.forEach(curso => {
+      const tarjeta = document.createElement("article");
+      const nombre = document.createElement("h4");
+      nombre.textContent = curso.nombre;
+      tarjeta.appendChild(nombre);
+
+      const detalles = [
+        `Descripción: ${curso.descripcion}`,
+        `Docente: ${curso.docente}`,
+        `Fecha de inicio: ${curso.fecha_inicio}`,
+        `Fecha de finalización: ${curso.fecha_fin}`,
+        `Horario: ${curso.horario}`,
+        `Plazas máximas: ${curso.max_plazas}`
+      ];
+
+      detalles.forEach(detalle => {
+        const parrafo = document.createElement("p");
+        parrafo.textContent = detalle;
+        tarjeta.appendChild(parrafo);
+      });
+
+      listado.appendChild(tarjeta);
+    });
+  } else {
+    listado.innerHTML = "No se ha encontrado el curso.";
+    return;
+  }
+
+
+
+}
+
+function mostrarHistorial() {
+  const listado = document.getElementById("historial_cursos");
+  if (!listado) {
+    return;
+  }
+
+  const cursos = leerDatos(DATOS_CURSOS);
+  listado.innerHTML = "";
+
+  if (cursos.length === 0) {
+    listado.textContent = "No hay cursos en el historial.";
+    return;
+  }
+
+  cursos.forEach(curso => {
+    const tarjeta = document.createElement("article");
+    const nombre = document.createElement("h4");
+    nombre.textContent = curso.nombre;
+    tarjeta.appendChild(nombre);
+
+    const detalles = [
+      `Descripción: ${curso.descripcion}`,
+      `Docente: ${curso.docente}`,
+      `Fecha de inicio: ${curso.fecha_inicio}`,
+      `Fecha de finalización: ${curso.fecha_fin}`,
+      `Horario: ${curso.horario}`,
+      `Plazas máximas: ${curso.max_plazas}`
+    ];
+
+    detalles.forEach(detalle => {
+      const parrafo = document.createElement("p");
+      parrafo.textContent = detalle;
+      tarjeta.appendChild(parrafo);
+    });
+
+    listado.appendChild(tarjeta);
   });
 }
 
@@ -361,6 +584,11 @@ function iniciarSesion(event) {
     const usuarios = leerDatos(DATOS_USER);
     const usuario = usuarios.find(u => u.Correo === correo && u.Contraseña === contraseña);
 
+    if(usuario.estado === "inactivo") {
+      alert("Tu cuenta está inactiva. Por favor, contacta con el administrador.");
+      return;
+    }
+
     if (usuario) {
         if (usuario.Correo == "admin@centroeducativo.com") {
             sessionStorage.setItem("tipoUsuario", "admin");
@@ -370,6 +598,11 @@ function iniciarSesion(event) {
             window.location.href = "portal.html";
         }
         sessionStorage.setItem("loggeado", "true");
+        
+        if(usuario.rol === "admin") {
+          sessionStorage.setItem("tipoUsuario", "admin");
+        }
+
     } else {
         alert("Correo o contraseña incorrectos.");
     }
@@ -437,7 +670,8 @@ function altaCurso(event) {
     horario: document.getElementById("horario_alta_curso").value.trim(),
     max_plazas: document.getElementById("max_plazas_alta_curso").value.trim(),
     foto: document.getElementById("foto_alta_curso").value.trim(),
-    estado: document.getElementById("estado_alta_curso").value.trim()
+    estado: document.getElementById("estado_alta_curso").value.trim(),
+    plazas_ocupadas: 0
   };
 
   cursos.push(curso);
@@ -551,6 +785,12 @@ function delAula(event){
 
   if (!encontrado) {
     alert("Selecciona primero un aula.");
+    return;
+  }
+
+  const activo = leerDatos(DATOS_CURSOS).find(curso => String(curso.aula) === idDel && curso.estado === "activo");
+  if (activo) {
+    alert("No se puede eliminar el aula porque está asignada a un curso activo.");
     return;
   }
 
@@ -719,6 +959,12 @@ function delDoc(event) {
     return;
   }
 
+  const asignacion = leerDatos(DATOS_CURSOS).find(curso => String(curso.docente) === idDel);
+  if (asignacion) {
+    alert("No se puede eliminar este docente porque está asignado a un curso. Reasigna o elimina el curso antes de eliminar al docente.");
+    return;
+  }
+
   if (!confirm("¿Seguro que quieres eliminar este docente?")) {
     return;
   }
@@ -764,6 +1010,30 @@ function altaMat(event) {
     estado: document.getElementById("estado_alta_mat").value
   };
 
+  const cursos = leerDatos(DATOS_CURSOS);
+  const curso = cursos.find(c => String(c.id) === String(matricula.curso));
+  if (!curso) {
+    alert("Selecciona un curso válido.");
+    return;
+  }
+
+  const matriculado = matriculas.find(m => String(m.alumno) === String(matricula.alumno) && String(m.curso) === String(matricula.curso));
+  if (matriculado) {
+    alert("Este usuario ya está matriculado en este curso.");
+    return;
+  }
+
+  const plazasMaximas = Number(curso.max_plazas);
+  const plazasOcupadas = matriculas.filter(m =>
+    String(m.curso) === String(matricula.curso) && m.estado === "activo"
+  ).length;
+
+  if (matricula.estado === "activo" &&
+      (!String(curso.max_plazas).trim() || !Number.isFinite(plazasMaximas) || plazasOcupadas >= plazasMaximas)) {
+    alert("El curso ya ha alcanzado el número máximo de plazas.");
+    return;
+  }
+
   matriculas.push(matricula);
   guardarDatos(DATOS_MATRICULAS, matriculas);
   updateSelect();
@@ -775,13 +1045,44 @@ function modMat(event) {
 
   const idMod = document.getElementById("id_mod_mat").value;
   const matriculas = leerDatos(DATOS_MATRICULAS);
+  const matriculaAnterior = matriculas.find(m => String(m.id) === idMod);
   const matricula = {
-    id: idMod,
+    id: matriculaAnterior.id,
     alumno: document.getElementById("alumno_mod_mat").value,
     curso: document.getElementById("curso_mod_mat").value.trim(),
     fecha_matricula: document.getElementById("fecha_matricula_mod_mat").value,
     estado: document.getElementById("estado_mod_mat").value
   };
+
+  const cursos = leerDatos(DATOS_CURSOS);
+  const curso = cursos.find(c => String(c.id) === String(matricula.curso));
+  if (!curso) {
+    alert("Selecciona un curso válido.");
+    return;
+  }
+
+  const matriculado = matriculas.find(m =>
+    String(m.id) !== idMod &&
+    String(m.alumno) === String(matricula.alumno) &&
+    String(m.curso) === String(matricula.curso)
+  );
+  if (matriculado) {
+    alert("Este usuario ya está matriculado en este curso.");
+    return;
+  }
+
+  const plazasMaximas = Number(curso.max_plazas);
+  const plazasOcupadas = matriculas.filter(m =>
+    String(m.id) !== idMod &&
+    String(m.curso) === String(matricula.curso) &&
+    m.estado === "activo"
+  ).length;
+
+  if (matricula.estado === "activo" &&
+      (!String(curso.max_plazas).trim() || !Number.isFinite(plazasMaximas) || plazasOcupadas >= plazasMaximas)) {
+    alert("El curso ya ha alcanzado el número máximo de plazas.");
+    return;
+  }
 
   const matriculasActualizadas = matriculas.map(m =>
     String(m.id) === idMod ? matricula : m
@@ -867,6 +1168,12 @@ function altaUser(event) {
     rol: document.getElementById("rol_alta_user").value,
     estado: document.getElementById("estado_alta_user").value
   };
+
+  const existente = usuarios.find(u => u.Correo === usuario.Correo);
+  if (existente) {
+    alert("Ya existe un usuario con ese correo.");
+    return;
+  }
 
   usuarios.push(usuario);
   guardarDatos(DATOS_USER, usuarios);

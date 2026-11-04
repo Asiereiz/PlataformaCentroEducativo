@@ -214,6 +214,40 @@ section{
     margin-bottom: 20px;
 }
 
+#lista_cursos,
+#resultados_busqueda,
+#historial_cursos,
+#detalles_busqueda,
+#lista_docentes{
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+#lista_cursos article,
+#resultados_busqueda article,
+#historial_cursos article,
+#detalles_busqueda article,
+#lista_docentes article{
+    box-sizing: border-box;
+    flex: 1 1 260px;
+    padding: 16px;
+    border: 1px solid #d5d9e2;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #222222;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+#lista_cursos article h4,
+#resultados_busqueda article h4,
+#historial_cursos article h4,
+#detalles_busqueda article h4,
+#lista_docentes article h4{
+    margin-top: 0;
+}
+
 .gestion{
     display: flex;
     flex-direction: column;
