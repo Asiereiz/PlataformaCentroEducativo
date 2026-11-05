@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     login.addEventListener("submit", iniciarSesion)
   }
 
+  inicializarUsuarios();
   mostrarSesion();
   updateSelect();
   mostrarCatalogo();
@@ -265,11 +266,11 @@ function aplicarPreferencias() {
   }
 }
 
-const DATOS_USER = "user";
-const DATOS_CURSOS = "cursos";
-const DATOS_AULAS = "aulas";
-const DATOS_DOCENTES = "docentes";
-const DATOS_MATRICULAS = "matriculas";
+const DATOS_USER = [];
+const DATOS_CURSOS = [];
+const DATOS_AULAS = [];
+const DATOS_DOCENTES = [];
+const DATOS_MATRICULAS = [];
 
 
 function guardarDatos(array, datos){
@@ -542,13 +543,19 @@ function inicializarUsuarios() {
 
     let user = leerDatos(DATOS_USER);
     
-    if (user === null) {
-        user = [
-        { id: 1, Nombre: "Admin", Primer_apellido: "Admin", Segundo_apellido: "Admin", Correo: "admin@centroeducativo.com", Contraseña: "Admin", Confirmar_contraseña: "Admin" }
+    if (user.length === 0) {
+        user = [{
+          id: 1, 
+          Nombre: "Admin", 
+          Primer_apellido: "Admin", 
+          Segundo_apellido: "Admin", 
+          Correo: "admin@centroeducativo.com", 
+          Contraseña: "admin", 
+          Rol: "admin", 
+          Estado: "activo" }
         ];
-
         guardarDatos(DATOS_USER, user);
-    }
+      }
 }
 
 function irAlInicio(event) {
@@ -642,7 +649,8 @@ function mostrarSesion() {
 
 function cerrarSesion(){
   sessionStorage.removeItem("tipoUsuario");
-  sessionStorage.setItem("loggeado", false);
+  sessionStorage.removeItem("loggeado");
+  sessionStorage.removeItem("usuarioActual");
   window.location.href = "index.html";
 }
 
