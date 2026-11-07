@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarCatalogo();
   mostrarDocentes();
   mostrarHistorial();
+  mostrarMatriculas();
   saludo();
 
   const campoBusqueda = document.getElementById("busqueda_curso");
@@ -180,6 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btntitInicio.addEventListener("click", irAlInicio);
   }
 
+  const botonMatricularme = document.getElementById("matricularme_form");
+  if(botonMatricularme){
+    botonMatricularme.addEventListener("submit", matricularme);
+  }
+
 });
 
 function saludo(){
@@ -266,11 +272,11 @@ function aplicarPreferencias() {
   }
 }
 
-const DATOS_USER = [];
-const DATOS_CURSOS = [];
-const DATOS_AULAS = [];
-const DATOS_DOCENTES = [];
-const DATOS_MATRICULAS = [];
+const DATOS_USER = "datos_usuarios";
+const DATOS_CURSOS = "datos_cursos";
+const DATOS_AULAS = "datos_aulas";
+const DATOS_DOCENTES = "datos_docentes";
+const DATOS_MATRICULAS = "datos_matriculas";
 
 
 function guardarDatos(array, datos){
@@ -308,6 +314,7 @@ function updateSelect() {
   actualizarOpciones("id_info_user", usuarios, "Nombre");
   actualizarOpciones("docente_alta_curso", docentes, "Nombre");
   actualizarOpciones("docente_mod_curso", docentes, "Nombre");
+  actualizarOpciones("curso_matricula", cursos.filter(curso => curso.estado === "activo"), "nombre","Selecciona un curso");
 
   const alumnos = usuarios.filter(usuario =>
     usuario.rol === "alumno" ||
@@ -372,6 +379,67 @@ function mostrarDocentes() {
     });
   });
 
+}
+
+function mostrarMatriculas(){
+  const listado = leerDatos(DATOS_MATRICULAS).filter(m => m.alumno === sessionStorage.getItem("usuarioActual"));
+  const contenedor = document.getElementById("ver_mis_matriculas");
+
+  if (!contenedor) {
+    return;
+  }
+
+  contenedor.innerHTML = "";
+
+  if(listado.length > 0){
+    listado.forEach(matricula => {
+      const tarjeta = document.createElement("article");
+      const nombre = document.createElement("h4");
+      nombre.textContent = matricula.curso;
+      tarjeta.appendChild(nombre);
+      contenedor.appendChild(tarjeta);
+    });
+  }else{
+    contenedor.textContent = "No tienes matrículas activas.";
+  }
+
+
+}
+
+function matricularme(event){
+  event.preventDefault();
+
+  const cursos = leerDatos(DATOS_CURSOS).filter(c => c.estado === "activo");
+  const form_matricula= document.getElementById("curso_matricula");
+
+  form_matricula.innerHTML = "";
+
+  cursos.forEach(curso => {
+    form_matricula.innerHTML += `<option value="${curso.id}">${curso.nombre}</option>`;
+  });
+
+  const cursoSeleccionado = document.getElementById("curso_matricula").value;
+  const todosCursos = leerDatos(DATOS_CURSOS);
+
+  const nuevaMat = {
+    id: todosCursos.length + 1,
+    alumno: sessionStorage.getItem("usuarioActual"),
+    curso: cursoSeleccionado,
+    fecha_matricula: new Date().toISOString().split("T")[0],
+    estado: "activo"
+    };
+
+    const matriculas = leerDatos(DATOS_MATRICULAS);
+
+    if(!confirm(`Estás seguro de que quieres matricularte en ${cursoSeleccionado.nombre}?`)) {
+      return;
+    }
+
+    matriculas.push(nuevaMat);
+    guardarDatos(DATOS_MATRICULAS, matriculas);
+
+    updateSelect();
+    mostrarMatriculas();
 }
 
 function mostrarCatalogo() {
@@ -509,12 +577,8 @@ function mostrarHistorial() {
   const cursos = leerDatos(DATOS_CURSOS);
   listado.innerHTML = "";
 
-  if (cursos.length === 0) {
-    listado.textContent = "No hay cursos en el historial.";
-    return;
-  }
-
-  cursos.forEach(curso => {
+  if (cursos.length > 0) {
+    cursos.forEach(curso => {
     const tarjeta = document.createElement("article");
     const nombre = document.createElement("h4");
     nombre.textContent = curso.nombre;
@@ -537,6 +601,10 @@ function mostrarHistorial() {
 
     listado.appendChild(tarjeta);
   });
+  }else{
+    listado.textContent = "No hay cursos en el historial.";
+    return;
+  }
 }
 
 function inicializarUsuarios() {

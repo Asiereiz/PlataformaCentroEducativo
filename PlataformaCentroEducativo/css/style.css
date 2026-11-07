@@ -317,6 +317,19 @@ body.oscuro #quienessomos > h3{
     color: #efebff;
 }
 
+body.oscuro .gestion section{
+    background-color: #62618a;
+}
+
+body.oscuro #lista_cursos article,
+body.oscuro #resultados_busqueda article,
+body.oscuro #historial_cursos article,
+body.oscuro #detalles_busqueda article,
+body.oscuro #lista_docentes article {
+    background-color: #62618a;
+    color: #efebff;
+}
+
 body.contraste #portal #bienvenida{
     border: 2px solid #ffffff;
     background: #000000;
@@ -391,6 +404,18 @@ body.contraste #quienessomos > h3{
     padding: 16px;
     margin: 0;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#matricularme_form,
+#cancelar_matricula_form {
+    align-items: flex-start;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+#matricularme_form label,
+#cancelar_matricula_form label {
+    align-items: flex-start;
 }
 
 form{

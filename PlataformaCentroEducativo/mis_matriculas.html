@@ -16,9 +16,12 @@
 
             <nav>
                 <ul>
-                    <li class="sesionAdmin" hidden><a href="panel-admin.html">Panel de administrador</a></li>
-                    <li><a href="#matricularme">Matricularme</a></li>
-                    <li><a href="#cancelar_matricula">Cancelar matrícula</a></li>
+                    <li><a href="portal.html">Inicio</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="docentes.html">Docentes</a></li>
+                    <li><a href="mis_matriculas.html">Mis matrículas</a></li>
+                    <li><a href="perfil.html">Perfil</a></li>
+                    <li><a href="accesibilidad.html">Accesibilidad</a></li>
 
                 </ul>
             </nav>
@@ -35,12 +38,26 @@
 
         <main>
 
+            <section id="ver_matriculas">
+                <h3>Mis matrículas</h3>
+                <div id="ver_mis_matriculas"></div>
+            </section>
+
             <section id="matricularme">
                 <h3>Matricularme</h3>
+                <form id="matricularme_form" method="post" action="#">
+                    <label for="curso_matricula">Selecciona un curso:</label>
+                    <select id="curso_matricula" name="curso_matricula">
+                        <option value="" disabled selected>Selecciona un curso</option>
+                    </select>
+                    <button type="submit">Matricularme</button>
+                </form>
+                    
             </section>
 
             <section id="cancelar_matricula">
                 <h3>Cancelar matrícula</h3>
+                <div id="cancelar_matricula"></div>
             </section>
 
 
