@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarDocentes();
   mostrarHistorial();
   mostrarMatriculas();
+  mostrarPerfil();
+  aplicarPreferencias();
   saludo();
 
   const campoBusqueda = document.getElementById("busqueda_curso");
@@ -29,12 +31,19 @@ document.addEventListener("DOMContentLoaded", () => {
     campoDetalles.addEventListener("input", mostrarDetallesCurso);
   }
 
-  aplicarPreferencias();
-
   const btnCerrarSesion = document.getElementById("cerrarSesion");
   if(btnCerrarSesion){
     btnCerrarSesion.addEventListener("click", cerrarSesion)
   }
+
+  document.querySelectorAll(".logout").forEach(enlace => {
+    enlace.addEventListener("click", () => {
+      sessionStorage.removeItem("tipoUsuario");
+      sessionStorage.removeItem("loggeado");
+      sessionStorage.removeItem("usuarioActual");
+      sessionStorage.removeItem("correoActual");
+    });
+  });
 
   const btnAltaAula = document.getElementById("alta_aula");
   if(btnAltaAula){
@@ -340,6 +349,40 @@ function actualizarOpciones(id, datos, campo, texto = "Selecciona un ID") {
   });
 }
 
+function mostrarPerfil() {
+  const tarjeta = document.getElementById("miperfil");
+  if (!tarjeta) {
+    return;
+  }
+
+  tarjeta.innerHTML = "";
+
+  const correoActual = sessionStorage.getItem("correoActual");
+  const nombreActual = sessionStorage.getItem("usuarioActual");
+  const usuarios = leerDatos(DATOS_USER);
+  const usuario = correoActual
+    ? usuarios.find(u => u.Correo === correoActual)
+    : usuarios.find(u => u.Nombre === nombreActual);
+
+  if (usuario == null) {
+    tarjeta.textContent = "No se encontró el usuario. Cierra sesión y vuelve a iniciar sesión.";
+    return;
+  }
+
+  const detalles = [
+    `Nombre: ${usuario.Nombre || ""}`,
+    `Primer apellido: ${usuario.Primer_apellido || ""}`,
+    `Segundo apellido: ${usuario.Segundo_apellido || ""}`,
+    `Correo: ${usuario.Correo || ""}`
+  ];
+
+  detalles.forEach(detalle => {
+    const parrafo = document.createElement("p");
+    parrafo.textContent = detalle;
+    tarjeta.appendChild(parrafo);
+  });
+}
+
 function mostrarDocentes() {
   const listado = document.getElementById("lista_docentes");
   if (!listado) {
@@ -430,6 +473,14 @@ function matricularme(event){
     };
 
     const matriculas = leerDatos(DATOS_MATRICULAS);
+
+    const existe = matriculas.some(m => m.curso === nuevaMat.curso && m.alumno === nuevaMat.alumno);
+
+    if(existe){
+      alert("Ya te has matriculado en este curso.");
+      updateSelect();
+      return;
+    }
 
     if(!confirm(`Estás seguro de que quieres matricularte en ${cursoSeleccionado.nombre}?`)) {
       return;
@@ -619,8 +670,8 @@ function inicializarUsuarios() {
           Segundo_apellido: "Admin", 
           Correo: "admin@centroeducativo.com", 
           Contraseña: "admin", 
-          Rol: "admin", 
-          Estado: "activo" }
+          rol: "admin", 
+          estado: "activo" }
         ];
         guardarDatos(DATOS_USER, user);
       }
@@ -668,30 +719,27 @@ function iniciarSesion(event) {
     
     const usuarios = leerDatos(DATOS_USER);
     const usuario = usuarios.find(u => u.Correo === correo && u.Contraseña === contraseña);
-    sessionStorage.setItem("usuarioActual", usuario.Nombre);
+
+    if (!usuario) {
+      alert("Correo o contraseña incorrectos.");
+      return;
+    }
 
     if(usuario.estado === "inactivo") {
       alert("Tu cuenta está inactiva. Por favor, contacta con el administrador.");
       return;
     }
 
-    if (usuario) {
-        if (usuario.Correo == "admin@centroeducativo.com") {
-            sessionStorage.setItem("tipoUsuario", "admin");
-            window.location.href = "portal.html";
-        } else {
-            sessionStorage.setItem("tipoUsuario", "alumno");
-            window.location.href = "portal.html";
-        }
-        sessionStorage.setItem("loggeado", "true");
-        
-        if(usuario.rol === "admin") {
-          sessionStorage.setItem("tipoUsuario", "admin");
-        }
+    sessionStorage.setItem("usuarioActual", usuario.Nombre);
+    sessionStorage.setItem("correoActual", usuario.Correo);
 
+    if (usuario.Correo === "admin@centroeducativo.com" || usuario.rol === "admin") {
+      sessionStorage.setItem("tipoUsuario", "admin");
     } else {
-        alert("Correo o contraseña incorrectos.");
+      sessionStorage.setItem("tipoUsuario", "alumno");
     }
+    sessionStorage.setItem("loggeado", "true");
+    window.location.href = "portal.html";
 
 }
 
@@ -719,6 +767,7 @@ function cerrarSesion(){
   sessionStorage.removeItem("tipoUsuario");
   sessionStorage.removeItem("loggeado");
   sessionStorage.removeItem("usuarioActual");
+  sessionStorage.removeItem("correoActual");
   window.location.href = "index.html";
 }
 
