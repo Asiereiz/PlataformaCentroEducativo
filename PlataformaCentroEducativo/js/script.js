@@ -749,17 +749,33 @@ function mostrarSesion() {
   const sesionAlumno = document.querySelectorAll(".sesionAlumno");
   const header = document.querySelector("header");
   const footer = document.querySelector("footer");
+  const panelAdmin = document.getElementById("panel-administracion");
+
+  document.querySelectorAll(".estado-sesion").forEach(el => {
+    const visible = (tipoUsuario === "admin" && el.classList.contains("sesionAdmin")) ||
+      (tipoUsuario === "alumno" && el.classList.contains("sesionAlumno"));
+    el.classList.toggle("estado-sesion-visible", visible);
+  });
+
+  if (panelAdmin) {
+    panelAdmin.classList.toggle("panel-administracion-oculto", tipoUsuario !== "admin");
+  }
 
   if (tipoUsuario === "admin") {
     header.classList.add("header-admin");
     if (footer) footer.classList.add("footer-admin");
     sesionAdmin.forEach(el => el.hidden = false);
     sesionAlumno.forEach(el => el.hidden = true);
-  } else {
+  } else if (tipoUsuario === "alumno") {
     header.classList.remove("header-admin");
     if (footer) footer.classList.remove("footer-admin");
     sesionAdmin.forEach(el => el.hidden = true);
     sesionAlumno.forEach(el => el.hidden = false);
+  } else {
+    header.classList.remove("header-admin");
+    if (footer) footer.classList.remove("footer-admin");
+    sesionAdmin.forEach(el => el.hidden = true);
+    sesionAlumno.forEach(el => el.hidden = true);
   }
 }
 
