@@ -234,23 +234,49 @@ section{
 #noticias,
 #calendario,
 #informacion-estudiantes,
-#quienessomos{
+#quienessomos,
+#panel-administracion{
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
     margin: 32px 0;
 }
 
+#portal #panel-administracion[hidden]{
+    display: none;
+}
+
+#portal #panel-administracion{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 16px;
+    margin: 0 0 36px;
+    padding: 24px;
+    border: 1px solid #d5d9e2;
+    border-radius: 14px;
+    background-color: #ffffff;
+}
+
 #noticias > h3,
 #calendario > h3,
 #informacion-estudiantes > h3,
-#quienessomos > h3{
+#quienessomos > h3,
+#panel-administracion > h3{
     width: 100%;
     margin: 0 0 2px;
     padding-bottom: 10px;
     border-bottom: 2px solid #d5d9e2;
     color: #26375f;
     font-size: 1.4rem;
+}
+
+#panel-administracion > h3{
+    grid-column: 1 / -1;
+}
+
+#panel-administracion > h3{
+    margin-bottom: -8px;
+    border: 0;
 }
 
 #portal article{
@@ -264,6 +290,11 @@ section{
     background-color: #ffffff;
     color: #222222;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#portal #panel-administracion article{
+    min-height: 145px;
+    padding: 18px;
 }
 
 #portal article h4{
@@ -286,6 +317,27 @@ section{
     line-height: 1.5;
 }
 
+#portal #panel-administracion article a{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: auto;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background-color: #3b4d86;
+    color: #ffffff;
+    text-decoration: none;
+    transition: background-color 160ms ease;
+}
+
+#portal #panel-administracion article a:hover{
+    background-color: #303f70;
+    color: #ffffff;
+}
+
 #portal article a:hover{
     color: #26375f;
 }
@@ -303,6 +355,20 @@ body.oscuro #portal article{
     color: #efebff;
 }
 
+body.oscuro #portal #panel-administracion{
+    border-color: #77778c;
+    background-color: #302e50;
+}
+
+body.oscuro #portal #panel-administracion article a{
+    background-color: #62618a;
+    color: #ffffff;
+}
+
+body.oscuro #portal #panel-administracion article a:hover{
+    background-color: #55547b;
+}
+
 body.oscuro #portal article h4,
 body.oscuro #portal article a,
 body.oscuro #portal article a:hover{
@@ -312,7 +378,8 @@ body.oscuro #portal article a:hover{
 body.oscuro #noticias > h3,
 body.oscuro #calendario > h3,
 body.oscuro #informacion-estudiantes > h3,
-body.oscuro #quienessomos > h3{
+body.oscuro #quienessomos > h3,
+body.oscuro #panel-administracion > h3{
     border-color: #77778c;
     color: #efebff;
 }
@@ -333,6 +400,12 @@ body.oscuro #lista_docentes article {
 body.contraste #portal #bienvenida{
     border: 2px solid #ffffff;
     background: #000000;
+    color: #ffffff;
+}
+
+body.contraste #portal #panel-administracion{
+    border: 2px solid #ffffff;
+    background: #000000;
 }
 
 body.contraste #portal article{
@@ -341,13 +414,24 @@ body.contraste #portal article{
     color: #ffffff;
 }
 
+body.contraste #portal #panel-administracion article a{
+    border: 1px solid #ffffff;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+body.contraste #portal #panel-administracion article a:hover{
+    background-color: #1a1a1a;
+}
+
 body.contraste #portal article h4,
 body.contraste #portal article a,
 body.contraste #portal article a:hover,
 body.contraste #noticias > h3,
 body.contraste #calendario > h3,
 body.contraste #informacion-estudiantes > h3,
-body.contraste #quienessomos > h3{
+body.contraste #quienessomos > h3,
+body.contraste #panel-administracion > h3{
     color: #ffffff;
 }
 
