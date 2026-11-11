@@ -41,6 +41,7 @@ function altaUser(event) {
     Contraseña: contraseña,
     Confirmar_contraseña: contraseña,
     rol: document.getElementById("rol_alta_user").value,
+    Fecha_de_alta: new Date().toLocaleDateString("es-ES"),
     estado: document.getElementById("estado_alta_user").value
   };
 
@@ -115,9 +116,11 @@ function delUser(event) {
     return;
   }
 
-  guardarDatos(DATOS_USER, usuarios.filter(usuario => String(usuario.id) !== idDel));
+  const datosActualizados = usuarios.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
+
+  guardarDatos(DATOS_USER, datosActualizados);
   updateSelect();
-  alert("Usuario eliminado correctamente.");
+  alert("Usuario desactivado correctamente.");
 }
 
 function infoUser(event) {

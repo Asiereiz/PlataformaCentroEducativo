@@ -40,8 +40,34 @@
 
         <main>
 
-            <h3>Mi perfil</h3>
-            <div id="miperfil"></div>
+            <div id="perfil-contenido">
+                <section>
+                    <h3>Mi perfil</h3>
+                    <div id="miperfil"></div>
+                </section>
+                <section>
+                    <h3>Editar información</h3>
+                    <div id="editarPerfil">
+                        <form id="editProfile">
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre_editar" name="nombre" placeholder="Nuevo nombre" required>
+                            <label for="primerApellido">Primer apellido:</label>
+                            <input type="text" id="primerApellido_editar" name="primerApellido" placeholder="Nuevo primer apellido" required>
+                            <label for="segundoApellido">Segundo apellido:</label>
+                            <input type="text" id="segundoApellido_editar" name="segundoApellido" placeholder="Nuevo segundo apellido" required>
+                            <label for="correo">Correo:</label>
+                            <input type="email" id="correo_editar" name="correo" placeholder="Nuevo correo" required>
+                            <label for="contraseña">Contraseña:</label>
+                            <input type="password" id="contraseña_editar" name="contraseña" placeholder="Nueva contraseña" required>
+                            <label for="confirmarContraseña">Confirmar contraseña:</label>
+                            <input type="password" id="confirmarContraseña_editar" name="confirmarContraseña" placeholder="Confirmar nueva contraseña" required>
+                            <label for="telefono">Teléfono:</label>
+                            <input type="text" id="telefono_editar" name="telefono" placeholder="Nuevo teléfono" required>
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
             
         </main>
 

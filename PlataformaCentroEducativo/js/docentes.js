@@ -148,7 +148,9 @@ function delDoc(event) {
     return;
   }
 
-  const asignacion = leerDatos(DATOS_CURSOS).find(curso => String(curso.docente) === idDel);
+  const asignacion = leerDatos(DATOS_CURSOS).find(curso =>
+    String(curso.docente) === idDel && curso.estado === "activo"
+  );
   if (asignacion) {
     alert("No se puede eliminar este docente porque está asignado a un curso. Reasigna o elimina el curso antes de eliminar al docente.");
     return;
@@ -158,9 +160,11 @@ function delDoc(event) {
     return;
   }
 
-  guardarDatos(DATOS_DOCENTES, docentes.filter(docente => String(docente.id) !== idDel));
+  const datosActualizados = docentes.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
+
+  guardarDatos(DATOS_DOCENTES, datosActualizados);
   updateSelect();
-  alert("Docente eliminado correctamente.");
+  alert("Docente desactivado correctamente.");
 }
 
 function infoDoc(event) {

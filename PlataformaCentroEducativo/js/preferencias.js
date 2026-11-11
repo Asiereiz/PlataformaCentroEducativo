@@ -1,90 +1,99 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const selectModoPantalla = document.getElementById("modoPantalla");
+  if (selectModoPantalla) {
+    selectModoPantalla.addEventListener("change", cambiarColorPantalla);
+  }
 
-    aplicarPreferencias();
-
-    const selectModoPantalla = document.getElementById("modoPantalla");
-    if(selectModoPantalla){
-        selectModoPantalla.addEventListener("change", cambiarColorPantalla);
-    }
-
-    const selectTamLetra = document.getElementById("sizeLetra");
-    if(selectTamLetra){
-        selectTamLetra.addEventListener("change", cambiarTamañoLetra);
-    }
-
+  const selectTamLetra = document.getElementById("sizeLetra");
+  if (selectTamLetra) {
+    selectTamLetra.addEventListener("change", cambiarTamañoLetra);
+  }
 });
 
-const CLAVE_TEMA = "tema";
-const CLAVE_TAMFUENTE = "tamfuente";
+window.addEventListener("pageshow", aplicarPreferencias);
 
-function cambiarColorPantalla(event){
-  event.preventDefault();
-
-  const pantalla = document.querySelector("body");
-  const modo = document.getElementById("modoPantalla").value;
-
-  localStorage.setItem(CLAVE_TEMA, modo);
-
-  if(modo === "oscuro"){
-    pantalla.classList.add("oscuro");
-    pantalla.classList.remove("contraste");
-  }else if (modo === "contraste"){
-    pantalla.classList.remove("oscuro");
-    pantalla.classList.add("contraste");
-  }else{
-    pantalla.classList.remove("oscuro");
-    pantalla.classList.remove("contraste");
+function obtenerUsuarioPreferencias(usuarios = leerDatos(DATOS_USER)) {
+  const correoActual = sessionStorage.getItem("correoActual");
+  const nombreActual = sessionStorage.getItem("usuarioActual");
+  if (!correoActual && !nombreActual) {
+    return null;
   }
+
+  return usuarios.find(usuario =>
+    correoActual
+      ? usuario.Correo === correoActual
+      : usuario.Nombre === nombreActual
+  ) || null;
 }
 
-function cambiarTamañoLetra(event){
-  event.preventDefault();
-
-  const letra = document.querySelector("body");
-  const modo = document.getElementById("sizeLetra").value;
-
-  localStorage.setItem(CLAVE_TAMFUENTE, modo);
-
-  if(modo === "large"){
-    letra.classList.add("large");
-    letra.classList.remove("small");
-  }else if (modo === "small"){
-    letra.classList.remove("large");
-    letra.classList.add("small");
-  }else{
-    letra.classList.remove("large");
-    letra.classList.remove("small");
+function leerPreferencias() {
+  const usuario = obtenerUsuarioPreferencias();
+  if (usuario) {
+    return usuario.Preferencias || {};
   }
+
+  const preferenciasInvitado = localStorage.getItem("preferencias_invitado");
+  return preferenciasInvitado ? JSON.parse(preferenciasInvitado) : {};
+}
+
+function guardarPreferencias(cambios) {
+  const usuarios = leerDatos(DATOS_USER);
+  const usuario = obtenerUsuarioPreferencias(usuarios);
+  if (!usuario) {
+    const preferencias = { ...leerPreferencias(), ...cambios };
+    localStorage.setItem("preferencias_invitado", JSON.stringify(preferencias));
+    return;
+  }
+
+  const usuarioActualizado = {
+    ...usuario,
+    Preferencias: { ...usuario.Preferencias, ...cambios }
+  };
+  const usuariosActualizados = usuarios.map(otroUsuario =>
+    otroUsuario === usuario ? usuarioActualizado : otroUsuario
+  );
+  guardarDatos(DATOS_USER, usuariosActualizados);
+}
+
+function cambiarColorPantalla() {
+  const modo = document.getElementById("modoPantalla").value;
+  guardarPreferencias({ tema: modo });
+  aplicarTema(modo);
+}
+
+function cambiarTamañoLetra() {
+  const modo = document.getElementById("sizeLetra").value;
+  guardarPreferencias({ tamfuente: modo });
+  aplicarTamañoLetra(modo);
+}
+
+function aplicarTema(tema) {
+  const pantalla = document.body;
+  pantalla.classList.toggle("oscuro", tema === "oscuro");
+  pantalla.classList.toggle("contraste", tema === "contraste");
+}
+
+function aplicarTamañoLetra(tamaño) {
+  const pantalla = document.body;
+  pantalla.classList.toggle("large", tamaño === "large");
+  pantalla.classList.toggle("small", tamaño === "small");
 }
 
 function aplicarPreferencias() {
-  const pantalla = document.querySelector("body");
+  const preferencias = leerPreferencias();
+  const tema = preferencias.tema || "claro";
+  const tamfuente = preferencias.tamfuente || "medium";
 
-  const tema = localStorage.getItem(CLAVE_TEMA);
-  if (tema === "oscuro") {
-    pantalla.classList.add("oscuro");
-    pantalla.classList.remove("contraste");
-  } else if (tema === "contraste") {
-    pantalla.classList.remove("oscuro");
-    pantalla.classList.add("contraste");
-  }
-
-  const tamfuente = localStorage.getItem(CLAVE_TAMFUENTE);
-  if (tamfuente === "large") {
-    pantalla.classList.add("large");
-    pantalla.classList.remove("small");
-  } else if (tamfuente === "small") {
-    pantalla.classList.remove("large");
-    pantalla.classList.add("small");
-  }
+  aplicarTema(tema);
+  aplicarTamañoLetra(tamfuente);
 
   const selectModoPantalla = document.getElementById("modoPantalla");
-  if (selectModoPantalla && tema) {
+  if (selectModoPantalla) {
     selectModoPantalla.value = tema;
   }
 
   const selectTamLetra = document.getElementById("sizeLetra");
-  if (selectTamLetra && tamfuente) {
+  if (selectTamLetra) {
     selectTamLetra.value = tamfuente;
   }
 }

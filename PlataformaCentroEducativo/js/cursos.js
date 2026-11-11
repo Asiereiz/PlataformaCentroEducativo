@@ -134,11 +134,12 @@ function delCurso(event){
     return;
   }
 
-  const cursosActualizados = cursos.filter(curso => String(curso.id) !== idDel);
-  guardarDatos(DATOS_CURSOS, cursosActualizados);
+  const datosActualizados = cursos.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
+
+  guardarDatos(DATOS_CURSOS, datosActualizados);
   updateSelect();
 
-  alert("Curso eliminado correctamente.");
+  alert("Curso desactivado correctamente.");
 }
 
 
@@ -215,7 +216,7 @@ function buscarCursos() {
   const listado = document.getElementById("resultados_busqueda");
   const cursos = leerDatos(DATOS_CURSOS).filter(curso =>
     curso.estado === "activo" &&
-    `${curso.nombre || ""} ${curso.descripcion || ""} ${curso.docente || ""}`.toLowerCase().includes(texto)
+    `${curso.nombre || ""} ${curso.descripcion || ""}`.toLowerCase().includes(texto)
   );
 
   listado.innerHTML = "";
@@ -234,20 +235,9 @@ function buscarCursos() {
     nombre.textContent = curso.nombre;
     tarjeta.appendChild(nombre);
 
-    const detalles = [
-      `Descripción: ${curso.descripcion}`,
-      `Docente: ${curso.docente}`,
-      `Fecha de inicio: ${curso.fecha_inicio}`,
-      `Fecha de finalización: ${curso.fecha_fin}`,
-      `Horario: ${curso.horario}`,
-      `Plazas máximas: ${curso.max_plazas}`
-    ];
-
-    detalles.forEach(detalle => {
-      const parrafo = document.createElement("p");
-      parrafo.textContent = detalle;
-      tarjeta.appendChild(parrafo);
-    });
+    const descripcion = document.createElement("p");
+    descripcion.textContent = `Descripción: ${curso.descripcion || ""}`;
+    tarjeta.appendChild(descripcion);
 
     listado.appendChild(tarjeta);
   });

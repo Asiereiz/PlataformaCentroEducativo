@@ -60,7 +60,15 @@
 
             <section id="cancelar_matricula">
                 <h3>Cancelar matrícula</h3>
-                <div id="cancelar_matricula"></div>
+                <div id="cancelar_matricula">
+                    <form id="cancelarmat_form" method="post" action="#">
+                        <label for="cancelarmat_select">Selecciona un curso:</label>
+                        <select id="cancelarmat_select" name="cancelarmat_select">
+                            <option value="" disabled selected>Selecciona una matrícula</option>
+                        </select>
+                        <button type="submit">Cancelar matrícula</button>
+                    </form>
+                </div>
             </section>
 
 

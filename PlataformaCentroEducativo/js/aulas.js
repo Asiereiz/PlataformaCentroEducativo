@@ -115,11 +115,12 @@ function delAula(event){
     return;
   }
 
-  const aulasActualizadas = aulas.filter(aula => String(aula.id) !== idDel);
-  guardarDatos(DATOS_AULAS, aulasActualizadas);
+  const datosActualizados = aulas.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
+
+  guardarDatos(DATOS_AULAS, datosActualizados);
   updateSelect();
 
-  alert("Aula eliminada correctamente.");
+  alert("Aula desactivada correctamente.");
 
 }
 

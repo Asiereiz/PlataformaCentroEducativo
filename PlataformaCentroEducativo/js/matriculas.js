@@ -27,11 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
         btnInfoMat.addEventListener("submit", infoMat);
     }
 
-    
-
     const botonMatricularme = document.getElementById("matricularme_form");
     if(botonMatricularme){
         botonMatricularme.addEventListener("submit", matricularme);
+    }
+
+    const btnCancelarMat = document.getElementById("cancelarmat_form");
+    if(btnCancelarMat){
+        btnCancelarMat.addEventListener("submit", cancelarMatriculas);
     }
 
 });
@@ -162,9 +165,11 @@ function delMat(event) {
     return;
   }
 
-  guardarDatos(DATOS_MATRICULAS, matriculas.filter(m => String(m.id) !== idDel));
+  const matriculasActualizadas = matriculas.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
+
+  guardarDatos(DATOS_MATRICULAS, matriculasActualizadas);
   updateSelect();
-  alert("Matrícula eliminada correctamente.");
+  alert("Matrícula desactivada correctamente.");
 }
 
 function infoMat(event) {
@@ -192,55 +197,112 @@ function infoMat(event) {
 }
 
 function mostrarMatriculas(){
-  const listado = leerDatos(DATOS_MATRICULAS).filter(m => m.alumno === sessionStorage.getItem("usuarioActual"));
   const contenedor = document.getElementById("ver_mis_matriculas");
+  const select = document.getElementById("cancelarmat_select");
+  const correoActual = sessionStorage.getItem("correoActual");
+  const nombreActual = sessionStorage.getItem("usuarioActual");
+  const usuarioActual = leerDatos(DATOS_USER).find(usuario =>
+    correoActual
+      ? usuario.Correo === correoActual
+      : usuario.Nombre === nombreActual
+  );
+  const listado = leerDatos(DATOS_MATRICULAS).filter(matricula => {
+    const alumno = String(matricula.alumno);
+    const perteneceAlUsuario =
+      (nombreActual && alumno === nombreActual) ||
+      (correoActual && alumno === correoActual) ||
+      (usuarioActual && alumno === String(usuarioActual.id));
+    return perteneceAlUsuario && matricula.estado === "activo";
+  });
+  const cursos = leerDatos(DATOS_CURSOS);
 
-  if (!contenedor) {
+  if (!contenedor && !select) {
     return;
   }
 
-  contenedor.innerHTML = "";
+  if (contenedor) {
+    contenedor.innerHTML = "";
 
-  if(listado.length > 0){
-    listado.forEach(matricula => {
-      const tarjeta = document.createElement("article");
-      const nombre = document.createElement("h4");
-      nombre.textContent = matricula.curso;
-      tarjeta.appendChild(nombre);
-      contenedor.appendChild(tarjeta);
-    });
-  }else{
-    contenedor.textContent = "No tienes matrículas activas.";
+    if (listado.length > 0) {
+      listado.forEach(matricula => {
+        const tarjeta = document.createElement("article");
+        const curso = cursos.find(c =>
+          String(c.id) === String(matricula.curso) ||
+          c.nombre === String(matricula.curso)
+        );
+
+        const nombre = document.createElement("p");
+        nombre.textContent = `Curso: ${curso ? curso.nombre : matricula.curso}`;
+        tarjeta.appendChild(nombre);
+
+        if (curso && curso.descripcion) {
+          const descripcion = document.createElement("p");
+          descripcion.textContent = `Descripción: ${curso.descripcion}`;
+          tarjeta.appendChild(descripcion);
+        }
+
+        const fecha = document.createElement("p");
+        fecha.textContent = `Fecha de matrícula: ${matricula.fecha_matricula || "No disponible"}`;
+        tarjeta.appendChild(fecha);
+
+        contenedor.appendChild(tarjeta);
+      });
+    } else {
+      contenedor.textContent = "No tienes matrículas.";
+    }
   }
 
+  if (select) {
+    select.innerHTML = "";
+    const opcionInicial = document.createElement("option");
+    opcionInicial.value = "";
+    opcionInicial.disabled = true;
+    opcionInicial.selected = true;
+    opcionInicial.textContent = "Selecciona una matrícula";
+    select.appendChild(opcionInicial);
+
+    listado.forEach(matricula => {
+      const curso = cursos.find(c =>
+        String(c.id) === String(matricula.curso) ||
+        c.nombre === String(matricula.curso)
+      );
+      const opcion = document.createElement("option");
+      opcion.value = `${matricula.id}|${matricula.curso}|${matricula.alumno}|${matricula.fecha_matricula}`;
+      opcion.textContent = curso
+        ? `${curso.nombre}`
+        : `Curso ${matricula.curso}`;
+      select.appendChild(opcion);
+    });
+  }
 }
 
 function matricularme(event){
   event.preventDefault();
 
-  const cursos = leerDatos(DATOS_CURSOS).filter(c => c.estado === "activo");
-  const form_matricula= document.getElementById("curso_matricula");
-
-  form_matricula.innerHTML = "";
-
-  cursos.forEach(curso => {
-    form_matricula.innerHTML += `<option value="${curso.id}">${curso.nombre}</option>`;
-  });
-
   const cursoSeleccionado = document.getElementById("curso_matricula").value;
-  const todosCursos = leerDatos(DATOS_CURSOS);
+  const curso = leerDatos(DATOS_CURSOS).find(c =>
+    String(c.id) === String(cursoSeleccionado) && c.estado === "activo"
+  );
+  if (!curso) {
+    alert("Selecciona un curso activo.");
+    return;
+  }
+
+  const matriculas = leerDatos(DATOS_MATRICULAS);
 
   const nuevaMat = {
-    id: todosCursos.length + 1,
+    id: matriculas.length + 1,
     alumno: sessionStorage.getItem("usuarioActual"),
     curso: cursoSeleccionado,
     fecha_matricula: new Date().toISOString().split("T")[0],
     estado: "activo"
     };
 
-    const matriculas = leerDatos(DATOS_MATRICULAS);
-
-    const existe = matriculas.some(m => m.curso === nuevaMat.curso && m.alumno === nuevaMat.alumno);
+    const existe = matriculas.some(m =>
+      m.estado === "activo" &&
+      String(m.curso) === String(nuevaMat.curso) &&
+      String(m.alumno) === String(nuevaMat.alumno)
+    );
 
     if(existe){
       alert("Ya te has matriculado en este curso.");
@@ -248,7 +310,19 @@ function matricularme(event){
       return;
     }
 
-    if(!confirm(`Estás seguro de que quieres matricularte en ${cursoSeleccionado.nombre}?`)) {
+    const plazasMaximas = Number(curso.max_plazas);
+    const plazasOcupadas = matriculas.filter(m =>
+      String(m.curso) === String(curso.id) && m.estado === "activo"
+    ).length;
+
+    if (!String(curso.max_plazas).trim() ||
+        !Number.isFinite(plazasMaximas) ||
+        plazasOcupadas >= plazasMaximas) {
+      alert("El curso ya ha alcanzado el número máximo de plazas.");
+      return;
+    }
+
+    if(!confirm(`Estás seguro de que quieres matricularte en ${curso.nombre}?`)) {
       return;
     }
 
@@ -257,4 +331,36 @@ function matricularme(event){
 
     updateSelect();
     mostrarMatriculas();
+}
+
+function cancelarMatriculas(event){
+  event.preventDefault();
+
+  const seleccion = document.getElementById("cancelarmat_select").value;
+  if (!seleccion) {
+    alert("Selecciona una matrícula.");
+    return;
+  }
+
+  const matriculas = leerDatos(DATOS_MATRICULAS);
+  const matricula = matriculas.find(m =>
+    m.estado === "activo" &&
+    `${m.id}|${m.curso}|${m.alumno}|${m.fecha_matricula}` === seleccion
+  );
+
+  if (!matricula) {
+    alert("No se encontró una matrícula activa con esa selección.");
+    mostrarMatriculas();
+    return;
+  }
+
+  const matriculasActualizadas = matriculas.map(m =>
+    m.estado === "activo" &&
+    `${m.id}|${m.curso}|${m.alumno}|${m.fecha_matricula}` === seleccion
+      ? { ...m, estado: "inactivo" }
+      : m
+  );
+  guardarDatos(DATOS_MATRICULAS, matriculasActualizadas);
+  mostrarMatriculas();
+  alert("Matrícula cancelada correctamente.");
 }

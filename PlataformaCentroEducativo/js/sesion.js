@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    inicializarUsuarios();
+    inicializarDatos();
     mostrarSesion();
     saludo();
 
@@ -52,23 +52,161 @@ function leerDatos(array){
    return datos;
 }
 
-function inicializarUsuarios() {
+function inicializarDatos() {
+  const usuariosExistentes = leerDatos(DATOS_USER);
+  const docentesExistentes = leerDatos(DATOS_DOCENTES);
+  const aulasExistentes = leerDatos(DATOS_AULAS);
+  const cursosExistentes = leerDatos(DATOS_CURSOS);
+  const matriculasExistentes = leerDatos(DATOS_MATRICULAS);
+  const hayUsuariosNoIniciales = usuariosExistentes.some(usuario =>
+    usuario.Correo !== "admin@centroeducativo.com"
+  );
 
-    let user = leerDatos(DATOS_USER);
-    
-    if (user.length === 0) {
-        user = [{
-          id: 1, 
-          Nombre: "Admin", 
-          Primer_apellido: "Admin", 
-          Segundo_apellido: "Admin", 
-          Correo: "admin@centroeducativo.com", 
-          Contraseña: "admin", 
-          rol: "admin", 
-          estado: "activo" }
-        ];
-        guardarDatos(DATOS_USER, user);
-      }
+  if (usuariosExistentes.length > 1 || hayUsuariosNoIniciales || docentesExistentes.length > 0 ||
+      aulasExistentes.length > 0 || cursosExistentes.length > 0 ||
+      matriculasExistentes.length > 0) {
+    if (usuariosExistentes.length === 0) {
+      guardarDatos(DATOS_USER, [{
+        id: 1,
+        Nombre: "Admin",
+        Primer_apellido: "Admin",
+        Segundo_apellido: "Admin",
+        Correo: "admin@centroeducativo.com",
+        Contraseña: "admin",
+        Confirmar_contraseña: "admin",
+        rol: "admin",
+        estado: "activo"
+      }]);
+    }
+    return;
+  }
+
+  const admin = usuariosExistentes.find(usuario =>
+    usuario.Correo === "admin@centroeducativo.com"
+  ) || {
+    id: 1,
+    Nombre: "Admin",
+    Primer_apellido: "Admin",
+    Segundo_apellido: "Admin",
+    Correo: "admin@centroeducativo.com",
+    Contraseña: "admin",
+    Confirmar_contraseña: "admin",
+    rol: "admin",
+    estado: "activo"
+  };
+  const fechaAlta = new Date().toLocaleDateString("es-ES");
+
+  const usuarios = [admin,
+    {
+      id: 2, Nombre: "Ane", Primer_apellido: "Garcia", Segundo_apellido: "Lopez",
+      Correo: "ane.garcia@centroeducativo.com", Contraseña: "alumno123",
+      Confirmar_contraseña: "alumno123", rol: "alumno", Fecha_de_alta: fechaAlta,
+      estado: "activo"
+    },
+    {
+      id: 3, Nombre: "Iker", Primer_apellido: "Martinez", Segundo_apellido: "Ruiz",
+      Correo: "iker.martinez@centroeducativo.com", Contraseña: "alumno123",
+      Confirmar_contraseña: "alumno123", rol: "alumno", Fecha_de_alta: fechaAlta,
+      estado: "activo"
+    },
+    {
+      id: 4, Nombre: "Nerea", Primer_apellido: "Sanchez", Segundo_apellido: "Diaz",
+      Correo: "nerea.sanchez@centroeducativo.com", Contraseña: "alumno123",
+      Confirmar_contraseña: "alumno123", rol: "alumno", Fecha_de_alta: fechaAlta,
+      estado: "activo"
+    },
+    {
+      id: 5, Nombre: "Unai", Primer_apellido: "Perez", Segundo_apellido: "Martin",
+      Correo: "unai.perez@centroeducativo.com", Contraseña: "alumno123",
+      Confirmar_contraseña: "alumno123", rol: "alumno", Fecha_de_alta: fechaAlta,
+      estado: "activo"
+    },
+    {
+      id: 6, Nombre: "Ainhoa", Primer_apellido: "Torres", Segundo_apellido: "Ibarra",
+      Correo: "ainhoa.torres@centroeducativo.com", Contraseña: "alumno123",
+      Confirmar_contraseña: "alumno123", rol: "alumno", Fecha_de_alta: fechaAlta,
+      estado: "activo"
+    }
+  ];
+
+  const docentes = [
+    {
+      id: 1, Nombre: "Marta", Primer_apellido: "Lopez", Segundo_apellido: "Sanz",
+      Correo: "marta.lopez@centroeducativo.com", Especialidad: "Matematicas",
+      Telefono: "600000001", Fotografia: "", estado: "activo"
+    },
+    {
+      id: 2, Nombre: "Jon", Primer_apellido: "Garcia", Segundo_apellido: "Gil",
+      Correo: "jon.garcia@centroeducativo.com", Especialidad: "Informatica",
+      Telefono: "600000002", Fotografia: "", estado: "activo"
+    },
+    {
+      id: 3, Nombre: "Leire", Primer_apellido: "Martin", Segundo_apellido: "Vega",
+      Correo: "leire.martin@centroeducativo.com", Especialidad: "Historia",
+      Telefono: "600000003", Fotografia: "", estado: "activo"
+    },
+    {
+      id: 4, Nombre: "Aitor", Primer_apellido: "Ruiz", Segundo_apellido: "Cano",
+      Correo: "aitor.ruiz@centroeducativo.com", Especialidad: "Ingles",
+      Telefono: "600000004", Fotografia: "", estado: "activo"
+    },
+    {
+      id: 5, Nombre: "June", Primer_apellido: "Diaz", Segundo_apellido: "Mora",
+      Correo: "june.diaz@centroeducativo.com", Especialidad: "Biologia",
+      Telefono: "600000005", Fotografia: "", estado: "activo"
+    }
+  ];
+
+  const aulas = [
+    { id: 1, nombre: "Aula 1", edificio: "Principal", planta: "0", capacidad: "25", equipamiento: "Proyector", estado: "activo" },
+    { id: 2, nombre: "Aula 2", edificio: "Principal", planta: "1", capacidad: "20", equipamiento: "Pizarra digital", estado: "activo" },
+    { id: 3, nombre: "Aula 3", edificio: "Anexo", planta: "0", capacidad: "30", equipamiento: "Ordenadores", estado: "activo" },
+    { id: 4, nombre: "Aula 4", edificio: "Anexo", planta: "1", capacidad: "24", equipamiento: "Proyector", estado: "activo" },
+    { id: 5, nombre: "Aula 5", edificio: "Principal", planta: "2", capacidad: "18", equipamiento: "Pizarra", estado: "activo" }
+  ];
+
+  const cursos = [
+    {
+      id: 1, nombre: "Matematicas basicas", descripcion: "Fundamentos de matematicas.",
+      docente: "1", aula: "1", fecha_inicio: "2026-09-01", fecha_fin: "2027-06-30",
+      horario: "Lunes 09:00", max_plazas: "25", foto: "", estado: "activo", plazas_ocupadas: 0
+    },
+    {
+      id: 2, nombre: "Introduccion a la informatica", descripcion: "Conceptos iniciales de informatica.",
+      docente: "2", aula: "2", fecha_inicio: "2026-09-01", fecha_fin: "2027-06-30",
+      horario: "Martes 10:00", max_plazas: "20", foto: "", estado: "activo", plazas_ocupadas: 0
+    },
+    {
+      id: 3, nombre: "Historia contemporanea", descripcion: "Principales procesos historicos contemporaneos.",
+      docente: "3", aula: "3", fecha_inicio: "2026-09-01", fecha_fin: "2027-06-30",
+      horario: "Miercoles 11:00", max_plazas: "30", foto: "", estado: "activo", plazas_ocupadas: 0
+    },
+    {
+      id: 4, nombre: "Ingles intermedio", descripcion: "Practica de ingles de nivel intermedio.",
+      docente: "4", aula: "4", fecha_inicio: "2026-09-01", fecha_fin: "2027-06-30",
+      horario: "Jueves 12:00", max_plazas: "24", foto: "", estado: "activo", plazas_ocupadas: 0
+    },
+    {
+      id: 5, nombre: "Biologia general", descripcion: "Conceptos fundamentales de biologia.",
+      docente: "5", aula: "5", fecha_inicio: "2026-09-01", fecha_fin: "2027-06-30",
+      horario: "Viernes 09:00", max_plazas: "18", foto: "", estado: "activo", plazas_ocupadas: 0
+    }
+  ];
+
+  const matriculas = [
+    { id: 1, alumno: "2", curso: "1", fecha_matricula: "2026-09-01", estado: "activo" },
+    { id: 2, alumno: "3", curso: "2", fecha_matricula: "2026-09-01", estado: "activo" },
+    { id: 3, alumno: "4", curso: "3", fecha_matricula: "2026-09-01", estado: "activo" },
+    { id: 4, alumno: "5", curso: "4", fecha_matricula: "2026-09-01", estado: "activo" },
+    { id: 5, alumno: "6", curso: "5", fecha_matricula: "2026-09-02", estado: "activo" }
+  ];
+
+  guardarDatos(DATOS_USER, usuarios);
+  guardarDatos(DATOS_DOCENTES, docentes);
+  guardarDatos(DATOS_AULAS, aulas);
+  guardarDatos(DATOS_CURSOS, cursos);
+  guardarDatos(DATOS_MATRICULAS, matriculas);
+  updateSelect();
 }
 
 function registrarUsuario(event) {
@@ -81,7 +219,9 @@ function registrarUsuario(event) {
     Segundo_apellido: document.getElementById("Segundo_apellido").value.trim(),
     Correo: document.getElementById("Correo").value.trim(),
     Contraseña: document.getElementById("Contraseña").value.trim(),
-    Confirmar_contraseña: document.getElementById("Confirmar_contraseña").value.trim()
+    Confirmar_contraseña: document.getElementById("Confirmar_contraseña").value.trim(),
+    rol: "alumno",
+    estado: "activo"
   }
 
   const usuarios = leerDatos(DATOS_USER);

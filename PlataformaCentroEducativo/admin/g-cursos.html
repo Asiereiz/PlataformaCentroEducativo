@@ -25,7 +25,6 @@
                     <li><a href="g-matriculas.html">Gestionar matrículas</a></li>
                     <li><a href="importar.html">Importar fichero JSON</a></li>
                     <li><a href="dashboard.html">Indicadores y estadísticas</a></li>
-                    <li><a href="config-parametros.html">Configurar parámetros</a></li>
                 </ul>
             </nav>
 
@@ -50,7 +49,9 @@
                                     <option value="" selected disabled>Selecciona un docente</option>
                             </select>
                         </p>
-                        <label for="aula_alta_curso">Aula: <input type="number" id="aula_alta_curso" name="Aula" required placeholder="Inserta el aula del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="aula_alta_curso">Aula: <select id="aula_alta_curso" name="Aula" required>
+                            <option value="" selected disabled>Selecciona el aula</option>
+                        </select></label>
                         <label for="fecha_inicio_alta_curso">Fecha de inicio: <input type="date" id="fecha_inicio_alta_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="fecha_finalizacion_alta_curso">Fecha de finalización: <input type="date" id="fecha_finalizacion_alta_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="horario_alta_curso">Horario: <input type="text" id="horario_alta_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;</label>
@@ -79,7 +80,9 @@
                                     <option value="" selected disabled>Selecciona un docente</option>
                             </select>
                         </label>
-                        <label for="aula_mod_curso">Aula: <input type="number" id="aula_mod_curso" name="Aula" required placeholder="Inserta el aula del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="aula_mod_curso">Aula: <select id="aula_mod_curso" name="Aula" required>
+                            <option value="" selected disabled>Selecciona el aula</option>
+                        </select></label>
                         <label for="fecha_inicio_mod_curso">Fecha de inicio: <input type="date" id="fecha_inicio_mod_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="fecha_finalizacion_mod_curso">Fecha de finalización: <input type="date" id="fecha_finalizacion_mod_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="horario_mod_curso">Horario: <input type="text" id="horario_mod_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;</label>
