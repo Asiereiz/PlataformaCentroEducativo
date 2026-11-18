@@ -42,7 +42,8 @@ function altaUser(event) {
     Confirmar_contraseña: contraseña,
     rol: document.getElementById("rol_alta_user").value,
     Fecha_de_alta: new Date().toLocaleDateString("es-ES"),
-    estado: document.getElementById("estado_alta_user").value
+    estado: document.getElementById("estado_alta_user").value,
+    Fotografia: FOTOGRAFIA_PREDETERMINADA
   };
 
   const existente = usuarios.find(u => u.Correo === usuario.Correo);
@@ -62,8 +63,14 @@ function modUser(event) {
 
   const idMod = document.getElementById("id_mod_user").value;
   const usuarios = leerDatos(DATOS_USER);
+  const usuarioAnterior = usuarios.find(usuario => String(usuario.id) === idMod);
+  if (!usuarioAnterior) {
+    alert("Selecciona primero un usuario.");
+    return;
+  }
+
   const usuarioModificado = {
-    id: idMod,
+    id: usuarioAnterior.id,
     Nombre: document.getElementById("nombre_mod_user").value.trim(),
     Primer_apellido: document.getElementById("primer_apellido_mod_user").value.trim(),
     Segundo_apellido: document.getElementById("segundo_apellido_mod_user").value.trim(),
@@ -71,7 +78,8 @@ function modUser(event) {
     Contraseña: document.getElementById("contraseña_mod_user").value.trim(),
     Confirmar_contraseña: document.getElementById("contraseña_mod_user").value.trim(),
     rol: document.getElementById("rol_mod_user").value,
-    estado: document.getElementById("estado_mod_user").value
+    estado: document.getElementById("estado_mod_user").value,
+    Fotografia: usuarioAnterior.Fotografia || FOTOGRAFIA_PREDETERMINADA
   };
 
   const usuariosActualizados = usuarios.map(usuario =>

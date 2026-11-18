@@ -52,12 +52,46 @@ function leerDatos(array){
    return datos;
 }
 
+
 function inicializarDatos() {
   const usuariosExistentes = leerDatos(DATOS_USER);
   const docentesExistentes = leerDatos(DATOS_DOCENTES);
   const aulasExistentes = leerDatos(DATOS_AULAS);
   const cursosExistentes = leerDatos(DATOS_CURSOS);
   const matriculasExistentes = leerDatos(DATOS_MATRICULAS);
+  const usuariosConFotografia = usuariosExistentes.map(usuario => {
+    if (esImagenValida(usuario.Fotografia)) {
+      return usuario;
+    }
+
+    return { ...usuario, Fotografia: FOTOGRAFIA_PREDETERMINADA };
+  });
+  if (usuariosConFotografia.some((usuario, indice) => usuario !== usuariosExistentes[indice])) {
+    guardarDatos(DATOS_USER, usuariosConFotografia);
+  }
+
+  const docentesConFotografia = docentesExistentes.map(docente => {
+    if (esImagenValida(docente.Fotografia)) {
+      return docente;
+    }
+
+    return { ...docente, Fotografia: FOTOGRAFIA_PREDETERMINADA };
+  });
+  if (docentesConFotografia.some((docente, indice) => docente !== docentesExistentes[indice])) {
+    guardarDatos(DATOS_DOCENTES, docentesConFotografia);
+  }
+
+  const cursosConImagen = cursosExistentes.map(curso => {
+    if (esImagenValida(curso.foto)) {
+      return curso;
+    }
+
+    return { ...curso, foto: IMAGEN_CURSO_PREDETERMINADA };
+  });
+  if (cursosConImagen.some((curso, indice) => curso !== cursosExistentes[indice])) {
+    guardarDatos(DATOS_CURSOS, cursosConImagen);
+  }
+
   const hayUsuariosNoIniciales = usuariosExistentes.some(usuario =>
     usuario.Correo !== "admin@centroeducativo.com"
   );
@@ -75,7 +109,8 @@ function inicializarDatos() {
         Contraseña: "admin",
         Confirmar_contraseña: "admin",
         rol: "admin",
-        estado: "activo"
+        estado: "activo",
+        Fotografia: FOTOGRAFIA_PREDETERMINADA
       }]);
     }
     return;
@@ -128,32 +163,36 @@ function inicializarDatos() {
       estado: "activo"
     }
   ];
+  const usuariosConImagen = usuarios.map(usuario => ({
+    ...usuario,
+    Fotografia: usuario.Fotografia || FOTOGRAFIA_PREDETERMINADA
+  }));
 
   const docentes = [
     {
       id: 1, Nombre: "Marta", Primer_apellido: "Lopez", Segundo_apellido: "Sanz",
       Correo: "marta.lopez@centroeducativo.com", Especialidad: "Matematicas",
-      Telefono: "600000001", Fotografia: "", estado: "activo"
+      Telefono: "600000001", Fotografia: FOTOGRAFIA_PREDETERMINADA, estado: "activo"
     },
     {
       id: 2, Nombre: "Jon", Primer_apellido: "Garcia", Segundo_apellido: "Gil",
       Correo: "jon.garcia@centroeducativo.com", Especialidad: "Informatica",
-      Telefono: "600000002", Fotografia: "", estado: "activo"
+      Telefono: "600000002", Fotografia: FOTOGRAFIA_PREDETERMINADA, estado: "activo"
     },
     {
       id: 3, Nombre: "Leire", Primer_apellido: "Martin", Segundo_apellido: "Vega",
       Correo: "leire.martin@centroeducativo.com", Especialidad: "Historia",
-      Telefono: "600000003", Fotografia: "", estado: "activo"
+      Telefono: "600000003", Fotografia: FOTOGRAFIA_PREDETERMINADA, estado: "activo"
     },
     {
       id: 4, Nombre: "Aitor", Primer_apellido: "Ruiz", Segundo_apellido: "Cano",
       Correo: "aitor.ruiz@centroeducativo.com", Especialidad: "Ingles",
-      Telefono: "600000004", Fotografia: "", estado: "activo"
+      Telefono: "600000004", Fotografia: FOTOGRAFIA_PREDETERMINADA, estado: "activo"
     },
     {
       id: 5, Nombre: "June", Primer_apellido: "Diaz", Segundo_apellido: "Mora",
       Correo: "june.diaz@centroeducativo.com", Especialidad: "Biologia",
-      Telefono: "600000005", Fotografia: "", estado: "activo"
+      Telefono: "600000005", Fotografia: FOTOGRAFIA_PREDETERMINADA, estado: "activo"
     }
   ];
 
@@ -192,6 +231,10 @@ function inicializarDatos() {
       horario: "Viernes 09:00", max_plazas: "18", foto: "", estado: "activo", plazas_ocupadas: 0
     }
   ];
+  const cursosConImagenInicial = cursos.map(curso => ({
+    ...curso,
+    foto: IMAGEN_CURSO_PREDETERMINADA
+  }));
 
   const matriculas = [
     { id: 1, alumno: "2", curso: "1", fecha_matricula: "2026-09-01", estado: "activo" },
@@ -201,10 +244,10 @@ function inicializarDatos() {
     { id: 5, alumno: "6", curso: "5", fecha_matricula: "2026-09-02", estado: "activo" }
   ];
 
-  guardarDatos(DATOS_USER, usuarios);
+  guardarDatos(DATOS_USER, usuariosConImagen);
   guardarDatos(DATOS_DOCENTES, docentes);
   guardarDatos(DATOS_AULAS, aulas);
-  guardarDatos(DATOS_CURSOS, cursos);
+  guardarDatos(DATOS_CURSOS, cursosConImagenInicial);
   guardarDatos(DATOS_MATRICULAS, matriculas);
   updateSelect();
 }
@@ -221,7 +264,8 @@ function registrarUsuario(event) {
     Contraseña: document.getElementById("Contraseña").value.trim(),
     Confirmar_contraseña: document.getElementById("Confirmar_contraseña").value.trim(),
     rol: "alumno",
-    estado: "activo"
+    estado: "activo",
+    Fotografia: FOTOGRAFIA_PREDETERMINADA
   }
 
   const usuarios = leerDatos(DATOS_USER);

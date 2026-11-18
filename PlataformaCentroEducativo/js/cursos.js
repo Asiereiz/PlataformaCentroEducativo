@@ -40,8 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function altaCurso(event) {
+async function altaCurso(event) {
   event.preventDefault();
+
+  let foto;
+  try {
+    foto = await leerImagen(document.getElementById("foto_alta_curso"));
+  } catch (error) {
+    alert(`No se pudo leer la imagen: ${error.message}`);
+    return;
+  }
 
   const cursos = leerDatos(DATOS_CURSOS);
   const curso = {
@@ -54,25 +62,40 @@ function altaCurso(event) {
     fecha_fin: document.getElementById("fecha_finalizacion_alta_curso").value.trim(),
     horario: document.getElementById("horario_alta_curso").value.trim(),
     max_plazas: document.getElementById("max_plazas_alta_curso").value.trim(),
-    foto: document.getElementById("foto_alta_curso").value.trim(),
+    foto,
     estado: document.getElementById("estado_alta_curso").value.trim(),
     plazas_ocupadas: 0
   };
 
   cursos.push(curso);
-  guardarDatos(DATOS_CURSOS, cursos);
+  if (!guardarDatosConImagen(DATOS_CURSOS, cursos)) {
+    return;
+  }
 
   updateSelect();
   alert("Curso registrado correctamente.");
 }
 
 
-function modCurso(event){
+async function modCurso(event){
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_curso").value;
   const cursos = leerDatos(DATOS_CURSOS);
   const cursoAnterior = cursos.find(curso => String(curso.id) === idMod);
+  if (!cursoAnterior) {
+    alert("Selecciona primero un curso.");
+    return;
+  }
+
+  let fotoNueva;
+  try {
+    fotoNueva = await leerImagen(document.getElementById("foto_mod_curso"));
+  } catch (error) {
+    alert(`No se pudo leer la imagen: ${error.message}`);
+    return;
+  }
+
   const cursoModificado = {
     id: cursoAnterior.id,
     nombre: document.getElementById("nombre_mod_curso").value.trim(),
@@ -83,14 +106,16 @@ function modCurso(event){
     fecha_fin: document.getElementById("fecha_finalizacion_mod_curso").value.trim(),
     horario: document.getElementById("horario_mod_curso").value.trim(),
     max_plazas: document.getElementById("max_plazas_mod_curso").value.trim(),
-    foto: document.getElementById("foto_mod_curso").value.trim(),
+    foto: fotoNueva || cursoAnterior.foto || "",
     estado: document.getElementById("estado_mod_curso").value
   };
 
   const cursosActualizados = cursos.map(curso =>
     String(curso.id) === idMod ? cursoModificado : curso
   );
-  guardarDatos(DATOS_CURSOS, cursosActualizados);
+  if (!guardarDatosConImagen(DATOS_CURSOS, cursosActualizados)) {
+    return;
+  }
   updateSelect();
 
   alert("Curso modificado correctamente.");
@@ -167,7 +192,7 @@ function infoCurso(event){
     <li>Fecha de fin: ${curso.fecha_fin}</li>
     <li>Horario: ${curso.horario}</li>
     <li>Máximo de plazas: ${curso.max_plazas}</li>
-    <li>Foto: ${curso.foto}</li>
+    <li>Imagen: ${curso.foto ? "Disponible" : "No disponible"}</li>
     <li>Estado: ${curso.estado}</li>
   `;
 }
@@ -188,6 +213,7 @@ function mostrarCatalogo() {
 
   cursos.forEach(curso => {
     const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
     const nombre = document.createElement("h4");
     nombre.textContent = curso.nombre;
     tarjeta.appendChild(nombre);
@@ -216,7 +242,7 @@ function buscarCursos() {
   const listado = document.getElementById("resultados_busqueda");
   const cursos = leerDatos(DATOS_CURSOS).filter(curso =>
     curso.estado === "activo" &&
-    `${curso.nombre || ""} ${curso.descripcion || ""}`.toLowerCase().includes(texto)
+    `${curso.nombre || ""}`.toLowerCase().includes(texto)
   );
 
   listado.innerHTML = "";
@@ -231,6 +257,7 @@ function buscarCursos() {
 
   cursos.forEach(curso => {
     const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
     const nombre = document.createElement("h4");
     nombre.textContent = curso.nombre;
     tarjeta.appendChild(nombre);
@@ -252,11 +279,12 @@ function mostrarDetallesCurso() {
     return;
   }
 
-  const cursos = leerDatos(DATOS_CURSOS).filter(curso => curso.estado === "activo" && `${curso.nombre || ""} ${curso.descripcion || ""} ${curso.docente || ""}`.toLowerCase().includes(busqueda));
+  const cursos = leerDatos(DATOS_CURSOS).filter(curso => curso.estado === "activo" && `${curso.nombre || ""}`.toLowerCase().includes(busqueda));
 
   if (cursos.length > 0) {
     cursos.forEach(curso => {
       const tarjeta = document.createElement("article");
+      agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
       const nombre = document.createElement("h4");
       nombre.textContent = curso.nombre;
       tarjeta.appendChild(nombre);
@@ -299,6 +327,7 @@ function mostrarHistorial() {
   if (cursos.length > 0) {
     cursos.forEach(curso => {
     const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
     const nombre = document.createElement("h4");
     nombre.textContent = curso.nombre;
     tarjeta.appendChild(nombre);

@@ -45,6 +45,7 @@ function mostrarDocentes() {
 
   docentes.forEach(d => {
     const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, d.Fotografia, `Fotografía de ${d.Nombre}`);
     const nombre = document.createElement("h4");
     nombre.textContent = d.Nombre;
     tarjeta.appendChild(nombre);
@@ -57,8 +58,7 @@ function mostrarDocentes() {
       `Correo: ${d.Correo}`,
       `Teléfono: ${d.Telefono}`,
       `Especialidad: ${d.Especialidad}`,
-      `Estado: ${d.estado}`,
-      `Fotografía: ${d.Fotografia}`
+      `Estado: ${d.estado}`
     ];
 
     detalles.forEach(detalle => {
@@ -70,8 +70,16 @@ function mostrarDocentes() {
 
 }
 
-function altaDoc(event) {
+async function altaDoc(event) {
   event.preventDefault();
+
+  let fotografia;
+  try {
+    fotografia = await leerImagen(document.getElementById("foto_alta_doc"));
+  } catch (error) {
+    alert(`No se pudo leer la fotografía: ${error.message}`);
+    return;
+  }
 
   const docentes = leerDatos(DATOS_DOCENTES);
   const docente = {
@@ -82,22 +90,37 @@ function altaDoc(event) {
     Correo: document.getElementById("correo_alta_doc").value.trim(),
     Especialidad: document.getElementById("especialidad_alta_doc").value.trim(),
     Telefono: document.getElementById("telefono_alta_doc").value.trim(),
-    Fotografia: document.getElementById("foto_alta_doc").value.trim(),
+    Fotografia: fotografia || FOTOGRAFIA_PREDETERMINADA,
     estado: document.getElementById("estado_alta_doc").value
   };
 
   docentes.push(docente);
-  guardarDatos(DATOS_DOCENTES, docentes);
+  if (!guardarDatosConImagen(DATOS_DOCENTES, docentes)) {
+    return;
+  }
   updateSelect();
   alert("Docente registrado correctamente.");
 }
 
-function modDoc(event) {
+async function modDoc(event) {
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_doc").value;
   const docentes = leerDatos(DATOS_DOCENTES);
   const docenteAnterior = docentes.find(docente => String(docente.id) === idMod);
+  if (!docenteAnterior) {
+    alert("Selecciona primero un docente.");
+    return;
+  }
+
+  let fotografiaNueva;
+  try {
+    fotografiaNueva = await leerImagen(document.getElementById("foto_mod_doc"));
+  } catch (error) {
+    alert(`No se pudo leer la fotografía: ${error.message}`);
+    return;
+  }
+
   const docenteModificado = {
     id: docenteAnterior.id,
     Nombre: document.getElementById("nombre_mod_doc").value.trim(),
@@ -106,14 +129,16 @@ function modDoc(event) {
     Correo: document.getElementById("correo_mod_doc").value.trim(),
     Especialidad: document.getElementById("especialidad_mod_doc").value.trim(),
     Telefono: document.getElementById("telefono_mod_doc").value.trim(),
-    Fotografia: document.getElementById("foto_mod_doc").value.trim(),
+    Fotografia: fotografiaNueva || docenteAnterior.Fotografia || FOTOGRAFIA_PREDETERMINADA,
     estado: document.getElementById("estado_mod_doc").value
   };
 
   const docentesActualizados = docentes.map(docente =>
     String(docente.id) === idMod ? docenteModificado : docente
   );
-  guardarDatos(DATOS_DOCENTES, docentesActualizados);
+  if (!guardarDatosConImagen(DATOS_DOCENTES, docentesActualizados)) {
+    return;
+  }
   updateSelect();
   alert("Docente modificado correctamente.");
 }
@@ -186,7 +211,7 @@ function infoDoc(event) {
     <li>Correo: ${docente.Correo}</li>
     <li>Especialidad: ${docente.Especialidad}</li>
     <li>Teléfono: ${docente.Telefono}</li>
-    <li>Fotografía: ${docente.Fotografia}</li>
+    <li>Fotografía: ${docente.Fotografia ? "Disponible" : "No disponible"}</li>
     <li>Estado: ${docente.estado}</li>
   `;
 }

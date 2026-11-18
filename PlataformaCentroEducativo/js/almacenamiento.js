@@ -7,6 +7,8 @@ const DATOS_CURSOS = "datos_cursos";
 const DATOS_AULAS = "datos_aulas";
 const DATOS_DOCENTES = "datos_docentes";
 const DATOS_MATRICULAS = "datos_matriculas";
+const FOTOGRAFIA_PREDETERMINADA = "../img/usuario-predeterminado.jpg";
+const IMAGEN_CURSO_PREDETERMINADA = "../img/curso-ucm.png";
 
 function updateSelect() {
     const aulas = leerDatos(DATOS_AULAS);
@@ -57,4 +59,62 @@ function actualizarOpciones(id, datos, campo, texto = "Selecciona un ID") {
   datos.forEach(dato => {
     select.innerHTML += `<option value="${dato.id}">${dato.id} - ${dato[campo]}</option>`;
   });
+}
+
+function leerImagen(input) {
+  const archivo = input.files[0];
+  if (!archivo) {
+    return Promise.resolve("");
+  }
+
+  if (!archivo.type.startsWith("image/")) {
+    return Promise.reject(new Error("El archivo seleccionado no es una imagen."));
+  }
+
+  return new Promise((resolve, reject) => {
+    const lector = new FileReader();
+    lector.onload = () => {
+      if (typeof lector.result === "string") {
+        resolve(lector.result);
+      } else {
+        reject(new Error("No se pudo leer el contenido de la imagen."));
+      }
+    };
+    lector.onerror = () => reject(lector.error || new Error("Error al leer la imagen."));
+    lector.readAsDataURL(archivo);
+  });
+}
+
+function agregarImagen(tarjeta, fuenteImagen, textoAlternativo) {
+  if (!esImagenValida(fuenteImagen)) {
+    return;
+  }
+
+  const imagen = document.createElement("img");
+  imagen.src = fuenteImagen;
+  imagen.alt = textoAlternativo;
+  imagen.loading = "lazy";
+  imagen.className = "imagen-tarjeta";
+  tarjeta.appendChild(imagen);
+}
+
+function esImagenValida(imagen) {
+  return typeof imagen === "string" && (
+    imagen.startsWith("data:image/") ||
+    /^\.\.\/img\/[\w.-]+\.(?:png|jpe?g|webp|gif)$/i.test(imagen)
+  );
+}
+
+function guardarDatosConImagen(clave, datos) {
+  try {
+    guardarDatos(clave, datos);
+    return true;
+  } catch (error) {
+    if (error && (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")) {
+      alert("No se pudieron guardar los datos porque se ha alcanzado el espacio disponible. Prueba con una imagen de menor tamaño.");
+      return false;
+    }
+
+    throw error;
+  }
 }
