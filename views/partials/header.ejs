@@ -1,0 +1,104 @@
+<%
+  /* Cabecera común de todas las páginas (tema 5.2, apartado 3: includes en EJS).
+     Datos opcionales que puede pasar cada vista:
+       variante   -> "publico" fuerza la cabecera de visitante
+       accesos    -> en la cabecera pública: "completo" (login + registro) o "login"
+       migas      -> [{ texto, href }] para el camino de migas (después de "Inicio")
+       seccion    -> "admin" para el menú de administración, y actual = página actual
+       ocultarInicio, claseSalir -> pequeños ajustes del menú */
+  const privado = Boolean(locals.usuario) && locals.variante !== "publico";
+  const admin = privado && usuario.rol === "admin";
+  const migas = locals.migas || [];
+  const inicio = privado ? "/portal" : "/";
+  const claseSalir = locals.claseSalir || "logout";
+  const menuAdmin = [
+    ["cursos", "/admin/cursos", "Gestionar cursos"],
+    ["docentes", "/admin/docentes", "Gestionar docentes"],
+    ["aulas", "/admin/aulas", "Gestionar aulas"],
+    ["usuarios", "/admin/usuarios", "Gestionar usuarios"],
+    ["matriculas", "/admin/matriculas", "Gestionar matrículas"],
+    ["importar", "/admin/importar", "Importar fichero JSON"],
+    ["dashboard", "/admin/dashboard", "Indicadores y estadísticas"]
+  ];
+%>
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+
+        <title>Plataforma Centro Educativo</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+
+    <body class="<%= locals.clasesBody || '' %>">
+
+<% if (!privado) { %>
+        <header class="header-bienvenida">
+            <h1><a class="titulo" href="/">Portal Centro Educativo</a></h1>
+            <h2><a class="titulo" href="/">Bienvenido</a></h2>
+<% if (locals.accesos === "completo") { %>
+
+            <nav class="nav-acceso">
+                <ul>
+                    <li><a class="login" href="/login">Iniciar sesión</a></li>
+                    <li><a class="login" href="/registro">Registrarme</a></li>
+                </ul>
+            </nav>
+<% } else if (locals.accesos === "login") { %>
+
+            <nav class="nav-acceso">
+                <ul>
+                    <li><a class="login" href="/login">Iniciar sesión</a></li>
+                </ul>
+            </nav>
+<% } %>
+
+            <nav id="migapan">
+                <a href="/">Inicio</a>
+<% migas.forEach(miga => { %>
+                <span>&nbsp;&gt;&nbsp;</span>
+                <a href="<%= miga.href %>"><%= miga.texto %></a>
+<% }) %>
+            </nav>
+
+        </header>
+<% } else { %>
+        <header<% if (admin) { %> class="header-admin"<% } %>>
+            <h1><a class="titulo" href="/portal">Portal Centro Educativo</a>
+               <% if (admin) { %><span class="estado-sesion estado-sesion-visible sesionAdmin">Sesión como administrador</span>
+               <% } else { %><span class="estado-sesion estado-sesion-visible sesionAlumno">Sesión como alumno</span><% } %>
+            </h1>
+            <nav>
+                <ul>
+<% if (locals.seccion === "admin") { %>
+                    <li><a href="/portal">Inicio</a></li>
+<% menuAdmin.forEach(([clave, href, texto]) => { if (clave !== locals.actual) { %>
+                    <li><a href="<%= href %>"><%= texto %></a></li>
+<% } }) %>
+<% } else { %>
+<% if (!locals.ocultarInicio) { %>
+                    <li><a href="/portal">Inicio</a></li>
+<% } %>
+<% if (admin) { %>
+                    <li class="sesionAdmin"><a href="/admin/cursos">Panel de administración</a></li>
+<% } %>
+                    <li><a href="/cursos">Cursos</a></li>
+                    <li><a href="/docentes">Docentes</a></li>
+                    <li><a href="/mis-matriculas">Mis matrículas</a></li>
+                    <li><a href="/perfil">Perfil</a></li>
+                    <li><a href="/accesibilidad">Accesibilidad</a></li>
+<% } %>
+                </ul>
+            </nav>
+            <a class="<%= claseSalir %>" href="/logout">Cerrar sesión</a>
+            <nav id="migapan">
+                <a href="/portal">Inicio</a>
+<% migas.forEach(miga => { %>
+                <span>&nbsp;&gt;&nbsp;</span>
+                <a href="<%= miga.href %>"><%= miga.texto %></a>
+<% }) %>
+            </nav>
+        </header>
+<% } %>

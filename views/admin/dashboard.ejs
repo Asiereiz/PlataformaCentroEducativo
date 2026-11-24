@@ -1,0 +1,19 @@
+<%- include('../partials/header', { seccion: "admin", actual: "dashboard", migas: [{ texto: "Indicadores y estadísticas", href: "/admin/dashboard" }] }) %>
+
+        <main>
+<%- include('../partials/mensajes') %>
+            <h3>Indicadores y estadísticas</h3>
+            <div id="estadisticas">
+                <p>Total de cursos activos: <%= estadisticas.cursos_activos %></p>
+                <p>Total de alumnos registrados: <%= estadisticas.alumnos %></p>
+                <p>Total de docentes activos: <%= estadisticas.docentes_activos %></p>
+                <p>Ocupación de aulas: <%= estadisticas.aulas_ocupadas %> / <%= estadisticas.aulas_total %> (<%= estadisticas.porcentaje_ocupacion %>%)</p>
+                <ul>
+<% estadisticas.top_cursos.forEach(curso => { %>
+                    <li><%= curso.nombre %>: <%= curso.total %> matriculados</li>
+<% }) %>
+                </ul>
+            </div>
+        </main>
+
+<%- include('../partials/footer') %>

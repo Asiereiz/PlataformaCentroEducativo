@@ -1,0 +1,19 @@
+<% const datos = locals.datos || {}; %>
+<%- include('partials/header', { variante: "publico", migas: [{ texto: "Iniciar sesión", href: "/login" }] }) %>
+
+        <main>
+<%- include('partials/mensajes') %>
+            <section id="loggear">
+                <form id="formlogin" action="/login" method="post">
+                    <legend>Datos personales</legend>
+                    <fieldset>
+                        <label for="Correo">Correo electrónico: <input type="email" id="Correo" name="correo" value="<%= datos.correo || '' %>" required placeholder="Inserta tu correo electrónico"></label>
+                        <label for="Contraseña">Contraseña: <input type="password" id="Contraseña" name="contrasena" required placeholder="Inserta tu contraseña"> &nbsp;&nbsp;&nbsp;</label>
+                        <button type="submit"> Iniciar sesión</button>
+                        <p>¿No tienes cuenta? <a class="registrate" href="/registro">Regístrate</a></p>
+                    </fieldset>
+                </form>
+            </section>
+        </main>
+
+<%- include('partials/footer', { variante: "publico" }) %>

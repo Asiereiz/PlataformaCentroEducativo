@@ -1,0 +1,55 @@
+<%
+  /* Página de gestión (alta, modificación, eliminación y consulta) de una entidad.
+     Se rellena con la configuración g que prepara routes/gestion.web.js. */
+  const enctype = g.campos.some(c => c.tipo === "file") ? ' enctype="multipart/form-data"' : "";
+%>
+<%- include('../partials/header', { seccion: "admin", actual: g.actual, migas: [{ texto: g.titulo, href: "/admin/" + g.ruta }] }) %>
+
+        <main class="gestion">
+<%- include('../partials/mensajes') %>
+            <section class="alta">
+                <form action="/admin/<%= g.ruta %>" method="post" id="alta_<%= g.clave %>"<%- enctype %>>
+                    <legend>Alta</legend>
+<% g.campos.forEach(c => { %>
+                    <label for="<%= c.n %>_alta_<%= g.clave %>"><%= c.et %>: <%- include('campo', { c, forma: "alta" }) %><% if (c.nota) { %> <%= c.nota.alta %><% } %></label>
+<% }) %>
+                    <button type="submit"> Registrar</button>
+                </form>
+            </section>
+
+            <section class="mod">
+                <form action="/admin/<%= g.ruta %>/modificar" method="post" id="mod_<%= g.clave %>"<%- enctype %> data-recurso="<%= g.ruta %>">
+                    <legend>Modificar</legend>
+                    <label for="id_mod_<%= g.clave %>">Identificador: <%- include('id-select', { forma: "mod" }) %></label>
+<% g.campos.forEach(c => { %>
+                    <label for="<%= c.n %>_mod_<%= g.clave %>"><%= c.et %>: <%- include('campo', { c, forma: "mod" }) %><% if (c.nota) { %> <%= c.nota.mod %><% } %></label>
+<% }) %>
+                    <button type="submit"> Modificar</button>
+                </form>
+            </section>
+
+            <section class="del">
+                <form action="/admin/<%= g.ruta %>/eliminar" method="post" id="del_<%= g.clave %>" data-confirmar="¿Seguro que quieres eliminar <%= g.eliminar %>?">
+                    <legend>Eliminar</legend>
+                    <label for="id_del_<%= g.clave %>">Identificador: <%- include('id-select', { forma: "del" }) %></label>
+                    <button type="submit"> Eliminar</button>
+                </form>
+            </section>
+
+            <section class="info">
+                <!-- La consulta se hace con Fetch: GET /api/<%= g.ruta %>/:id y se muestran los datos recibidos en JSON -->
+                <form action="/admin/<%= g.ruta %>" method="get" id="info_<%= g.clave %>" data-recurso="<%= g.ruta %>">
+                    <legend>Consulta</legend>
+<% if (g.consultaPor === "alumno-curso") { %>
+                    <label for="alumno_info_<%= g.clave %>">Alumno: <%- include('campo', { c: { n: "alumno", tipo: "select", ph: "Selecciona un alumno", opciones: g.campos[0].opciones }, forma: "info" }) %></label>
+                    <label for="curso_info_<%= g.clave %>">Curso: <%- include('campo', { c: { n: "curso", tipo: "select", ph: "Selecciona un curso", opciones: g.campos[1].opciones }, forma: "info" }) %></label>
+<% } else { %>
+                    <label for="id_info_<%= g.clave %>">Identificador: <%- include('id-select', { forma: "info" }) %></label>
+<% } %>
+                    <button type="submit"> Consultar</button>
+                </form>
+                <ul id="listado_<%= g.clave %>" data-etiquetas="<%= JSON.stringify(g.info) %>"></ul>
+            </section>
+        </main>
+
+<%- include('../partials/footer', { scripts: ["/js/formularios.js", "/js/admin.js"] }) %>

@@ -1,0 +1,46 @@
+<% const datos = locals.datos || {}; %>
+<%- include('partials/header', { migas: [{ texto: "Perfil", href: "/perfil" }] }) %>
+
+        <main>
+<%- include('partials/mensajes') %>
+            <div id="perfil-contenido">
+                <section>
+                    <h3>Mi perfil</h3>
+                    <div id="miperfil">
+                        <img class="imagen-tarjeta imagen-perfil" src="<%= perfil.fotografia %>" alt="Fotografía de <%= perfil.nombre %>">
+                        <p>Nombre: <%= perfil.nombre %></p>
+                        <p>Primer apellido: <%= perfil.primer_apellido %></p>
+                        <p>Segundo apellido: <%= perfil.segundo_apellido %></p>
+                        <p>Correo: <%= perfil.correo %></p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Editar información</h3>
+                    <div id="editarPerfil">
+                        <form id="editProfile" action="/perfil" method="post" enctype="multipart/form-data">
+                            <label for="nombre_editar">Nombre:</label>
+                            <input type="text" id="nombre_editar" name="nombre" value="<%= datos.nombre || '' %>" placeholder="Nuevo nombre">
+                            <label for="primerApellido_editar">Primer apellido:</label>
+                            <input type="text" id="primerApellido_editar" name="primer_apellido" value="<%= datos.primer_apellido || '' %>" placeholder="Nuevo primer apellido">
+                            <label for="segundoApellido_editar">Segundo apellido:</label>
+                            <input type="text" id="segundoApellido_editar" name="segundo_apellido" value="<%= datos.segundo_apellido || '' %>" placeholder="Nuevo segundo apellido">
+                            <label for="correo_editar">Correo:</label>
+                            <input type="email" id="correo_editar" name="correo" value="<%= datos.correo || '' %>" placeholder="Nuevo correo">
+                            <label for="contraseña_editar">Contraseña:</label>
+                            <input type="password" id="contraseña_editar" name="contrasena" placeholder="Nueva contraseña">
+                            <label for="confirmarContraseña_editar">Confirmar contraseña:</label>
+                            <input type="password" id="confirmarContraseña_editar" name="confirmar_contrasena" placeholder="Confirmar nueva contraseña">
+                            <label for="telefono_editar">Teléfono:</label>
+                            <input type="text" id="telefono_editar" name="telefono" value="<%= datos.telefono || '' %>" placeholder="Nuevo teléfono">
+                            <label for="fotografia_editar">Fotografía del perfil (opcional):</label>
+                            <input type="file" id="fotografia_editar" name="foto" accept="image/jpeg,image/png,image/webp">
+                            <small>Si no seleccionas una imagen nueva, se conserva la actual. Formatos: jpg, png o webp (máximo 2 MB).</small>
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,22 @@
+<% const datos = locals.datos || {}; %>
+<%- include('partials/header', { variante: "publico", accesos: "login", migas: [{ texto: "Registrarme", href: "/registro" }] }) %>
+
+        <main>
+<%- include('partials/mensajes') %>
+            <section id="loggear">
+                <form id="formregistro" action="/registro" method="post">
+                    <legend>Datos personales</legend>
+                    <fieldset>
+                        <label for="Nombre">Nombre: <input type="text" id="Nombre" name="nombre" value="<%= datos.nombre || '' %>" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="Primer_apellido">Primer apellido: <input type="text" id="Primer_apellido" name="primer_apellido" value="<%= datos.primer_apellido || '' %>" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="Segundo_apellido">Segundo apellido: <input type="text" id="Segundo_apellido" name="segundo_apellido" value="<%= datos.segundo_apellido || '' %>" required placeholder="Inserta tu segundo apellido"></label>
+                        <label for="Correo">Correo electrónico: <input type="email" id="Correo" name="correo" value="<%= datos.correo || '' %>" required placeholder="Inserta tu correo electrónico"></label>
+                        <label for="Contraseña">Contraseña: <input type="password" id="Contraseña" name="contrasena" required placeholder="Inserta tu contraseña"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="Confirmar_contraseña">Confirmar contraseña: <input type="password" id="Confirmar_contraseña" name="confirmar_contrasena" required placeholder="Confirma tu contraseña"></label>
+                        <button type="submit"> Registrarme</button>
+                    </fieldset>
+                </form>
+            </section>
+        </main>
+
+<%- include('partials/footer', { variante: "publico" }) %>

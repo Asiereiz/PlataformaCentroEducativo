@@ -1,0 +1,27 @@
+<%- include('partials/header', { migas: [{ texto: "Accesibilidad", href: "/accesibilidad" }] }) %>
+
+        <main>
+<%- include('partials/mensajes') %>
+            <!-- Las preferencias se guardan en cookies (res.cookie) y las lee el servidor en cada petición -->
+            <form action="/accesibilidad" method="post">
+                <div id="config">
+                    <label for="modoPantalla">Seleccionar Tema:
+                        <select id="modoPantalla" name="tema" data-autoenviar>
+                            <option value="claro"<%= tema === "claro" ? " selected" : "" %>>Modo claro</option>
+                            <option value="oscuro"<%= tema === "oscuro" ? " selected" : "" %>>Modo oscuro</option>
+                            <option value="contraste"<%= tema === "contraste" ? " selected" : "" %>>Modo contraste</option>
+                        </select>
+                    </label>
+                    <label for="sizeLetra">Seleccionar tamaño de letra:
+                        <select id="sizeLetra" name="tamfuente" data-autoenviar>
+                            <option value="small"<%= tamfuente === "small" ? " selected" : "" %>>Pequeño</option>
+                            <option value="medium"<%= tamfuente === "medium" ? " selected" : "" %>>Mediano</option>
+                            <option value="large"<%= tamfuente === "large" ? " selected" : "" %>>Grande</option>
+                        </select>
+                    </label>
+                    <noscript><button type="submit">Guardar preferencias</button></noscript>
+                </div>
+            </form>
+        </main>
+
+<%- include('partials/footer', { scripts: ["/js/formularios.js"] }) %>
