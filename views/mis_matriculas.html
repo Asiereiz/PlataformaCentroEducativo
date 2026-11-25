@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+
+        <title>Plataforma Centro Educativo</title>
+        <meta charset= "UTF-8">
+        <link rel="stylesheet" href="css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+
+    <body>
+
+        <header>
+            <h1><a class="titulo" id="tituloInicio" href="portal.html">Portal Centro Educativo</a>
+                <span class="estado-sesion sesionAdmin" hidden>Sesión como administrador</span>
+                <span class="estado-sesion sesionAlumno" hidden>Sesión como alumno</span>
+            </h1>
+
+            <nav>
+                <ul>
+                    <li><a href="portal.html">Inicio</a></li>
+                    <li class="sesionAdmin" hidden><a href="admin/g-cursos.html">Panel de administración</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="docentes.html">Docentes</a></li>
+                    <li><a href="mis_matriculas.html">Mis matrículas</a></li>
+                    <li><a href="perfil.html">Perfil</a></li>
+                    <li><a href="accesibilidad.html">Accesibilidad</a></li>
+                </ul>
+            </nav>
+
+            <a class="logout" href="index.html">Cerrar sesión</a>
+
+            <nav id="migapan">
+                <a href="portal.html" class="sesionAlumno" hidden>Inicio</a>
+                <a href="portal.html" class="sesionAdmin" hidden>Inicio</a>
+                <span>&nbsp;&gt;&nbsp;</span>
+                <a href="mis_matriculas.html">Mis matrículas</a>
+            </nav>
+        </header>
+
+        <main>
+
+            <section id="ver_matriculas">
+                <h3>Mis matrículas</h3>
+                <div id="ver_mis_matriculas"></div>
+            </section>
+
+            <section id="matricularme">
+                <h3>Matricularme</h3>
+                <form id="matricularme_form" method="post" action="#">
+                    <label for="curso_matricula">Selecciona un curso:</label>
+                    <select id="curso_matricula" name="curso_matricula">
+                        <option value="" disabled selected>Selecciona un curso</option>
+                    </select>
+                    <button type="submit">Matricularme</button>
+                </form>
+                    
+            </section>
+
+            <section id="cancelar_matricula">
+                <h3>Cancelar matrícula</h3>
+                <div id="cancelar_matricula">
+                    <form id="cancelarmat_form" method="post" action="#">
+                        <label for="cancelarmat_select">Selecciona un curso:</label>
+                        <select id="cancelarmat_select" name="cancelarmat_select">
+                            <option value="" disabled selected>Selecciona una matrícula</option>
+                        </select>
+                        <button type="submit">Cancelar matrícula</button>
+                    </form>
+                </div>
+            </section>
+
+
+        </main>
+
+        <footer class="footer-contacto">
+            <h3>Estamos aquí para ayudarte</h3>
+            <p class="footer-contacto-intro">
+                Si tienes alguna consulta sobre nuestros cursos, matrículas o servicios, puedes ponerte en contacto
+                con nuestro equipo. Estaremos encantados de atenderte.
+            </p>
+            <div class="footer-contacto-tarjetas">
+                <article><h4>Correo electrónico</h4><p><a href="mailto:info@centroeducativo.com">info@centroeducativo.com</a></p></article>
+                <article><h4>Teléfono</h4><p>+34 000 000 000</p></article>
+                <article><h4>Dirección</h4><p>Dirección del centro educativo</p></article>
+                <article><h4>Horario de atención</h4><p>Lunes a viernes: 09:00 - 14:00</p></article>
+            </div>
+            <p class="footer-contacto-enlace">Contacta con nosotros haciendo click <a href="contacto.html">aquí.</a></p>
+        </footer>
+
+        <script src="js/almacenamiento.js"></script>
+        <script src="js/sesion.js"></script>
+        <script src="js/preferencias.js"></script>
+        <script src="js/matriculas.js"></script>
+    </body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+
+        <title>Plataforma Centro Educativo</title>
+        <meta charset= "UTF-8">
+        <link rel="stylesheet" href="css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+
+    <body>
+
+        <header>
+            <h1><a class="titulo" id="tituloInicio" href="portal.html">Portal Centro Educativo</a>
+                <span class="estado-sesion sesionAdmin" hidden>Sesión como administrador</span>
+                <span class="estado-sesion sesionAlumno" hidden>Sesión como alumno</span>
+            </h1>
+
+            <nav>
+                <ul>
+                    <li><a href="portal.html">Inicio</a></li>
+                    <li class="sesionAdmin" hidden><a href="admin/g-cursos.html">Panel de administración</a></li>
+                    <li><a href="cursos.html">Cursos</a></li>
+                    <li><a href="docentes.html">Docentes</a></li>
+                    <li><a href="mis_matriculas.html">Mis matrículas</a></li>
+                    <li><a href="perfil.html">Perfil</a></li>
+                    <li><a href="accesibilidad.html">Accesibilidad</a></li>
+                </ul>
+            </nav>
+
+            <a class="logout" href="index.html">Cerrar sesión</a>
+
+            <nav id="migapan">
+                <a href="portal.html" class="sesionAlumno" hidden>Inicio</a>
+                <a href="portal.html" class="sesionAdmin" hidden>Inicio</a>
+                <span>&nbsp;&gt;&nbsp;</span>
+                <a href="perfil.html">Perfil</a>
+            </nav>
+        </header>
+
+        <main>
+
+            <div id="perfil-contenido">
+                <section>
+                    <h3>Mi perfil</h3>
+                    <div id="miperfil"></div>
+                </section>
+                <section>
+                    <h3>Editar información</h3>
+                    <div id="editarPerfil">
+                        <form id="editProfile">
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre_editar" name="nombre" placeholder="Nuevo nombre">
+                            <label for="primerApellido">Primer apellido:</label>
+                            <input type="text" id="primerApellido_editar" name="primerApellido" placeholder="Nuevo primer apellido">
+                            <label for="segundoApellido">Segundo apellido:</label>
+                            <input type="text" id="segundoApellido_editar" name="segundoApellido" placeholder="Nuevo segundo apellido">
+                            <label for="correo">Correo:</label>
+                            <input type="email" id="correo_editar" name="correo" placeholder="Nuevo correo">
+                            <label for="contraseña">Contraseña:</label>
+                            <input type="password" id="contraseña_editar" name="contraseña" placeholder="Nueva contraseña">
+                            <label for="confirmarContraseña">Confirmar contraseña:</label>
+                            <input type="password" id="confirmarContraseña_editar" name="confirmarContraseña" placeholder="Confirmar nueva contraseña">
+                            <label for="telefono">Teléfono:</label>
+                            <input type="text" id="telefono_editar" name="telefono" placeholder="Nuevo teléfono">
+                            <label for="fotografia_editar">Fotografía del perfil (opcional):</label>
+                            <input type="file" id="fotografia_editar" name="Fotografia" accept="image/*">
+                            <small>Si no seleccionas una imagen nueva, se conserva la actual.</small>
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+            
+        </main>
+
+        <footer class="footer-contacto">
+            <h3>Estamos aquí para ayudarte</h3>
+            <p class="footer-contacto-intro">
+                Si tienes alguna consulta sobre nuestros cursos, matrículas o servicios, puedes ponerte en contacto
+                con nuestro equipo. Estaremos encantados de atenderte.
+            </p>
+            <div class="footer-contacto-tarjetas">
+                <article><h4>Correo electrónico</h4><p><a href="mailto:info@centroeducativo.com">info@centroeducativo.com</a></p></article>
+                <article><h4>Teléfono</h4><p>+34 000 000 000</p></article>
+                <article><h4>Dirección</h4><p>Dirección del centro educativo</p></article>
+                <article><h4>Horario de atención</h4><p>Lunes a viernes: 09:00 - 14:00</p></article>
+            </div>
+            <p class="footer-contacto-enlace">Contacta con nosotros haciendo click <a href="contacto.html">aquí.</a></p>
+        </footer>
+
+        <script src="js/almacenamiento.js"></script>
+        <script src="js/sesion.js"></script>
+        <script src="js/preferencias.js"></script>
+        <script src="js/perfil.js"></script>
+    </body>
+
+</html>

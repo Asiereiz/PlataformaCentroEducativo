@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+
+        <title>Plataforma Centro Educativo</title>
+        <meta charset= "UTF-8">
+        <link rel="stylesheet" href="../css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+
+    <body>
+
+        <header>
+            <h1><a class="titulo" href="../admin.html">Portal Centro Educativo</a>
+                <span class="estado-sesion sesionAdmin" hidden>Sesión como administrador</span>
+                <span class="estado-sesion sesionAlumno" hidden>Sesión como alumno</span>
+            </h1>
+            <nav>
+                <ul>
+                    <li><a href="../portal.html">Inicio</a></li>
+                    <li><a href="g-docentes.html">Gestionar docentes</a></li>
+                    <li><a href="g-aulas.html">Gestionar aulas</a></li>
+                    <li><a href="g-usuarios.html">Gestionar usuarios</a></li>
+                    <li><a href="g-matriculas.html">Gestionar matrículas</a></li>
+                    <li><a href="importar.html">Importar fichero JSON</a></li>
+                    <li><a href="dashboard.html">Indicadores y estadísticas</a></li>
+                </ul>
+            </nav>
+
+            <a class="logout" href="../index.html">Cerrar sesión</a>
+
+            <nav id="migapan">
+                <a href="../portal.html">Inicio</a>
+                <span>&nbsp;&gt;&nbsp;</span>
+                <a href="g-cursos.html">Gestionar cursos</a>
+            </nav>
+
+        </header>
+
+        <main class="gestion">
+
+            <section class="alta">
+                <form action="#" method="post" id="alta_curso">
+                    <legend>Alta</legend>
+                        <label for="nombre_alta_curso">Nombre: <input type="text" id="nombre_alta_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;
+                        <label for="descripcion_alta_curso">Descripción: <textarea id="descripcion_alta_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea> &nbsp;&nbsp;&nbsp;
+                        <label for="docente_alta_curso">Docente responsable: <select id="docente_alta_curso" name="docente" required>
+                                    <option value="" selected disabled>Selecciona un docente</option>
+                            </select>
+                        </p>
+                        <label for="aula_alta_curso">Aula: <select id="aula_alta_curso" name="Aula" required>
+                            <option value="" selected disabled>Selecciona el aula</option>
+                        </select></label>
+                        <label for="fecha_inicio_alta_curso">Fecha de inicio: <input type="date" id="fecha_inicio_alta_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_finalizacion_alta_curso">Fecha de finalización: <input type="date" id="fecha_finalizacion_alta_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="horario_alta_curso">Horario: <input type="text" id="horario_alta_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="max_plazas_alta_curso">Número máximo de plazas: <input type="number" id="max_plazas_alta_curso" name="Max_plazas" required placeholder="Inserta el número máximo de plazas"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="foto_alta_curso">Imagen representativa: <input type="file" id="foto_alta_curso" name="Fotografia" accept="image/*" required placeholder="Inserta tu fotografía"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="estado_alta_curso">Estado: <select id="estado_alta_curso" name="estado" required>
+                                    <option value="" selected disabled>Selecciona un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                        </p>
+                            <button type="submit"> Registrar</button>
+                </form>
+            </section> 
+            
+            <section class="mod">
+                <form action="#" method="post" id="mod_curso">
+                    <legend>Modificar</legend>
+                        <p>Identificador: <select id="id_mod_curso" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </p>
+                        <label for="nombre_mod_curso">Nombre: <input type="text" id="nombre_mod_curso" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="descripcion_mod_curso">Descripción: <textarea id="descripcion_mod_curso" name="Descripcion" rows="5" cols="50" required placeholder="Inserta la descripción del curso"></textarea></label>
+                        <label for="docente_mod_curso">Docente responsable: <select id="docente_mod_curso" name="docente" required>
+                                    <option value="" selected disabled>Selecciona un docente</option>
+                            </select>
+                        </label>
+                        <label for="aula_mod_curso">Aula: <select id="aula_mod_curso" name="Aula" required>
+                            <option value="" selected disabled>Selecciona el aula</option>
+                        </select></label>
+                        <label for="fecha_inicio_mod_curso">Fecha de inicio: <input type="date" id="fecha_inicio_mod_curso" name="Fecha_inicio" required placeholder="Inserta la fecha de inicio del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="fecha_finalizacion_mod_curso">Fecha de finalización: <input type="date" id="fecha_finalizacion_mod_curso" name="Fecha_finalizacion" required placeholder="Inserta la fecha de finalización del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="horario_mod_curso">Horario: <input type="text" id="horario_mod_curso" name="Horario" required placeholder="Inserta el horario del curso"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="max_plazas_mod_curso">Número máximo de plazas: <input type="number" id="max_plazas_mod_curso" name="Max_plazas" required placeholder="Inserta el número máximo de plazas"> &nbsp;&nbsp;&nbsp;</label>
+                        <label for="foto_mod_curso">Imagen representativa: <input type="file" id="foto_mod_curso" name="Fotografia" accept="image/*" placeholder="Inserta tu fotografía"> Opcional: si no eliges otra, se conserva la imagen actual. &nbsp;&nbsp;&nbsp;</label>
+                        <p>Estado: <select id="estado_mod_curso" name="estado" required>
+                                    <option value="" selected disabled>Selecciona un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                        </p>
+                        <button type="submit"> Modificar</button>
+                </form>
+            </section>
+
+            <section class="del">
+                <form action="#" method="post" id="del_curso">
+                    <legend>Eliminar</legend>
+                        <label for="id_del_curso">Identificador: <select id="id_del_curso" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </label>
+                        <button type="submit"> Eliminar</button>
+                </form>
+            </section>
+
+            <section class="info">
+                <form action="#" method="post" id="info_curso">
+                    <legend>Consulta</legend>
+                        <label for="id_info_curso">Identificador: <select id="id_info_curso" name="id" required>
+                            <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
+                            </select>
+                        </label>
+                        <button type="submit"> Consultar</button>
+                </form>
+                <ul id="listado_curso"></ul>
+            </section>              
+
+        </main>
+
+        <footer class="footer-contacto">
+            <h3>Estamos aquí para ayudarte</h3>
+            <p class="footer-contacto-intro">
+                Si tienes alguna consulta sobre nuestros cursos, matrículas o servicios, puedes ponerte en contacto
+                con nuestro equipo. Estaremos encantados de atenderte.
+            </p>
+            <div class="footer-contacto-tarjetas">
+                <article><h4>Correo electrónico</h4><p><a href="mailto:info@centroeducativo.com">info@centroeducativo.com</a></p></article>
+                <article><h4>Teléfono</h4><p>+34 000 000 000</p></article>
+                <article><h4>Dirección</h4><p>Dirección del centro educativo</p></article>
+                <article><h4>Horario de atención</h4><p>Lunes a viernes: 09:00 - 14:00</p></article>
+            </div>
+            <p class="footer-contacto-enlace">Contacta con nosotros haciendo click <a href="../contacto.html">aquí.</a></p>
+        </footer>
+
+        <script src="../js/almacenamiento.js"></script>
+        <script src="../js/sesion.js"></script>
+        <script src="../js/preferencias.js"></script>
+        <script src="../js/cursos.js"></script>
+    </body>
+
+</html>

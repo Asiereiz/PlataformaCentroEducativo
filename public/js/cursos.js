@@ -1,154 +1,424 @@
-// Página de cursos: el navegador pide los datos a la API REST con Fetch,
-// recibe JSON y lo muestra en la página (tema 5.3, apartado 3).
-//
-//   fetch("/api/cursos")  ->  servidor Express  ->  MariaDB  ->  JSON  ->  esta página
-
 document.addEventListener("DOMContentLoaded", () => {
-  mostrarCatalogo();
 
-  document.getElementById("busqueda_curso").addEventListener("input", buscarCursos);
-  document.getElementById("detalles_curso").addEventListener("input", mostrarDetallesCurso);
+    mostrarCatalogo();
+    mostrarHistorial();
+
+    const campoBusqueda = document.getElementById("busqueda_curso");
+    if(campoBusqueda){
+        campoBusqueda.addEventListener("input", buscarCursos);
+    }
+
+    const campoDetalles = document.getElementById("detalles_curso");
+    if(campoDetalles){
+        campoDetalles.addEventListener("input", mostrarDetallesCurso);
+    }
+
+    const btnAltaCurso = document.getElementById("alta_curso");
+    if(btnAltaCurso){
+        btnAltaCurso.addEventListener("submit", altaCurso);
+    }
+
+    const btnModCurso = document.getElementById("mod_curso");
+    if(btnModCurso){
+        btnModCurso.addEventListener("submit", modCurso);
+    }
+
+    const selectModCurso = document.getElementById("id_mod_curso");
+    if(selectModCurso){
+        selectModCurso.addEventListener("change", rellenarCurso);
+    }
+
+    const btnDelCurso = document.getElementById("del_curso");
+    if(btnDelCurso){
+        btnDelCurso.addEventListener("submit", delCurso);
+    }
+
+    const btnInfoCurso = document.getElementById("info_curso");
+    if(btnInfoCurso){
+        btnInfoCurso.addEventListener("submit", infoCurso);
+    }
+
 });
 
-// Los cursos se piden una sola vez a la API y se reutilizan en todas las secciones
-let cursosPedidos = null;
+let promesaCursosApi;
 
-function obtenerCursos() {
-  if (!cursosPedidos) {
-    cursosPedidos = cargarCursos().catch(error => {
-      cursosPedidos = null; // si falla, se podrá volver a intentar
-      throw error;
-    });
+function obtenerCursosApi() {
+  if (!promesaCursosApi) {
+    promesaCursosApi = fetch("/api/cursos")
+      .then(async respuesta => {
+        if (!respuesta.ok) {
+          throw new Error(`La petición terminó con HTTP ${respuesta.status}.`);
+        }
+
+        const filas = await respuesta.json();
+        if (!Array.isArray(filas)) {
+          throw new Error("La respuesta de /api/cursos no es una lista.");
+        }
+
+        return filas.map(curso => ({
+          ...curso,
+          id: curso.id_curso,
+          docente: curso.id_docente,
+          aula: curso.id_aula,
+          max_plazas: curso.plazas,
+          foto: curso.imagen
+        }));
+      });
   }
-  return cursosPedidos;
+
+  return promesaCursosApi;
 }
 
-// GET /api/cursos
-async function cargarCursos() {
-  const respuesta = await fetch("/api/cursos", { headers: { Accept: "application/json" } });
-  if (!respuesta.ok) {
-    throw new Error(`El servidor respondió ${respuesta.status}`);
-  }
-  return await respuesta.json();
+function mostrarErrorCargaCursos(listado, error) {
+  console.error("No se pudieron cargar los cursos desde MariaDB.", error);
+  listado.textContent = "No se pudieron cargar los cursos. Comprueba la conexión e inténtalo de nuevo.";
 }
 
-// Construye la tarjeta de un curso. Con "completa" añade todos los detalles.
-function crearTarjeta(curso, completa) {
-  const tarjeta = document.createElement("article");
+async function altaCurso(event) {
+  event.preventDefault();
 
-  if (curso.foto) {
-    const imagen = document.createElement("img");
-    imagen.src = curso.foto;
-    imagen.alt = `Imagen del curso ${curso.nombre}`;
-    imagen.loading = "lazy";
-    imagen.className = "imagen-tarjeta";
-    tarjeta.appendChild(imagen);
+  let foto;
+  try {
+    foto = await leerImagen(document.getElementById("foto_alta_curso"));
+  } catch (error) {
+    alert(`No se pudo leer la imagen: ${error.message}`);
+    return;
   }
 
-  const nombre = document.createElement("h4");
-  nombre.textContent = curso.nombre;
-  tarjeta.appendChild(nombre);
+  const cursos = leerDatos(DATOS_CURSOS);
+  const curso = {
+    id: cursos.length + 1,
+    nombre: document.getElementById("nombre_alta_curso").value.trim(),
+    descripcion: document.getElementById("descripcion_alta_curso").value.trim(),
+    docente: document.getElementById("docente_alta_curso").value,
+    aula: document.getElementById("aula_alta_curso").value.trim(),
+    fecha_inicio: document.getElementById("fecha_inicio_alta_curso").value.trim(),
+    fecha_fin: document.getElementById("fecha_finalizacion_alta_curso").value.trim(),
+    horario: document.getElementById("horario_alta_curso").value.trim(),
+    max_plazas: document.getElementById("max_plazas_alta_curso").value.trim(),
+    foto,
+    estado: document.getElementById("estado_alta_curso").value.trim(),
+    plazas_ocupadas: 0
+  };
 
-  const detalles = completa
-    ? [
-        `Descripción: ${curso.descripcion}`,
-        `Docente: ${curso.docente_nombre}`,
-        `Fecha de inicio: ${curso.fecha_inicio}`,
-        `Fecha de finalización: ${curso.fecha_fin}`,
-        `Horario: ${curso.horario}`,
-        `Plazas máximas: ${curso.max_plazas}`
-      ]
-    : [`Descripción: ${curso.descripcion}`];
+  cursos.push(curso);
+  if (!guardarDatosConImagen(DATOS_CURSOS, cursos)) {
+    return;
+  }
 
-  detalles.forEach(detalle => {
-    const parrafo = document.createElement("p");
-    parrafo.textContent = detalle;
-    tarjeta.appendChild(parrafo);
-  });
+  updateSelect();
+  alert("Curso registrado correctamente.");
+}
 
-  return tarjeta;
+
+async function modCurso(event){
+  event.preventDefault();
+
+  const idMod = document.getElementById("id_mod_curso").value;
+  const cursos = leerDatos(DATOS_CURSOS);
+  const cursoAnterior = cursos.find(curso => String(curso.id) === idMod);
+  if (!cursoAnterior) {
+    alert("Selecciona primero un curso.");
+    return;
+  }
+
+  let fotoNueva;
+  try {
+    fotoNueva = await leerImagen(document.getElementById("foto_mod_curso"));
+  } catch (error) {
+    alert(`No se pudo leer la imagen: ${error.message}`);
+    return;
+  }
+
+  const cursoModificado = {
+    id: cursoAnterior.id,
+    nombre: document.getElementById("nombre_mod_curso").value.trim(),
+    descripcion: document.getElementById("descripcion_mod_curso").value.trim(),
+    docente: document.getElementById("docente_mod_curso").value,
+    aula: document.getElementById("aula_mod_curso").value.trim(),
+    fecha_inicio: document.getElementById("fecha_inicio_mod_curso").value.trim(),
+    fecha_fin: document.getElementById("fecha_finalizacion_mod_curso").value.trim(),
+    horario: document.getElementById("horario_mod_curso").value.trim(),
+    max_plazas: document.getElementById("max_plazas_mod_curso").value.trim(),
+    foto: fotoNueva || cursoAnterior.foto || "",
+    estado: document.getElementById("estado_mod_curso").value
+  };
+
+  const cursosActualizados = cursos.map(curso =>
+    String(curso.id) === idMod ? cursoModificado : curso
+  );
+  if (!guardarDatosConImagen(DATOS_CURSOS, cursosActualizados)) {
+    return;
+  }
+  updateSelect();
+
+  alert("Curso modificado correctamente.");
+}
+
+function rellenarCurso() {
+  const idMod = document.getElementById("id_mod_curso").value;
+  const cursos = leerDatos(DATOS_CURSOS);
+  const curso = cursos.find(c => String(c.id) === idMod);
+
+  if (!curso) {
+    return;
+  }
+
+  document.getElementById("nombre_mod_curso").value = curso.nombre;
+  document.getElementById("descripcion_mod_curso").value = curso.descripcion;
+  document.getElementById("docente_mod_curso").value = curso.docente;
+  document.getElementById("aula_mod_curso").value = curso.aula;
+  document.getElementById("fecha_inicio_mod_curso").value = curso.fecha_inicio;
+  document.getElementById("fecha_finalizacion_mod_curso").value = curso.fecha_fin;
+  document.getElementById("horario_mod_curso").value = curso.horario;
+  document.getElementById("max_plazas_mod_curso").value = curso.max_plazas;
+  document.getElementById("estado_mod_curso").value = curso.estado;
+}
+
+
+
+function delCurso(event){
+  event.preventDefault();
+
+  const idDel = document.getElementById("id_del_curso").value;
+  const cursos = leerDatos(DATOS_CURSOS);
+  const encontrado = cursos.find(curso => String(curso.id) === idDel);
+
+  if (!encontrado) {
+    alert("Selecciona primero un curso.");
+    return;
+  }
+
+  if (!confirm("¿Seguro que quieres eliminar este curso?")) {
+    return;
+  }
+
+  const datosActualizados = cursos.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
+
+  guardarDatos(DATOS_CURSOS, datosActualizados);
+  updateSelect();
+
+  alert("Curso desactivado correctamente.");
+}
+
+
+
+function infoCurso(event){
+  event.preventDefault();
+
+  const idInfo = document.getElementById("id_info_curso").value;
+
+  const cursos = leerDatos(DATOS_CURSOS);
+  const curso = cursos.find(c => String(c.id) === idInfo);
+
+  if (!curso) {
+    alert("Selecciona primero un curso.");
+    return;
+  }
+
+  const listado = document.getElementById("listado_curso");
+  listado.innerHTML = `
+    <li>Nombre: ${curso.nombre}</li>
+    <li>Descripción: ${curso.descripcion}</li>
+    <li>Docente: ${curso.docente}</li>
+    <li>Aula: ${curso.aula}</li>
+    <li>Fecha de inicio: ${curso.fecha_inicio}</li>
+    <li>Fecha de fin: ${curso.fecha_fin}</li>
+    <li>Horario: ${curso.horario}</li>
+    <li>Máximo de plazas: ${curso.max_plazas}</li>
+    <li>Imagen: ${curso.foto ? "Disponible" : "No disponible"}</li>
+    <li>Estado: ${curso.estado}</li>
+  `;
 }
 
 async function mostrarCatalogo() {
   const listado = document.getElementById("lista_cursos");
-  const json = document.getElementById("json_cursos_texto");
-  const historial = document.getElementById("historial_cursos");
-
-  listado.textContent = "Cargando cursos...";
-
-  let cursos;
-  try {
-    cursos = await obtenerCursos();
-  } catch (error) {
-    listado.textContent = `No se pudieron cargar los cursos: ${error.message}`;
-    historial.textContent = "No se pudo cargar el historial de cursos.";
+  if (!listado) {
     return;
   }
 
-  // El JSON tal cual lo ha devuelto la API
-  json.textContent = JSON.stringify(cursos, null, 2);
-
-  listado.textContent = "";
-  const activos = cursos.filter(curso => curso.estado === "activo");
-  if (activos.length === 0) {
-    listado.textContent = "No hay cursos disponibles.";
+  listado.textContent = "Cargando cursos...";
+  let cursos;
+  try {
+    cursos = (await obtenerCursosApi()).filter(curso =>
+      String(curso.estado).toLowerCase() === "activo"
+    );
+  } catch (error) {
+    mostrarErrorCargaCursos(listado, error);
+    return;
   }
-  activos.forEach(curso => listado.appendChild(crearTarjeta(curso, true)));
 
-  // Historial: todos los cursos, también los inactivos
-  historial.textContent = "";
+  listado.innerHTML = "";
+
   if (cursos.length === 0) {
-    historial.textContent = "No hay cursos en el historial.";
+    listado.textContent = "No hay cursos disponibles.";
+    return;
   }
-  cursos.forEach(curso => historial.appendChild(crearTarjeta(curso, true)));
+
+  cursos.forEach(curso => {
+    const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
+    const nombre = document.createElement("h4");
+    nombre.textContent = curso.nombre;
+    tarjeta.appendChild(nombre);
+
+    const detalles = [
+      `Descripción: ${curso.descripcion}`,
+      `Docente: ${curso.docente}`,
+      `Fecha de inicio: ${curso.fecha_inicio}`,
+      `Fecha de finalización: ${curso.fecha_fin}`,
+      `Horario: ${curso.horario}`,
+      `Plazas máximas: ${curso.max_plazas}`
+    ];
+
+    detalles.forEach(detalle => {
+      const parrafo = document.createElement("p");
+      parrafo.textContent = detalle;
+      tarjeta.appendChild(parrafo);
+    });
+
+    listado.appendChild(tarjeta);
+  });
 }
 
 async function buscarCursos() {
   const texto = document.getElementById("busqueda_curso").value.trim().toLowerCase();
   const listado = document.getElementById("resultados_busqueda");
 
-  listado.textContent = "";
+  listado.innerHTML = "";
   if (texto === "") {
     return;
   }
 
   let cursos;
   try {
-    cursos = await obtenerCursos();
+    cursos = (await obtenerCursosApi()).filter(curso =>
+      String(curso.estado).toLowerCase() === "activo" &&
+      `${curso.nombre || ""}`.toLowerCase().includes(texto)
+    );
   } catch (error) {
-    listado.textContent = "No se pudieron cargar los cursos.";
+    mostrarErrorCargaCursos(listado, error);
     return;
   }
 
-  const encontrados = cursos.filter(curso => curso.estado === "activo" && curso.nombre.toLowerCase().includes(texto));
-  if (encontrados.length === 0) {
+  if (cursos.length === 0) {
     listado.textContent = "No se encontraron cursos.";
     return;
   }
-  encontrados.forEach(curso => listado.appendChild(crearTarjeta(curso, false)));
+
+  cursos.forEach(curso => {
+    const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
+    const nombre = document.createElement("h4");
+    nombre.textContent = curso.nombre;
+    tarjeta.appendChild(nombre);
+
+    const descripcion = document.createElement("p");
+    descripcion.textContent = `Descripción: ${curso.descripcion || ""}`;
+    tarjeta.appendChild(descripcion);
+
+    listado.appendChild(tarjeta);
+  });
 }
 
 async function mostrarDetallesCurso() {
-  const texto = document.getElementById("detalles_curso").value.trim().toLowerCase();
+  const busqueda = document.getElementById("detalles_curso").value.toLowerCase().trim();
   const listado = document.getElementById("detalles_busqueda");
+  listado.innerHTML = "";
 
-  listado.textContent = "";
-  if (texto === "") {
+  if (busqueda === "") {
     return;
   }
 
   let cursos;
   try {
-    cursos = await obtenerCursos();
+    cursos = (await obtenerCursosApi()).filter(curso =>
+      String(curso.estado).toLowerCase() === "activo" &&
+      `${curso.nombre || ""}`.toLowerCase().includes(busqueda)
+    );
   } catch (error) {
-    listado.textContent = "No se pudieron cargar los cursos.";
+    mostrarErrorCargaCursos(listado, error);
     return;
   }
 
-  const encontrados = cursos.filter(curso => curso.estado === "activo" && curso.nombre.toLowerCase().includes(texto));
-  if (encontrados.length === 0) {
-    listado.textContent = "No se ha encontrado el curso.";
+  if (cursos.length > 0) {
+    cursos.forEach(curso => {
+      const tarjeta = document.createElement("article");
+      agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
+      const nombre = document.createElement("h4");
+      nombre.textContent = curso.nombre;
+      tarjeta.appendChild(nombre);
+
+      const detalles = [
+        `Descripción: ${curso.descripcion}`,
+        `Docente: ${curso.docente}`,
+        `Fecha de inicio: ${curso.fecha_inicio}`,
+        `Fecha de finalización: ${curso.fecha_fin}`,
+        `Horario: ${curso.horario}`,
+        `Plazas máximas: ${curso.max_plazas}`
+      ];
+
+      detalles.forEach(detalle => {
+        const parrafo = document.createElement("p");
+        parrafo.textContent = detalle;
+        tarjeta.appendChild(parrafo);
+      });
+
+      listado.appendChild(tarjeta);
+    });
+  } else {
+    listado.innerHTML = "No se ha encontrado el curso.";
     return;
   }
-  encontrados.forEach(curso => listado.appendChild(crearTarjeta(curso, true)));
+
+
+
+}
+
+async function mostrarHistorial() {
+  const listado = document.getElementById("historial_cursos");
+  if (!listado) {
+    return;
+  }
+
+  listado.textContent = "Cargando cursos...";
+  let cursos;
+  try {
+    cursos = await obtenerCursosApi();
+  } catch (error) {
+    mostrarErrorCargaCursos(listado, error);
+    return;
+  }
+
+  listado.innerHTML = "";
+
+  if (cursos.length > 0) {
+    cursos.forEach(curso => {
+    const tarjeta = document.createElement("article");
+    agregarImagen(tarjeta, curso.foto, `Imagen del curso ${curso.nombre}`);
+    const nombre = document.createElement("h4");
+    nombre.textContent = curso.nombre;
+    tarjeta.appendChild(nombre);
+
+    const detalles = [
+      `Descripción: ${curso.descripcion}`,
+      `Docente: ${curso.docente}`,
+      `Fecha de inicio: ${curso.fecha_inicio}`,
+      `Fecha de finalización: ${curso.fecha_fin}`,
+      `Horario: ${curso.horario}`,
+      `Plazas máximas: ${curso.max_plazas}`
+    ];
+
+    detalles.forEach(detalle => {
+      const parrafo = document.createElement("p");
+      parrafo.textContent = detalle;
+      tarjeta.appendChild(parrafo);
+    });
+
+    listado.appendChild(tarjeta);
+  });
+  }else{
+    listado.textContent = "No hay cursos en el historial.";
+    return;
+  }
 }
