@@ -21,8 +21,8 @@ Las páginas HTML están en `views` (incluidas las páginas de administración e
 
 Las rutas no encontradas muestran un error 404. Los errores internos muestran un error 500; las respuestas de `/api` se envían en JSON y los errores internos se registran en la consola del servidor.
 
-La ruta `GET /api/db/estado` comprueba la conexión a MariaDB con `SELECT 1`; las funciones que gestionan los datos siguen sin cambios.
+La ruta `GET /api/db/estado` comprueba la conexión a MariaDB con `SELECT 1`.
 
-La ruta `GET /api/cursos` devuelve en JSON las filas de la tabla `cursos`.
+La API `/api/cursos` lee y administra cursos en MariaDB: `GET` lista, `POST` crea, `PUT /api/cursos/:id` modifica y `PATCH /api/cursos/:id` desactiva un curso (`estado: "inactivo"`). Las operaciones de alta, modificación, consulta y desactivación de cursos usan la base de datos; los selectores de cursos también cargan sus opciones desde la API.
 
-El catálogo y las búsquedas de `cursos.html` consultan esa ruta mediante Fetch. Las operaciones de administración de cursos todavía usan `localStorage`.
+El catálogo y las búsquedas de `cursos.html` consultan esa ruta mediante Fetch. Las peticiones JSON admiten cuerpos de hasta 10 MB, incluida la imagen codificada.

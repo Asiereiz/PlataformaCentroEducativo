@@ -9,10 +9,10 @@ const DATOS_DOCENTES = "datos_docentes";
 const DATOS_MATRICULAS = "datos_matriculas";
 const FOTOGRAFIA_PREDETERMINADA = "../img/usuario-predeterminado.jpg";
 const IMAGEN_CURSO_PREDETERMINADA = "../img/curso-ucm.png";
+let promesaCursosApi;
 
 function updateSelect() {
     const aulas = leerDatos(DATOS_AULAS);
-    const cursos = leerDatos(DATOS_CURSOS);
     const docentes = leerDatos(DATOS_DOCENTES);
     const matriculas = leerDatos(DATOS_MATRICULAS);
     const usuarios = leerDatos(DATOS_USER);
@@ -20,9 +20,6 @@ function updateSelect() {
     actualizarOpciones("id_mod_aula", aulas, "nombre");
     actualizarOpciones("id_del_aula", aulas, "nombre");
     actualizarOpciones("id_info_aula", aulas, "nombre");
-    actualizarOpciones("id_mod_curso", cursos, "nombre");
-    actualizarOpciones("id_del_curso", cursos, "nombre");
-    actualizarOpciones("id_info_curso", cursos, "nombre");
     actualizarOpciones("id_mod_doc", docentes, "Nombre");
     actualizarOpciones("id_del_doc", docentes, "Nombre");
     actualizarOpciones("id_info_doc", docentes, "Nombre");
@@ -33,7 +30,6 @@ function updateSelect() {
     actualizarOpciones("id_info_user", usuarios, "Nombre");
     actualizarOpciones("docente_alta_curso", docentes, "Nombre");
     actualizarOpciones("docente_mod_curso", docentes, "Nombre");
-    actualizarOpciones("curso_matricula", cursos.filter(curso => curso.estado === "activo"), "nombre","Selecciona un curso");
     actualizarOpciones("aula_alta_curso", aulas.filter(aula => aula.estado === "activo"), "nombre", "Selecciona un aula");
     actualizarOpciones("aula_mod_curso", aulas.filter(aula => aula.estado === "activo"), "nombre", "Selecciona un aula");
 
@@ -44,9 +40,68 @@ function updateSelect() {
     actualizarOpciones("alumno_alta_mat", alumnos, "Nombre", "Selecciona un alumno");
     actualizarOpciones("alumno_mod_mat", alumnos, "Nombre", "Selecciona un alumno");
     actualizarOpciones("alumno_info_mat", alumnos, "Nombre", "Selecciona un alumno");
-    actualizarOpciones("curso_alta_mat", cursos, "nombre", "Selecciona un curso");
-    actualizarOpciones("curso_mod_mat", cursos, "nombre", "Selecciona un curso");
-    actualizarOpciones("curso_info_mat", cursos, "nombre", "Selecciona un curso");
+    actualizarSelectoresCursos();
+}
+
+function obtenerCursosApi() {
+  if (!promesaCursosApi) {
+    promesaCursosApi = fetch("/api/cursos")
+      .then(async respuesta => {
+        if (!respuesta.ok) {
+          throw new Error(`La petición terminó con HTTP ${respuesta.status}.`);
+        }
+
+        const filas = await respuesta.json();
+        if (!Array.isArray(filas)) {
+          throw new Error("La respuesta de /api/cursos no es una lista.");
+        }
+
+        return filas.map(curso => ({
+          ...curso,
+          id: curso.id_curso,
+          docente: curso.id_docente,
+          aula: curso.id_aula,
+          max_plazas: curso.plazas,
+          foto: curso.imagen
+        }));
+      })
+      .catch(error => {
+        promesaCursosApi = null;
+        throw error;
+      });
+  }
+
+  return promesaCursosApi;
+}
+
+async function actualizarSelectoresCursos() {
+  const selectores = [
+    ["id_mod_curso", "nombre", "Selecciona un ID"],
+    ["id_del_curso", "nombre", "Selecciona un ID"],
+    ["id_info_curso", "nombre", "Selecciona un ID"],
+    ["curso_matricula", "nombre", "Selecciona un curso"],
+    ["curso_alta_mat", "nombre", "Selecciona un curso"],
+    ["curso_mod_mat", "nombre", "Selecciona un curso"],
+    ["curso_info_mat", "nombre", "Selecciona un curso"]
+  ];
+
+  try {
+    const cursos = await obtenerCursosApi();
+    selectores.forEach(([id, campo, texto]) => {
+      const datos = id === "curso_matricula"
+        ? cursos.filter(curso => String(curso.estado).toLowerCase() === "activo")
+        : cursos;
+      actualizarOpciones(id, datos, campo, texto);
+    });
+  } catch (error) {
+    console.error("No se pudieron cargar los cursos para los selectores.", error);
+    selectores.forEach(([id]) => {
+      const select = document.getElementById(id);
+      if (select) {
+        select.innerHTML = '<option value="">No se pudieron cargar los cursos</option>';
+      }
+    });
+  }
 }
 
 function actualizarOpciones(id, datos, campo, texto = "Selecciona un ID") {

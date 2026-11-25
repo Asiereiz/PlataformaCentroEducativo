@@ -40,38 +40,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-let promesaCursosApi;
-
-function obtenerCursosApi() {
-  if (!promesaCursosApi) {
-    promesaCursosApi = fetch("/api/cursos")
-      .then(async respuesta => {
-        if (!respuesta.ok) {
-          throw new Error(`La petición terminó con HTTP ${respuesta.status}.`);
-        }
-
-        const filas = await respuesta.json();
-        if (!Array.isArray(filas)) {
-          throw new Error("La respuesta de /api/cursos no es una lista.");
-        }
-
-        return filas.map(curso => ({
-          ...curso,
-          id: curso.id_curso,
-          docente: curso.id_docente,
-          aula: curso.id_aula,
-          max_plazas: curso.plazas,
-          foto: curso.imagen
-        }));
-      });
-  }
-
-  return promesaCursosApi;
-}
-
 function mostrarErrorCargaCursos(listado, error) {
   console.error("No se pudieron cargar los cursos desde MariaDB.", error);
   listado.textContent = "No se pudieron cargar los cursos. Comprueba la conexión e inténtalo de nuevo.";
+}
+
+function datosCursoFormulario(sufijo, foto) {
+  return {
+    nombre: document.getElementById(`nombre_${sufijo}`).value.trim(),
+    descripcion: document.getElementById(`descripcion_${sufijo}`).value.trim(),
+    docente: document.getElementById(`docente_${sufijo}`).value,
+    aula: document.getElementById(`aula_${sufijo}`).value.trim(),
+    fecha_inicio: document.getElementById(`fecha_inicio_${sufijo}`).value,
+    fecha_fin: document.getElementById(`fecha_finalizacion_${sufijo}`).value,
+    horario: document.getElementById(`horario_${sufijo}`).value.trim(),
+    max_plazas: Number(document.getElementById(`max_plazas_${sufijo}`).value),
+    foto,
+    estado: document.getElementById(`estado_${sufijo}`).value
+  };
+}
+
+async function enviarCurso(url, metodo, curso) {
+  const respuesta = await fetch(url, {
+    method: metodo,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(curso)
+  });
+  const resultado = await respuesta.json();
+  if (!respuesta.ok) {
+    throw new Error(resultado.error || `La petición terminó con HTTP ${respuesta.status}.`);
+  }
+}
+
+async function refrescarCursos() {
+  promesaCursosApi = null;
+  await obtenerCursosApi();
+  updateSelect();
 }
 
 async function altaCurso(event) {
@@ -85,29 +89,14 @@ async function altaCurso(event) {
     return;
   }
 
-  const cursos = leerDatos(DATOS_CURSOS);
-  const curso = {
-    id: cursos.length + 1,
-    nombre: document.getElementById("nombre_alta_curso").value.trim(),
-    descripcion: document.getElementById("descripcion_alta_curso").value.trim(),
-    docente: document.getElementById("docente_alta_curso").value,
-    aula: document.getElementById("aula_alta_curso").value.trim(),
-    fecha_inicio: document.getElementById("fecha_inicio_alta_curso").value.trim(),
-    fecha_fin: document.getElementById("fecha_finalizacion_alta_curso").value.trim(),
-    horario: document.getElementById("horario_alta_curso").value.trim(),
-    max_plazas: document.getElementById("max_plazas_alta_curso").value.trim(),
-    foto,
-    estado: document.getElementById("estado_alta_curso").value.trim(),
-    plazas_ocupadas: 0
-  };
-
-  cursos.push(curso);
-  if (!guardarDatosConImagen(DATOS_CURSOS, cursos)) {
-    return;
+  try {
+    await enviarCurso("/api/cursos", "POST", datosCursoFormulario("alta_curso", foto));
+    await refrescarCursos();
+    alert("Curso registrado correctamente.");
+  } catch (error) {
+    console.error("No se pudo registrar el curso.", error);
+    alert(`No se pudo registrar el curso: ${error.message}`);
   }
-
-  updateSelect();
-  alert("Curso registrado correctamente.");
 }
 
 
@@ -115,8 +104,13 @@ async function modCurso(event){
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_curso").value;
-  const cursos = leerDatos(DATOS_CURSOS);
-  const cursoAnterior = cursos.find(curso => String(curso.id) === idMod);
+  let cursoAnterior;
+  try {
+    cursoAnterior = (await obtenerCursosApi()).find(curso => String(curso.id) === idMod);
+  } catch (error) {
+    alert(`No se pudieron cargar los cursos: ${error.message}`);
+    return;
+  }
   if (!cursoAnterior) {
     alert("Selecciona primero un curso.");
     return;
@@ -130,35 +124,30 @@ async function modCurso(event){
     return;
   }
 
-  const cursoModificado = {
-    id: cursoAnterior.id,
-    nombre: document.getElementById("nombre_mod_curso").value.trim(),
-    descripcion: document.getElementById("descripcion_mod_curso").value.trim(),
-    docente: document.getElementById("docente_mod_curso").value,
-    aula: document.getElementById("aula_mod_curso").value.trim(),
-    fecha_inicio: document.getElementById("fecha_inicio_mod_curso").value.trim(),
-    fecha_fin: document.getElementById("fecha_finalizacion_mod_curso").value.trim(),
-    horario: document.getElementById("horario_mod_curso").value.trim(),
-    max_plazas: document.getElementById("max_plazas_mod_curso").value.trim(),
-    foto: fotoNueva || cursoAnterior.foto || "",
-    estado: document.getElementById("estado_mod_curso").value
-  };
-
-  const cursosActualizados = cursos.map(curso =>
-    String(curso.id) === idMod ? cursoModificado : curso
-  );
-  if (!guardarDatosConImagen(DATOS_CURSOS, cursosActualizados)) {
+  try {
+    await enviarCurso(
+      `/api/cursos/${encodeURIComponent(idMod)}`,
+      "PUT",
+      datosCursoFormulario("mod_curso", fotoNueva || cursoAnterior.foto || "")
+    );
+    await refrescarCursos();
+    alert("Curso modificado correctamente.");
+  } catch (error) {
+    console.error("No se pudo modificar el curso.", error);
+    alert(`No se pudo modificar el curso: ${error.message}`);
     return;
   }
-  updateSelect();
-
-  alert("Curso modificado correctamente.");
 }
 
-function rellenarCurso() {
+async function rellenarCurso() {
   const idMod = document.getElementById("id_mod_curso").value;
-  const cursos = leerDatos(DATOS_CURSOS);
-  const curso = cursos.find(c => String(c.id) === idMod);
+  let curso;
+  try {
+    curso = (await obtenerCursosApi()).find(c => String(c.id) === idMod);
+  } catch (error) {
+    alert(`No se pudieron cargar los cursos: ${error.message}`);
+    return;
+  }
 
   if (!curso) {
     return;
@@ -177,12 +166,17 @@ function rellenarCurso() {
 
 
 
-function delCurso(event){
+async function delCurso(event){
   event.preventDefault();
 
   const idDel = document.getElementById("id_del_curso").value;
-  const cursos = leerDatos(DATOS_CURSOS);
-  const encontrado = cursos.find(curso => String(curso.id) === idDel);
+  let encontrado;
+  try {
+    encontrado = (await obtenerCursosApi()).find(curso => String(curso.id) === idDel);
+  } catch (error) {
+    alert(`No se pudieron cargar los cursos: ${error.message}`);
+    return;
+  }
 
   if (!encontrado) {
     alert("Selecciona primero un curso.");
@@ -193,23 +187,30 @@ function delCurso(event){
     return;
   }
 
-  const datosActualizados = cursos.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
-
-  guardarDatos(DATOS_CURSOS, datosActualizados);
-  updateSelect();
-
-  alert("Curso desactivado correctamente.");
+  try {
+    await enviarCurso(`/api/cursos/${encodeURIComponent(idDel)}`, "PATCH", { estado: "inactivo" });
+    await refrescarCursos();
+    alert("Curso desactivado correctamente.");
+  } catch (error) {
+    console.error("No se pudo desactivar el curso.", error);
+    alert(`No se pudo desactivar el curso: ${error.message}`);
+  }
 }
 
 
 
-function infoCurso(event){
+async function infoCurso(event){
   event.preventDefault();
 
   const idInfo = document.getElementById("id_info_curso").value;
 
-  const cursos = leerDatos(DATOS_CURSOS);
-  const curso = cursos.find(c => String(c.id) === idInfo);
+  let curso;
+  try {
+    curso = (await obtenerCursosApi()).find(c => String(c.id) === idInfo);
+  } catch (error) {
+    alert(`No se pudieron cargar los cursos: ${error.message}`);
+    return;
+  }
 
   if (!curso) {
     alert("Selecciona primero un curso.");
