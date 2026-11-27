@@ -140,13 +140,26 @@ function leerImagen(input) {
   });
 }
 
+// La base de datos guarda rutas como "img/cursos/curso01.png" (sin "/" inicial).
+// Se convierten en "/img/cursos/curso01.png" para que funcionen desde cualquier página,
+// también desde las de /admin/ (acepta además "../img/..." y data:image antiguos).
+function rutaImagen(imagen) {
+  if (typeof imagen !== "string") {
+    return "";
+  }
+  if (imagen.startsWith("data:image/") || imagen.startsWith("/")) {
+    return imagen;
+  }
+  return "/" + imagen.replace(/^(\.\.\/)+/, "");
+}
+
 function agregarImagen(tarjeta, fuenteImagen, textoAlternativo) {
   if (!esImagenValida(fuenteImagen)) {
     return;
   }
 
   const imagen = document.createElement("img");
-  imagen.src = fuenteImagen;
+  imagen.src = rutaImagen(fuenteImagen);
   imagen.alt = textoAlternativo;
   imagen.loading = "lazy";
   imagen.className = "imagen-tarjeta";
@@ -154,10 +167,9 @@ function agregarImagen(tarjeta, fuenteImagen, textoAlternativo) {
 }
 
 function esImagenValida(imagen) {
-  return typeof imagen === "string" && (
-    imagen.startsWith("data:image/") ||
-    /^\.\.\/img\/[\w.-]+\.(?:png|jpe?g|webp|gif)$/i.test(imagen)
-  );
+  const ruta = rutaImagen(imagen);
+  return ruta.startsWith("data:image/") ||
+    /^\/img\/(?:(?:cursos|docentes|aulas|alumnos)\/)?[\w.-]+\.(?:png|jpe?g|webp|gif)$/i.test(ruta);
 }
 
 function guardarDatosConImagen(clave, datos) {
@@ -172,4 +184,4 @@ function guardarDatosConImagen(clave, datos) {
 
     throw error;
   }
-}
+}

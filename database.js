@@ -1,12 +1,15 @@
-const path = require("path");
-const dotenv = require("dotenv");
-const mariadb = require("mariadb");
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import dotenv from "dotenv";
+import mariadb from "mariadb";
 
+// En módulos ES no existe __dirname: se construye a partir de import.meta.url
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 let pool;
 
-function obtenerPool() {
+export function obtenerPool() {
   const database = process.env.DB_NAME;
   const user = process.env.DB_USER;
 
@@ -21,15 +24,14 @@ function obtenerPool() {
       database,
       user,
       password: process.env.DB_PASSWORD || "",
-      connectionLimit: 5
+      connectionLimit: 5,
+      dateStrings: true // las fechas llegan como "2026-09-01", no como fecha completa
     });
   }
 
   return pool;
 }
 
-async function verificarConexionMariaDB() {
+export async function verificarConexionMariaDB() {
   await obtenerPool().query("SELECT 1");
 }
-
-module.exports = { obtenerPool, verificarConexionMariaDB };

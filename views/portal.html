@@ -5,6 +5,7 @@
 
         <title>Plataforma Centro Educativo</title>
         <meta charset= "UTF-8">
+        <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
         <link rel="stylesheet" href="css/style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
@@ -12,7 +13,7 @@
     <body>
 
         <header>
-            <h1><a class="titulo" href="portal.html">Portal Centro Educativo</a>
+            <h1><a class="enlace-logo" href="portal.html" tabindex="-1" aria-hidden="true"><img class="logo-cabecera" src="/img/logo-mini.png" alt="" width="40" height="39"></a><a class="titulo" href="portal.html">CFORMA</a>
                <span class="estado-sesion sesionAdmin" hidden>Sesión como administrador</span>
                <span class="estado-sesion sesionAlumno" hidden>Sesión como alumno</span>
             </h1>
@@ -39,12 +40,75 @@
 
         <main id="portal">
             <section id="bienvenida">
+                <img class="banner-bienvenida" src="img/banner.jpg" alt="CFORMA, Centro de Formación: aprende hoy, construye tu mañana" width="612" height="176">
                 <h2>Bienvenido <span id="saludo"></span></h2>
 
                 <p id="bienvenidaportal">En nuestro centro educativo trabajamos para ofrecer una formación de calidad, accesible y adaptada a las necesidades de cada estudiante.
                     A través de esta plataforma podrás consultar nuestra oferta formativa, conocer a nuestro equipo docente, gestionar tus matrículas y acceder a toda la información académica de manera sencilla y rápida.
                     ¡Empieza tu camino hacia nuevos conocimientos y oportunidades!
                 </p>
+            </section>
+
+            <section id="accesos">
+
+                <h3>Accesos rápidos</h3>
+
+                <a class="acceso" href="cursos.html">
+                    <img src="img/icono_cursos.png" alt="" width="98" height="66">
+                    <span><strong>Cursos</strong><small>Consulta la oferta formativa</small></span>
+                </a>
+
+                <a class="acceso" href="docentes.html">
+                    <img src="img/icono_docentes.png" alt="" width="98" height="66">
+                    <span><strong>Docentes</strong><small>Conoce a nuestro equipo</small></span>
+                </a>
+
+                <a class="acceso" href="mis_matriculas.html">
+                    <img src="img/icono_matriculas.png" alt="" width="98" height="66">
+                    <span><strong>Mis matrículas</strong><small>Revisa el estado de tus inscripciones</small></span>
+                </a>
+
+                <a class="acceso" href="perfil.html">
+                    <img src="img/icono_usuario.png" alt="" width="98" height="66">
+                    <span><strong>Perfil</strong><small>Tus datos personales</small></span>
+                </a>
+
+                <a class="acceso" href="accesibilidad.html">
+                    <img src="img/icono_accesibilidad.png" alt="" width="98" height="66">
+                    <span><strong>Accesibilidad</strong><small>Adapta la web a tus necesidades</small></span>
+                </a>
+
+                <a class="acceso sesionAdmin" hidden href="admin/g-cursos.html">
+                    <img src="img/icono_configuracion.png" alt="" width="98" height="66">
+                    <span><strong>Administración</strong><small>Gestiona cursos, docentes y aulas</small></span>
+                </a>
+
+            </section>
+
+            <section id="instalaciones">
+
+                <h3>Nuestras instalaciones</h3>
+
+                <figure>
+                    <img src="img/aulas/aula02.png" alt="Aula de informática" width="588" height="233" loading="lazy">
+                    <figcaption>Aula de informática</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="img/aulas/aula04.png" alt="Taller práctico" width="588" height="233" loading="lazy">
+                    <figcaption>Taller práctico</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="img/aulas/aula06.png" alt="Salón de actos" width="588" height="233" loading="lazy">
+                    <figcaption>Salón de actos</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="img/aulas/aula08.png" alt="Laboratorio" width="588" height="233" loading="lazy">
+                    <figcaption>Laboratorio</figcaption>
+                </figure>
+
             </section>
 
             <section id="noticias">

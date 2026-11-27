@@ -45,27 +45,35 @@ function mostrarErrorCargaCursos(listado, error) {
   listado.textContent = "No se pudieron cargar los cursos. Comprueba la conexión e inténtalo de nuevo.";
 }
 
-function datosCursoFormulario(sufijo, foto) {
-  return {
-    nombre: document.getElementById(`nombre_${sufijo}`).value.trim(),
-    descripcion: document.getElementById(`descripcion_${sufijo}`).value.trim(),
-    docente: document.getElementById(`docente_${sufijo}`).value,
-    aula: document.getElementById(`aula_${sufijo}`).value.trim(),
-    fecha_inicio: document.getElementById(`fecha_inicio_${sufijo}`).value,
-    fecha_fin: document.getElementById(`fecha_finalizacion_${sufijo}`).value,
-    horario: document.getElementById(`horario_${sufijo}`).value.trim(),
-    max_plazas: Number(document.getElementById(`max_plazas_${sufijo}`).value),
-    foto,
-    estado: document.getElementById(`estado_${sufijo}`).value
-  };
+function datosCursoFormulario(sufijo, inputFoto) {
+  // La imagen viaja como archivo (multipart/form-data): la guarda Multer en el servidor
+  const datos = new FormData();
+  datos.append("nombre", document.getElementById(`nombre_${sufijo}`).value.trim());
+  datos.append("descripcion", document.getElementById(`descripcion_${sufijo}`).value.trim());
+  datos.append("docente", document.getElementById(`docente_${sufijo}`).value);
+  datos.append("aula", document.getElementById(`aula_${sufijo}`).value.trim());
+  datos.append("fecha_inicio", document.getElementById(`fecha_inicio_${sufijo}`).value);
+  datos.append("fecha_fin", document.getElementById(`fecha_finalizacion_${sufijo}`).value);
+  datos.append("horario", document.getElementById(`horario_${sufijo}`).value.trim());
+  datos.append("max_plazas", document.getElementById(`max_plazas_${sufijo}`).value);
+  datos.append("estado", document.getElementById(`estado_${sufijo}`).value);
+  if (inputFoto && inputFoto.files[0]) {
+    datos.append("foto", inputFoto.files[0]);
+  }
+  return datos;
 }
 
-async function enviarCurso(url, metodo, curso) {
-  const respuesta = await fetch(url, {
-    method: metodo,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(curso)
-  });
+async function enviarCurso(url, metodo, cuerpo) {
+  const opciones = { method: metodo };
+  if (cuerpo instanceof FormData) {
+    // Sin Content-Type: el navegador lo añade solo, con el "boundary" del multipart
+    opciones.body = cuerpo;
+  } else {
+    opciones.headers = { "Content-Type": "application/json" };
+    opciones.body = JSON.stringify(cuerpo); // por ejemplo, el PATCH de desactivar
+  }
+
+  const respuesta = await fetch(url, opciones);
   const resultado = await respuesta.json();
   if (!respuesta.ok) {
     throw new Error(resultado.error || `La petición terminó con HTTP ${respuesta.status}.`);
@@ -81,16 +89,12 @@ async function refrescarCursos() {
 async function altaCurso(event) {
   event.preventDefault();
 
-  let foto;
   try {
-    foto = await leerImagen(document.getElementById("foto_alta_curso"));
-  } catch (error) {
-    alert(`No se pudo leer la imagen: ${error.message}`);
-    return;
-  }
-
-  try {
-    await enviarCurso("/api/cursos", "POST", datosCursoFormulario("alta_curso", foto));
+    await enviarCurso(
+      "/api/cursos",
+      "POST",
+      datosCursoFormulario("alta_curso", document.getElementById("foto_alta_curso"))
+    );
     await refrescarCursos();
     alert("Curso registrado correctamente.");
   } catch (error) {
@@ -104,23 +108,8 @@ async function modCurso(event){
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_curso").value;
-  let cursoAnterior;
-  try {
-    cursoAnterior = (await obtenerCursosApi()).find(curso => String(curso.id) === idMod);
-  } catch (error) {
-    alert(`No se pudieron cargar los cursos: ${error.message}`);
-    return;
-  }
-  if (!cursoAnterior) {
+  if (!idMod) {
     alert("Selecciona primero un curso.");
-    return;
-  }
-
-  let fotoNueva;
-  try {
-    fotoNueva = await leerImagen(document.getElementById("foto_mod_curso"));
-  } catch (error) {
-    alert(`No se pudo leer la imagen: ${error.message}`);
     return;
   }
 
@@ -128,14 +117,13 @@ async function modCurso(event){
     await enviarCurso(
       `/api/cursos/${encodeURIComponent(idMod)}`,
       "PUT",
-      datosCursoFormulario("mod_curso", fotoNueva || cursoAnterior.foto || "")
+      datosCursoFormulario("mod_curso", document.getElementById("foto_mod_curso"))
     );
     await refrescarCursos();
     alert("Curso modificado correctamente.");
   } catch (error) {
     console.error("No se pudo modificar el curso.", error);
     alert(`No se pudo modificar el curso: ${error.message}`);
-    return;
   }
 }
 
@@ -422,4 +410,4 @@ async function mostrarHistorial() {
     listado.textContent = "No hay cursos en el historial.";
     return;
   }
-}
+}

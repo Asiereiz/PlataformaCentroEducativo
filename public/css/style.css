@@ -1069,3 +1069,421 @@ body.contraste .footer-contacto-tarjetas a{
         padding: 30px 20px;
     }
 }
+/* ------------------------------------------------------------------
+   Accesos rápidos / iconos de interfaz (mobile-first)
+   ------------------------------------------------------------------ */
+
+#portal #accesos{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 0 0 32px;
+}
+
+#portal #accesos > h3{
+    margin: 0 0 2px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #d5d9e2;
+    color: #26375f;
+    font-size: 1.4rem;
+}
+
+#portal a.acceso{
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 88px;
+    padding: 10px 16px 10px 10px;
+    border: 1px solid #d5d9e2;
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: #222222;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+#portal a.acceso[hidden]{
+    display: none;
+}
+
+#portal a.acceso img{
+    flex: 0 0 auto;
+    width: 74px;
+    height: auto;
+    aspect-ratio: 98 / 66;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+#portal a.acceso span{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+#portal a.acceso strong{
+    color: #26375f;
+    font-size: 1.1rem;
+}
+
+#portal a.acceso small{
+    color: #555b6e;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+#portal a.acceso:hover,
+#portal a.acceso:focus-visible{
+    border-color: #36477e;
+    box-shadow: 0 8px 18px rgba(38, 55, 95, 0.18);
+    transform: translateY(-2px);
+}
+
+#portal a.acceso:focus-visible{
+    outline: 3px solid #36477e;
+    outline-offset: 2px;
+}
+
+/* Icono + título de las páginas de administración */
+h3.titulo-icono{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 16px;
+}
+
+h3.titulo-icono img{
+    width: 56px;
+    height: auto;
+    border-radius: 8px;
+}
+
+body.oscuro #portal #accesos > h3,
+body.oscuro #portal a.acceso strong,
+body.oscuro #portal a.acceso small{
+    color: #efebff;
+}
+
+body.oscuro #portal #accesos > h3{
+    border-color: #77778c;
+}
+
+body.oscuro #portal a.acceso{
+    border-color: #77778c;
+    background-color: #211f43;
+    color: #efebff;
+}
+
+body.oscuro #portal a.acceso:hover,
+body.oscuro #portal a.acceso:focus-visible{
+    border-color: #efebff;
+    background-color: #2b2955;
+}
+
+body.oscuro #portal a.acceso:focus-visible{
+    outline-color: #efebff;
+}
+
+body.oscuro h3.titulo-icono{
+    color: #efebff;
+}
+
+body.contraste #portal #accesos > h3{
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+body.contraste #portal a.acceso{
+    border: 2px solid #ffffff;
+    background-color: #000000;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+body.contraste #portal a.acceso strong,
+body.contraste #portal a.acceso small{
+    color: #ffffff;
+}
+
+body.contraste #portal a.acceso img{
+    border: 1px solid #ffffff;
+}
+
+body.contraste #portal a.acceso:hover,
+body.contraste #portal a.acceso:focus-visible{
+    background-color: #1a1a1a;
+    transform: none;
+}
+
+body.contraste #portal a.acceso:focus-visible{
+    outline-color: #ffff00;
+}
+
+body.contraste h3.titulo-icono{
+    color: #ffffff;
+}
+
+body.large #portal a.acceso small{
+    font-size: 1rem;
+}
+
+@media (min-width: 600px){
+    #portal #accesos{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #portal #accesos > h3{
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 1025px){
+    #portal #accesos{
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    }
+
+    #portal a.acceso{
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    #portal a.acceso img{
+        width: 84px;
+    }
+
+    #portal a.acceso span{
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    #portal a.acceso{
+        transition: none;
+    }
+
+    #portal a.acceso:hover,
+    #portal a.acceso:focus-visible{
+        transform: none;
+    }
+}
+
+/* Logo de la cabecera: un solo logo a la izquierda, con el título y
+   "Sesión como..." apilados a su derecha */
+header h1:has(.enlace-logo){
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 10px;
+    align-items: center;
+}
+
+.enlace-logo{
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    display: block;
+    line-height: 0;
+}
+
+header h1 .titulo{
+    grid-column: 2;
+    grid-row: 1;
+}
+
+header h1 .estado-sesion,
+header h1 .subtitulo-cabecera{
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.subtitulo-cabecera,
+.subtitulo-cabecera:visited,
+.subtitulo-cabecera:hover{
+    color: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 2px;
+    text-decoration: none;
+}
+
+.logo-cabecera{
+    display: block;
+    width: 44px;
+    height: auto;
+    margin: -6px 0;
+    border-radius: 9px;
+}
+
+/* Banner dentro de la tarjeta de bienvenida */
+#portal #bienvenida .banner-bienvenida{
+    display: block;
+    width: 100%;
+    max-width: 612px;
+    height: auto;
+    margin: 0 0 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Galería de instalaciones (fotos de aulas) */
+#portal #instalaciones{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 0 0 32px;
+}
+
+#portal #instalaciones > h3{
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #d5d9e2;
+    color: #26375f;
+    font-size: 1.4rem;
+}
+
+#portal #instalaciones figure{
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid #d5d9e2;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#portal #instalaciones img{
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 588 / 233;
+    object-fit: cover;
+}
+
+#portal #instalaciones figcaption{
+    padding: 10px 14px;
+    color: #26375f;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+body.oscuro #portal #instalaciones > h3{
+    border-color: #77778c;
+    color: #efebff;
+}
+
+body.oscuro #portal #instalaciones figure{
+    border-color: #77778c;
+    background-color: #211f43;
+}
+
+body.oscuro #portal #instalaciones figcaption{
+    color: #efebff;
+}
+
+body.contraste #portal #instalaciones > h3{
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+body.contraste #portal #instalaciones figure{
+    border: 2px solid #ffffff;
+    background-color: #000000;
+    box-shadow: none;
+}
+
+body.contraste #portal #instalaciones figcaption{
+    color: #ffffff;
+}
+
+@media (min-width: 600px){
+    #portal #instalaciones{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #portal #instalaciones > h3{
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 768px){
+    /* Texto a la izquierda y banner a la derecha */
+    #portal #bienvenida{
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 400px);
+        column-gap: 32px;
+        align-items: center;
+    }
+
+    #portal #bienvenida .banner-bienvenida{
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        margin: 0;
+    }
+
+    #portal #bienvenida h2{
+        grid-column: 1;
+        grid-row: 1;
+        align-self: end;
+    }
+
+    #portal #bienvenida #bienvenidaportal{
+        grid-column: 1;
+        grid-row: 2;
+        align-self: start;
+    }
+}
+
+@media (min-width: 1025px){
+    #portal #instalaciones{
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Etiquetas de las noticias (Información académica, Actualidad...) */
+#portal article small{
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* Nombre de marca CFORMA en la cabecera */
+header h1 .titulo{
+    font-size: 1.3em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+/* Logo completo encima de los formularios de acceso */
+.logo-formulario{
+    display: block;
+    width: min(300px, 80%);
+    height: auto;
+    margin: 8px auto 20px;
+}
+
+/* Lista de docentes adaptable: 2 columnas en móvil, 3 en tablet, 5 en escritorio */
+#lista_docentes{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#lista_docentes article{
+    overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px){
+    #lista_docentes{
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1025px){
+    #lista_docentes{
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
