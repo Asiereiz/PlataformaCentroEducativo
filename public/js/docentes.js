@@ -77,13 +77,11 @@ async function mostrarDocentes() {
 }
 
 function datosDocenteFormulario(sufijo, inputFoto) {
-  // La imagen viaja como archivo (multipart/form-data): la guarda Multer en el servidor
   const datos = new FormData();
   datos.append("nombre", document.getElementById(`nombre_${sufijo}`).value.trim());
   datos.append("email", document.getElementById(`correo_${sufijo}`).value.trim());
   datos.append("especialidad", document.getElementById(`especialidad_${sufijo}`).value.trim());
   datos.append("telefono", document.getElementById(`telefono_${sufijo}`).value.trim());
-  // La columna activo es 1 / 0; el desplegable del formulario es "activo" / "inactivo"
   datos.append("activo", document.getElementById(`estado_${sufijo}`).value === "activo" ? 1 : 0);
   if (inputFoto && inputFoto.files[0]) {
     datos.append("foto", inputFoto.files[0]);
@@ -94,11 +92,10 @@ function datosDocenteFormulario(sufijo, inputFoto) {
 async function enviarDocente(url, metodo, cuerpo) {
   const opciones = { method: metodo };
   if (cuerpo instanceof FormData) {
-    // Sin Content-Type: el navegador lo añade solo, con el "boundary" del multipart
     opciones.body = cuerpo;
   } else {
     opciones.headers = { "Content-Type": "application/json" };
-    opciones.body = JSON.stringify(cuerpo); // por ejemplo, el PATCH de desactivar
+    opciones.body = JSON.stringify(cuerpo);
   }
 
   const respuesta = await fetch(url, opciones);
@@ -186,7 +183,6 @@ async function delDoc(event) {
   }
 
   try {
-    // Un docente asignado a un curso activo no se puede eliminar
     const cursos = await obtenerCursosApi();
     const asignacion = cursos.find(curso =>
       String(curso.docente) === idDel && curso.estado === "activo"

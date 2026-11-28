@@ -27,93 +27,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function altaUser(event) {
-  event.preventDefault();
-
-  const usuarios = leerDatos(DATOS_USER);
-  const contraseña = document.getElementById("contraseña_alta_user").value.trim();
-  const usuario = {
-    id: usuarios.length + 1,
-    Nombre: document.getElementById("nombre_alta_user").value.trim(),
-    Primer_apellido: document.getElementById("primer_apellido_alta_user").value.trim(),
-    Segundo_apellido: document.getElementById("segundo_apellido_alta_user").value.trim(),
-    Correo: document.getElementById("correo_alta_user").value.trim(),
-    Contraseña: contraseña,
-    Confirmar_contraseña: contraseña,
-    rol: document.getElementById("rol_alta_user").value,
-    Fecha_de_alta: new Date().toLocaleDateString("es-ES"),
-    estado: document.getElementById("estado_alta_user").value,
-    Fotografia: FOTOGRAFIA_PREDETERMINADA
+function datosUsuarioFormulario(sufijo) {
+  const datos = {
+    nombre: document.getElementById(`nombre_${sufijo}_user`).value.trim(),
+    email: document.getElementById(`correo_${sufijo}_user`).value.trim(),
+    activo: document.getElementById(`estado_${sufijo}_user`).value
   };
 
-  const existente = usuarios.find(u => u.Correo === usuario.Correo);
-  if (existente) {
-    alert("Ya existe un usuario con ese correo.");
-    return;
+  const contraseña = document.getElementById(`contraseña_${sufijo}_user`).value;
+  if (contraseña) {
+    datos.password = contraseña;
   }
-
-  usuarios.push(usuario);
-  guardarDatos(DATOS_USER, usuarios);
-  updateSelect();
-  alert("Usuario registrado correctamente.");
+  return datos;
 }
 
-function modUser(event) {
+async function refrescarUsuarios() {
+  promesaUsuariosApi = null;
+  await obtenerUsuariosApi();
+  updateSelect();
+}
+
+async function altaUser(event) {
+  event.preventDefault();
+
+  try {
+    await peticionApi("/api/usuarios", "POST", datosUsuarioFormulario("alta"));
+    await refrescarUsuarios();
+    alert("Usuario registrado correctamente.");
+  } catch (error) {
+    console.error("No se pudo registrar el usuario.", error);
+    alert(`No se pudo registrar el usuario: ${error.message}`);
+  }
+}
+
+async function modUser(event) {
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_user").value;
-  const usuarios = leerDatos(DATOS_USER);
-  const usuarioAnterior = usuarios.find(usuario => String(usuario.id) === idMod);
-  if (!usuarioAnterior) {
+  if (!idMod) {
     alert("Selecciona primero un usuario.");
     return;
   }
 
-  const usuarioModificado = {
-    id: usuarioAnterior.id,
-    Nombre: document.getElementById("nombre_mod_user").value.trim(),
-    Primer_apellido: document.getElementById("primer_apellido_mod_user").value.trim(),
-    Segundo_apellido: document.getElementById("segundo_apellido_mod_user").value.trim(),
-    Correo: document.getElementById("correo_mod_user").value.trim(),
-    Contraseña: document.getElementById("contraseña_mod_user").value.trim(),
-    Confirmar_contraseña: document.getElementById("contraseña_mod_user").value.trim(),
-    rol: document.getElementById("rol_mod_user").value,
-    estado: document.getElementById("estado_mod_user").value,
-    Fotografia: usuarioAnterior.Fotografia || FOTOGRAFIA_PREDETERMINADA
-  };
-
-  const usuariosActualizados = usuarios.map(usuario =>
-    String(usuario.id) === idMod ? usuarioModificado : usuario
-  );
-  guardarDatos(DATOS_USER, usuariosActualizados);
-  updateSelect();
-  alert("Usuario modificado correctamente.");
+  try {
+    await peticionApi(`/api/usuarios/${encodeURIComponent(idMod)}`, "PUT", datosUsuarioFormulario("mod"));
+    await refrescarUsuarios();
+    alert("Usuario modificado correctamente.");
+  } catch (error) {
+    console.error("No se pudo modificar el usuario.", error);
+    alert(`No se pudo modificar el usuario: ${error.message}`);
+  }
 }
 
-function rellenarUser() {
+async function rellenarUser() {
   const idMod = document.getElementById("id_mod_user").value;
-  const usuarios = leerDatos(DATOS_USER);
-  const usuario = usuarios.find(u => String(u.id) === idMod);
+  let usuario;
+  try {
+    usuario = (await obtenerUsuariosApi()).find(u => String(u.id) === idMod);
+  } catch (error) {
+    alert(`No se pudieron cargar los usuarios: ${error.message}`);
+    return;
+  }
 
   if (!usuario) {
     return;
   }
 
-  document.getElementById("nombre_mod_user").value = usuario.Nombre;
-  document.getElementById("primer_apellido_mod_user").value = usuario.Primer_apellido;
-  document.getElementById("segundo_apellido_mod_user").value = usuario.Segundo_apellido;
-  document.getElementById("correo_mod_user").value = usuario.Correo;
-  document.getElementById("contraseña_mod_user").value = usuario.Contraseña;
-  document.getElementById("rol_mod_user").value = usuario.rol;
-  document.getElementById("estado_mod_user").value = usuario.estado;
+  document.getElementById("nombre_mod_user").value = usuario.nombre;
+  document.getElementById("correo_mod_user").value = usuario.email;
+  document.getElementById("contraseña_mod_user").value = "";
+  document.getElementById("estado_mod_user").value = String(Number(usuario.activo));
 }
 
-function delUser(event) {
+async function delUser(event) {
   event.preventDefault();
 
   const idDel = document.getElementById("id_del_user").value;
-  const usuarios = leerDatos(DATOS_USER);
-  const encontrado = usuarios.find(usuario => String(usuario.id) === idDel);
+  let encontrado;
+  try {
+    encontrado = (await obtenerUsuariosApi()).find(usuario => String(usuario.id) === idDel);
+  } catch (error) {
+    alert(`No se pudieron cargar los usuarios: ${error.message}`);
+    return;
+  }
 
   if (!encontrado) {
     alert("Selecciona primero un usuario.");
@@ -124,19 +120,27 @@ function delUser(event) {
     return;
   }
 
-  const datosActualizados = usuarios.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
-
-  guardarDatos(DATOS_USER, datosActualizados);
-  updateSelect();
-  alert("Usuario desactivado correctamente.");
+  try {
+    await peticionApi(`/api/usuarios/${encodeURIComponent(idDel)}`, "PATCH", { activo: 0 });
+    await refrescarUsuarios();
+    alert("Usuario desactivado correctamente.");
+  } catch (error) {
+    console.error("No se pudo desactivar el usuario.", error);
+    alert(`No se pudo desactivar el usuario: ${error.message}`);
+  }
 }
 
-function infoUser(event) {
+async function infoUser(event) {
   event.preventDefault();
 
   const idInfo = document.getElementById("id_info_user").value;
-  const usuarios = leerDatos(DATOS_USER);
-  const usuario = usuarios.find(u => String(u.id) === idInfo);
+  let usuario;
+  try {
+    usuario = (await obtenerUsuariosApi()).find(u => String(u.id) === idInfo);
+  } catch (error) {
+    alert(`No se pudieron cargar los usuarios: ${error.message}`);
+    return;
+  }
 
   if (!usuario) {
     alert("Selecciona primero un usuario.");
@@ -144,11 +148,10 @@ function infoUser(event) {
   }
 
   document.getElementById("listado_user").innerHTML = `
-    <li>Nombre: ${usuario.Nombre}</li>
-    <li>Primer apellido: ${usuario.Primer_apellido}</li>
-    <li>Segundo apellido: ${usuario.Segundo_apellido}</li>
-    <li>Correo: ${usuario.Correo}</li>
+    <li>Nombre: ${usuario.nombre}</li>
+    <li>Correo: ${usuario.email}</li>
     <li>Rol: ${usuario.rol}</li>
-    <li>Estado: ${usuario.estado}</li>
+    <li>Fecha de registro: ${String(usuario.fecha_registro).slice(0, 10)}</li>
+    <li>Estado: ${Number(usuario.activo) === 1 ? "activo" : "inactivo"}</li>
   `;
 }

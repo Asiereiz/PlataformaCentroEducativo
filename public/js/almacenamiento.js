@@ -2,30 +2,14 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSelect();
 });
 
-const DATOS_USER = "datos_usuarios";
-const DATOS_CURSOS = "datos_cursos";
-const DATOS_AULAS = "datos_aulas";
-const DATOS_DOCENTES = "datos_docentes";
-const DATOS_MATRICULAS = "datos_matriculas";
-const FOTOGRAFIA_PREDETERMINADA = "../img/usuario-predeterminado.jpg";
-const IMAGEN_CURSO_PREDETERMINADA = "../img/curso-ucm.png";
 let promesaCursosApi;
 let promesaDocentesApi;
 let promesaUsuariosApi;
+let promesaAulasApi;
 
 function updateSelect() {
-    const aulas = leerDatos(DATOS_AULAS);
-    const usuarios = leerDatos(DATOS_USER);
-
-    actualizarOpciones("id_mod_aula", aulas, "nombre");
-    actualizarOpciones("id_del_aula", aulas, "nombre");
-    actualizarOpciones("id_info_aula", aulas, "nombre");
-    actualizarOpciones("id_mod_user", usuarios, "Nombre");
-    actualizarOpciones("id_del_user", usuarios, "Nombre");
-    actualizarOpciones("id_info_user", usuarios, "Nombre");
-    actualizarOpciones("aula_alta_curso", aulas.filter(aula => aula.estado === "activo"), "nombre", "Selecciona un aula");
-    actualizarOpciones("aula_mod_curso", aulas.filter(aula => aula.estado === "activo"), "nombre", "Selecciona un aula");
-
+    actualizarSelectoresUsuarios();
+    actualizarSelectoresAulas();
     actualizarSelectoresCursos();
     actualizarSelectoresDocentes();
     actualizarSelectoresMatriculas();
@@ -62,8 +46,6 @@ function obtenerCursosApi() {
   return promesaCursosApi;
 }
 
-// Petición a la API con cuerpo JSON. Devuelve el JSON de la respuesta y,
-// si el servidor responde con un error, lanza un Error con el texto de { error }.
 async function peticionApi(url, metodo = "GET", cuerpo) {
   const opciones = { method: metodo };
   if (cuerpo !== undefined) {
@@ -79,8 +61,6 @@ async function peticionApi(url, metodo = "GET", cuerpo) {
   return resultado;
 }
 
-// Matrículas de la API. Filtros opcionales: { usuario, curso, estado }
-// No se guardan en memoria: cambian a menudo y se piden cada vez.
 async function obtenerMatriculasApi(filtros = {}) {
   const parametros = new URLSearchParams(filtros).toString();
   const filas = await peticionApi("/api/matriculas" + (parametros ? "?" + parametros : ""));
@@ -104,13 +84,11 @@ function obtenerUsuariosApi() {
   return promesaUsuariosApi;
 }
 
-// Rellena los desplegables de la gestión de matrículas (admin) con datos de la API
 async function actualizarSelectoresMatriculas() {
   const selectoresMatriculas = ["id_mod_mat", "id_del_mat"];
   const selectoresAlumnos = ["alumno_alta_mat", "alumno_mod_mat", "alumno_info_mat"];
   const todos = [...selectoresMatriculas, ...selectoresAlumnos];
 
-  // Si la página no tiene ninguno de estos selectores, no hace falta pedir nada
   if (!todos.some(id => document.getElementById(id))) {
     return;
   }
@@ -159,10 +137,69 @@ function obtenerDocentesApi() {
   return promesaDocentesApi;
 }
 
+async function actualizarSelectoresUsuarios() {
+  const selectores = ["id_mod_user", "id_del_user", "id_info_user"];
+
+  if (!selectores.some(id => document.getElementById(id))) {
+    return;
+  }
+
+  try {
+    const usuarios = await obtenerUsuariosApi();
+    selectores.forEach(id => actualizarOpciones(id, usuarios, "nombre"));
+  } catch (error) {
+    console.error("No se pudieron cargar los usuarios para los selectores.", error);
+    selectores.forEach(id => {
+      const select = document.getElementById(id);
+      if (select) {
+        select.innerHTML = '<option value="">No se pudieron cargar los usuarios</option>';
+      }
+    });
+  }
+}
+
+function obtenerAulasApi() {
+  if (!promesaAulasApi) {
+    promesaAulasApi = peticionApi("/api/aulas")
+      .then(filas => filas.map(aula => ({ ...aula, id: aula.id_aula })))
+      .catch(error => {
+        promesaAulasApi = null;
+        throw error;
+      });
+  }
+
+  return promesaAulasApi;
+}
+
+async function actualizarSelectoresAulas() {
+  const selectoresGestion = ["id_mod_aula", "id_del_aula", "id_info_aula"];
+  const selectoresCursos = ["aula_alta_curso", "aula_mod_curso"];
+  const todos = [...selectoresGestion, ...selectoresCursos];
+
+  if (!todos.some(id => document.getElementById(id))) {
+    return;
+  }
+
+  try {
+    const aulas = await obtenerAulasApi();
+    const activas = aulas.filter(aula => aula.estado === "activa");
+
+    selectoresGestion.forEach(id => actualizarOpciones(id, aulas, "nombre"));
+    selectoresCursos.forEach(id => actualizarOpciones(id, activas, "nombre", "Selecciona un aula"));
+  } catch (error) {
+    console.error("No se pudieron cargar las aulas para los selectores.", error);
+    todos.forEach(id => {
+      const select = document.getElementById(id);
+      if (select) {
+        select.innerHTML = '<option value="">No se pudieron cargar las aulas</option>';
+      }
+    });
+  }
+}
+
 async function actualizarSelectoresDocentes() {
   const selectores = ["id_mod_doc", "id_del_doc", "id_info_doc", "docente_alta_curso", "docente_mod_curso"];
 
-  // Si la página no tiene ninguno de estos selectores, no hace falta pedir los docentes
   if (!selectores.some(id => document.getElementById(id))) {
     return;
   }
@@ -223,33 +260,6 @@ function actualizarOpciones(id, datos, campo, texto = "Selecciona un ID") {
   });
 }
 
-function leerImagen(input) {
-  const archivo = input.files[0];
-  if (!archivo) {
-    return Promise.resolve("");
-  }
-
-  if (!archivo.type.startsWith("image/")) {
-    return Promise.reject(new Error("El archivo seleccionado no es una imagen."));
-  }
-
-  return new Promise((resolve, reject) => {
-    const lector = new FileReader();
-    lector.onload = () => {
-      if (typeof lector.result === "string") {
-        resolve(lector.result);
-      } else {
-        reject(new Error("No se pudo leer el contenido de la imagen."));
-      }
-    };
-    lector.onerror = () => reject(lector.error || new Error("Error al leer la imagen."));
-    lector.readAsDataURL(archivo);
-  });
-}
-
-// La base de datos guarda rutas como "img/cursos/curso01.png" (sin "/" inicial).
-// Se convierten en "/img/cursos/curso01.png" para que funcionen desde cualquier página,
-// también desde las de /admin/ (acepta además "../img/..." y data:image antiguos).
 function rutaImagen(imagen) {
   if (typeof imagen !== "string") {
     return "";
@@ -277,18 +287,4 @@ function esImagenValida(imagen) {
   const ruta = rutaImagen(imagen);
   return ruta.startsWith("data:image/") ||
     /^\/img\/(?:(?:cursos|docentes|aulas|alumnos)\/)?[\w.-]+\.(?:png|jpe?g|webp|gif)$/i.test(ruta);
-}
-
-function guardarDatosConImagen(clave, datos) {
-  try {
-    guardarDatos(clave, datos);
-    return true;
-  } catch (error) {
-    if (error && (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")) {
-      alert("No se pudieron guardar los datos porque se ha alcanzado el espacio disponible. Prueba con una imagen de menor tamaño.");
-      return false;
-    }
-
-    throw error;
-  }
 }

@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// Pide a la API los datos del usuario que ha iniciado sesión
 function obtenerUsuarioActual() {
   const idUsuario = sessionStorage.getItem("idUsuario");
   if (!idUsuario) {
@@ -67,7 +66,6 @@ async function editarPerfil(event) {
   try {
     const usuarioActual = await obtenerUsuarioActual();
 
-    // Los campos que se dejan vacíos conservan su valor actual
     const cambios = {
       nombre: obtenerValor("nombre_editar", usuarioActual.nombre),
       email: obtenerValor("correo_editar", usuarioActual.email)

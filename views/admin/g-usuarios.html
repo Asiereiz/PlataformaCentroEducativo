@@ -14,7 +14,7 @@
     <body>
 
         <header>
-            <h1><a class="enlace-logo" href="../admin.html" tabindex="-1" aria-hidden="true"><img class="logo-cabecera" src="/img/logo-mini.png" alt="" width="40" height="39"></a><a class="titulo" href="../admin.html">CFORMA</a>
+            <h1><a class="enlace-logo" href="../portal.html" tabindex="-1" aria-hidden="true"><img class="logo-cabecera" src="/img/logo-mini.png" alt="" width="40" height="39"></a><a class="titulo" href="../portal.html">CFORMA</a>
                 <span class="estado-sesion sesionAdmin" hidden>Sesión como administrador</span>
                 <span class="estado-sesion sesionAlumno" hidden>Sesión como alumno</span>
             </h1>
@@ -45,21 +45,13 @@
             <section class="alta">
                 <form action="#" method="post" id="alta_user">
                     <legend>Alta</legend>
-                        <label for="nombre_alta_user">Nombre: <input type="text" id="nombre_alta_user" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
-                        <label for="primer_apellido_alta_user">Primer apellido: <input type="text" id="primer_apellido_alta_user" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;</label>
-                        <label for="segundo_apellido_alta_user">Segundo apellido: <input type="text" id="segundo_apellido_alta_user" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></label>
+                        <label for="nombre_alta_user">Nombre completo: <input type="text" id="nombre_alta_user" name="Nombre" required placeholder="Inserta el nombre completo"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="correo_alta_user">Correo electrónico: <input type="email" id="correo_alta_user" name="Correo" required placeholder="Inserta tu correo electrónico"></label>
-                        <label for="contraseña_alta_user">Contraseña: <input type="password" id="contraseña_alta_user" name="Contraseña" required placeholder="Inserta tu contraseña"></label>
-                        <label for="rol_alta_user">Rol: <select id="rol_alta_user" name="rol" required>
-                                    <option value="" selected disabled>Selecciona un rol</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="alumno">Alumno</option>
-                                </select>
-                        </label>
+                        <label for="contraseña_alta_user">Contraseña: <input type="password" id="contraseña_alta_user" name="Contraseña" required minlength="8" placeholder="Mínimo 8 caracteres"></label>
                         <label for="estado_alta_user">Estado: <select id="estado_alta_user" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
+                                    <option value="1">Activo</option>
+                                    <option value="0">Inactivo</option>
                                 </select>
                         </label>
                         <button type="submit"> Registrar</button>
@@ -73,21 +65,13 @@
                             <option value=""> Selecciona un ID </option> &nbsp;&nbsp;&nbsp;
                             </select>
                         </label>
-                        <label for="nombre_mod_user">Nombre: <input type="text" id="nombre_mod_user" name="Nombre" required placeholder="Inserta tu nombre"> &nbsp;&nbsp;&nbsp;</label>
-                        <label for="primer_apellido_mod_user">Primer apellido: <input type="text" id="primer_apellido_mod_user" name="Primer_apellido" required placeholder="Inserta tu primer apellido"> &nbsp;&nbsp;&nbsp;</label>
-                        <label for="segundo_apellido_mod_user">Segundo apellido: <input type="text" id="segundo_apellido_mod_user" name="Segundo_apellido" required placeholder="Inserta tu segundo apellido"></label>
+                        <label for="nombre_mod_user">Nombre completo: <input type="text" id="nombre_mod_user" name="Nombre" required placeholder="Inserta el nombre completo"> &nbsp;&nbsp;&nbsp;</label>
                         <label for="correo_mod_user">Correo electrónico: <input type="email" id="correo_mod_user" name="Correo" required placeholder="Inserta tu correo electrónico"></label>
-                        <label for="contraseña_mod_user">Contraseña: <input type="password" id="contraseña_mod_user" name="Contraseña" required placeholder="Inserta tu contraseña"></label>
-                        <label for="rol_mod_user">Rol: <select id="rol_mod_user" name="rol" required>
-                                    <option value="" selected disabled>Selecciona un rol</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="alumno">Alumno</option>
-                                </select>
-                        </label>
+                        <label for="contraseña_mod_user">Contraseña: <input type="password" id="contraseña_mod_user" name="Contraseña" minlength="8" placeholder="Déjala vacía para no cambiarla"></label>
                         <label for="estado_mod_user">Estado: <select id="estado_mod_user" name="estado" required>
                                     <option value="" selected disabled>Selecciona un estado</option>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
+                                    <option value="1">Activo</option>
+                                    <option value="0">Inactivo</option>
                                 </select>
                         </label>
                         <button type="submit"> Modificar</button>

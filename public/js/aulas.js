@@ -27,59 +27,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function altaAula(event) {
+function datosAulaFormulario(sufijo) {
+  return {
+    nombre: document.getElementById(`nombre_${sufijo}_aula`).value.trim(),
+    edificio: document.getElementById(`edificio_${sufijo}_aula`).value.trim(),
+    planta: document.getElementById(`planta_${sufijo}_aula`).value.trim(),
+    capacidad: document.getElementById(`capacidad_${sufijo}_aula`).value.trim(),
+    equipamiento: document.getElementById(`equipamiento_${sufijo}_aula`).value.trim(),
+    estado: document.getElementById(`estado_${sufijo}_aula`).value
+  };
+}
+
+async function refrescarAulas() {
+  promesaAulasApi = null;
+  await obtenerAulasApi();
+  updateSelect();
+}
+
+async function altaAula(event) {
   event.preventDefault();
 
-  const aula = {
-    id: leerDatos(DATOS_AULAS).length + 1,
-    nombre: document.getElementById("nombre_alta_aula").value.trim(),
-    edificio: document.getElementById("edificio_alta_aula").value.trim(),
-    planta: document.getElementById("planta_alta_aula").value.trim(),
-    capacidad: document.getElementById("capacidad_alta_aula").value.trim(),
-    equipamiento: document.getElementById("equipamiento_alta_aula").value.trim(),
-    estado: document.getElementById("estado_alta_aula").value.trim()
+  try {
+    await peticionApi("/api/aulas", "POST", datosAulaFormulario("alta"));
+    await refrescarAulas();
+    alert("Aula registrada correctamente.");
+  } catch (error) {
+    console.error("No se pudo registrar el aula.", error);
+    alert(`No se pudo registrar el aula: ${error.message}`);
+  }
+}
+
+async function modAula(event){
+  event.preventDefault();
+
+  const idMod = document.getElementById("id_mod_aula").value;
+  if (!idMod) {
+    alert("Selecciona primero un aula.");
+    return;
   }
 
-  const aulas = leerDatos(DATOS_AULAS);
-  aulas.push(aula);
-  guardarDatos(DATOS_AULAS, aulas);
-
-  updateSelect();
+  try {
+    await peticionApi(`/api/aulas/${encodeURIComponent(idMod)}`, "PUT", datosAulaFormulario("mod"));
+    await refrescarAulas();
+    alert("Aula modificada correctamente.");
+  } catch (error) {
+    console.error("No se pudo modificar el aula.", error);
+    alert(`No se pudo modificar el aula: ${error.message}`);
+  }
 }
 
-function modAula(event){
-  event.preventDefault();
-
+async function rellenarAula() {
   const idMod = document.getElementById("id_mod_aula").value;
-
-  const aulas = leerDatos(DATOS_AULAS);
-  const aulaAnterior = aulas.find(aula => String(aula.id) === idMod);
-
-   const aulaModificada = {
-    id: aulaAnterior.id,
-    nombre: document.getElementById("nombre_mod_aula").value.trim(),
-    edificio: document.getElementById("edificio_mod_aula").value.trim(),
-    planta: document.getElementById("planta_mod_aula").value.trim(),
-    capacidad: document.getElementById("capacidad_mod_aula").value.trim(),
-    equipamiento: document.getElementById("equipamiento_mod_aula").value.trim(),
-    estado: document.getElementById("estado_mod_aula").value
-  };
-
-  const aulasActualizadas = aulas.map(aula =>
-    String(aula.id) === idMod ? aulaModificada : aula
-  );
-
-  guardarDatos(DATOS_AULAS, aulasActualizadas);
-  updateSelect();
-
-  alert("Aula modificada correctamente.");
-
-}
-
-function rellenarAula() {
-  const idMod = document.getElementById("id_mod_aula").value;
-  const aulas = leerDatos(DATOS_AULAS);
-  const aula = aulas.find(a => String(a.id) === idMod);
+  let aula;
+  try {
+    aula = (await obtenerAulasApi()).find(a => String(a.id) === idMod);
+  } catch (error) {
+    alert(`No se pudieron cargar las aulas: ${error.message}`);
+    return;
+  }
 
   if (!aula) {
     return;
@@ -93,21 +98,20 @@ function rellenarAula() {
   document.getElementById("estado_mod_aula").value = aula.estado;
 }
 
-function delAula(event){
+async function delAula(event){
   event.preventDefault();
-  
-  const idDel = document.getElementById("id_del_aula").value;
-  const aulas = leerDatos(DATOS_AULAS);
-  const encontrado = aulas.find(aula => String(aula.id) === idDel);
 
-  if (!encontrado) {
-    alert("Selecciona primero un aula.");
+  const idDel = document.getElementById("id_del_aula").value;
+  let encontrado;
+  try {
+    encontrado = (await obtenerAulasApi()).find(aula => String(aula.id) === idDel);
+  } catch (error) {
+    alert(`No se pudieron cargar las aulas: ${error.message}`);
     return;
   }
 
-  const activo = leerDatos(DATOS_CURSOS).find(curso => String(curso.aula) === idDel && curso.estado === "activo");
-  if (activo) {
-    alert("No se puede eliminar el aula porque está asignada a un curso activo.");
+  if (!encontrado) {
+    alert("Selecciona primero un aula.");
     return;
   }
 
@@ -115,22 +119,28 @@ function delAula(event){
     return;
   }
 
-  const datosActualizados = aulas.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
-
-  guardarDatos(DATOS_AULAS, datosActualizados);
-  updateSelect();
-
-  alert("Aula desactivada correctamente.");
-
+  try {
+    await peticionApi(`/api/aulas/${encodeURIComponent(idDel)}`, "PATCH", { estado: "inactiva" });
+    await refrescarAulas();
+    alert("Aula desactivada correctamente.");
+  } catch (error) {
+    console.error("No se pudo desactivar el aula.", error);
+    alert(`No se pudo desactivar el aula: ${error.message}`);
+  }
 }
 
-function infoAula(event){
+async function infoAula(event){
   event.preventDefault();
 
   const idInfo = document.getElementById("id_info_aula").value;
 
-  const aulas = leerDatos(DATOS_AULAS);
-  const aula = aulas.find(a => String(a.id) === idInfo);
+  let aula;
+  try {
+    aula = (await obtenerAulasApi()).find(a => String(a.id) === idInfo);
+  } catch (error) {
+    alert(`No se pudieron cargar las aulas: ${error.message}`);
+    return;
+  }
 
   if (!aula) {
     alert("Selecciona primero un aula.");

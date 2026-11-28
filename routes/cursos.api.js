@@ -4,29 +4,24 @@ import { subirFoto, rutaFoto, borrarSubida } from "./imagenes.js";
 
 const router = Router();
 
-// Misma forma de ruta que usa el script SQL: sin "/" inicial (img/cursos/curso01.png)
 const IMAGEN_PREDETERMINADA = "img/curso-ucm.png";
 
-// GET /api/cursos  ->  200 OK + array JSON
 router.get("/", async (req, res) => {
   try {
     const cursos = await db.listarCursos();
-    res.json(cursos); // 200 OK + JSON
+    res.json(cursos);
   } catch (err) {
     console.error("Error en BD:", err);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// POST /api/cursos  ->  201 Created
-// (multipart/form-data: los campos llegan en req.body y la imagen en req.file)
 router.post("/", subirFoto("foto", "cursos"), async (req, res) => {
-  const nueva = rutaFoto(req); // "img/cursos/xxxx.png" o null
+  const nueva = rutaFoto(req);
 
-  // 1) Validación de entrada -> 400
   const error = validarCurso(req.body);
   if (error) {
-    borrarSubida(nueva); // datos mal: no dejar la imagen huérfana
+    borrarSubida(nueva);
     return res.status(400).json({ error });
   }
 
@@ -35,7 +30,7 @@ router.post("/", subirFoto("foto", "cursos"), async (req, res) => {
       ...datosCurso(req.body),
       imagen: nueva || IMAGEN_PREDETERMINADA
     });
-    return res.status(201).json({ id_curso }); // Creado
+    return res.status(201).json({ id_curso });
   } catch (err) {
     borrarSubida(nueva);
     console.error("Error en BD:", err);
@@ -43,7 +38,6 @@ router.post("/", subirFoto("foto", "cursos"), async (req, res) => {
   }
 });
 
-// PUT /api/cursos/:id  ->  200 OK
 router.put("/:id", subirFoto("foto", "cursos"), async (req, res) => {
   const nueva = rutaFoto(req);
 
@@ -55,7 +49,6 @@ router.put("/:id", subirFoto("foto", "cursos"), async (req, res) => {
   }
 
   try {
-    // 404: el curso no existe
     const existente = await db.obtenerCurso(id);
     if (!existente) {
       borrarSubida(nueva);
@@ -64,10 +57,10 @@ router.put("/:id", subirFoto("foto", "cursos"), async (req, res) => {
 
     await db.modificarCurso(id, {
       ...datosCurso(req.body),
-      imagen: nueva || existente.imagen // sin foto nueva se conserva la anterior
+      imagen: nueva || existente.imagen
     });
     if (nueva) {
-      borrarSubida(existente.imagen); // la foto antigua ya no se usa
+      borrarSubida(existente.imagen);
     }
     return res.json({ id_curso: id });
   } catch (err) {
@@ -77,7 +70,6 @@ router.put("/:id", subirFoto("foto", "cursos"), async (req, res) => {
   }
 });
 
-// PATCH /api/cursos/:id  ->  200 OK (solo permite desactivar un curso)
 router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (validarId(id)) {
@@ -102,9 +94,6 @@ router.patch("/:id", async (req, res) => {
 });
 
 export default router;
-
-// ----------------------------------------------------------- validaciones
-// Devuelven un texto con el error, o null si todo está bien.
 
 function validarId(id) {
   if (!Number.isSafeInteger(id) || id < 1) {
@@ -132,7 +121,6 @@ function validarCurso(datos) {
   return null;
 }
 
-// Pasa los campos del formulario al formato que espera el servicio
 function datosCurso(datos) {
   return {
     nombre: String(datos.nombre).trim(),

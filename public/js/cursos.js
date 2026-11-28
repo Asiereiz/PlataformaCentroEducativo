@@ -46,7 +46,6 @@ function mostrarErrorCargaCursos(listado, error) {
 }
 
 function datosCursoFormulario(sufijo, inputFoto) {
-  // La imagen viaja como archivo (multipart/form-data): la guarda Multer en el servidor
   const datos = new FormData();
   datos.append("nombre", document.getElementById(`nombre_${sufijo}`).value.trim());
   datos.append("descripcion", document.getElementById(`descripcion_${sufijo}`).value.trim());
@@ -66,11 +65,10 @@ function datosCursoFormulario(sufijo, inputFoto) {
 async function enviarCurso(url, metodo, cuerpo) {
   const opciones = { method: metodo };
   if (cuerpo instanceof FormData) {
-    // Sin Content-Type: el navegador lo añade solo, con el "boundary" del multipart
     opciones.body = cuerpo;
   } else {
     opciones.headers = { "Content-Type": "application/json" };
-    opciones.body = JSON.stringify(cuerpo); // por ejemplo, el PATCH de desactivar
+    opciones.body = JSON.stringify(cuerpo);
   }
 
   const respuesta = await fetch(url, opciones);

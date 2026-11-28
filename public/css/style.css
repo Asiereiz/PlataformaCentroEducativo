@@ -1069,9 +1069,6 @@ body.contraste .footer-contacto-tarjetas a{
         padding: 30px 20px;
     }
 }
-/* ------------------------------------------------------------------
-   Accesos rápidos / iconos de interfaz (mobile-first)
-   ------------------------------------------------------------------ */
 
 #portal #accesos{
     display: grid;
@@ -1147,7 +1144,6 @@ body.contraste .footer-contacto-tarjetas a{
     outline-offset: 2px;
 }
 
-/* Icono + título de las páginas de administración */
 h3.titulo-icono{
     display: flex;
     align-items: center;
@@ -1274,8 +1270,6 @@ body.large #portal a.acceso small{
     }
 }
 
-/* Logo de la cabecera: un solo logo a la izquierda, con el título y
-   "Sesión como..." apilados a su derecha */
 header h1:has(.enlace-logo){
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -1320,7 +1314,6 @@ header h1 .subtitulo-cabecera{
     border-radius: 9px;
 }
 
-/* Banner dentro de la tarjeta de bienvenida */
 #portal #bienvenida .banner-bienvenida{
     display: block;
     width: 100%;
@@ -1331,7 +1324,6 @@ header h1 .subtitulo-cabecera{
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Galería de instalaciones (fotos de aulas) */
 #portal #instalaciones{
     display: grid;
     grid-template-columns: 1fr;
@@ -1412,7 +1404,6 @@ body.contraste #portal #instalaciones figcaption{
 }
 
 @media (min-width: 768px){
-    /* Texto a la izquierda y banner a la derecha */
     #portal #bienvenida{
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(260px, 400px);
@@ -1445,21 +1436,18 @@ body.contraste #portal #instalaciones figcaption{
     }
 }
 
-/* Etiquetas de las noticias (Información académica, Actualidad...) */
 #portal article small{
     font-size: 1rem;
     font-style: italic;
     line-height: 1.5;
 }
 
-/* Nombre de marca CFORMA en la cabecera */
 header h1 .titulo{
     font-size: 1.3em;
     font-weight: 700;
     letter-spacing: 0.12em;
 }
 
-/* Logo completo encima de los formularios de acceso */
 .logo-formulario{
     display: block;
     width: min(300px, 80%);
@@ -1467,7 +1455,6 @@ header h1 .titulo{
     margin: 8px auto 20px;
 }
 
-/* Lista de docentes adaptable: 2 columnas en móvil, 3 en tablet, 5 en escritorio */
 #lista_docentes{
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }

@@ -3,13 +3,10 @@ import * as db from "../db/mariadb.js";
 
 const router = Router();
 
-// Valores permitidos (los mismos que ofrece accesibilidad.html)
 const TEMAS = ["claro", "oscuro", "contraste"];
 const TAMANOS = ["small", "medium", "large"];
 const PREDETERMINADAS = { tema: "claro", tamano_letra: "medium" };
 
-// GET /api/preferencias/:id  ->  200 OK + { tema, tamano_letra }
-// Si el usuario nunca las ha cambiado, devuelve las predeterminadas.
 router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (validarId(id)) {
@@ -29,8 +26,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// PUT /api/preferencias/:id  ->  200 OK
-// Cuerpo JSON: { tema, tamano_letra }. Crea las preferencias o las actualiza.
 router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
   const error = validarId(id) || validarPreferencias(req.body);
@@ -53,9 +48,6 @@ router.put("/:id", async (req, res) => {
 });
 
 export default router;
-
-// ----------------------------------------------------------- validaciones
-// Devuelven un texto con el error, o null si todo está bien.
 
 function validarId(id) {
   if (!Number.isSafeInteger(id) || id < 1) {

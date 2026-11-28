@@ -12,58 +12,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.addEventListener("pageshow", aplicarPreferencias);
 
-// Las preferencias de un usuario con sesión viven en la base de datos (tabla preferencias).
-// Para no pedirlas en cada página, al iniciar sesión se guarda una copia en sessionStorage.
-// Quien no ha iniciado sesión no tiene usuario: sus preferencias se quedan en este navegador.
-const CLAVE_PREFERENCIAS = "preferencias";
 const CLAVE_PREFERENCIAS_INVITADO = "preferencias_invitado";
+const PREFIJO_PREFERENCIAS_USUARIO = "preferencias_usuario_";
 
-// La API usa { tema, tamano_letra }; en la página se usa { tema, tamfuente }
-function desdeApi(preferencias) {
-  return { tema: preferencias.tema, tamfuente: preferencias.tamano_letra };
-}
-
-// Pide a la API las preferencias del usuario y las guarda en sessionStorage
-async function cargarPreferenciasDeBD(idUsuario) {
-  try {
-    const preferencias = desdeApi(await peticionApi(`/api/preferencias/${encodeURIComponent(idUsuario)}`));
-    sessionStorage.setItem(CLAVE_PREFERENCIAS, JSON.stringify(preferencias));
-    return preferencias;
-  } catch (error) {
-    console.error("No se pudieron cargar las preferencias de accesibilidad.", error);
-    return {};
-  }
+function clavePreferencias() {
+  const idUsuario = sessionStorage.getItem("idUsuario");
+  return idUsuario ? PREFIJO_PREFERENCIAS_USUARIO + idUsuario : CLAVE_PREFERENCIAS_INVITADO;
 }
 
 function leerPreferencias() {
   try {
-    const guardadas = sessionStorage.getItem("idUsuario")
-      ? sessionStorage.getItem(CLAVE_PREFERENCIAS)
-      : localStorage.getItem(CLAVE_PREFERENCIAS_INVITADO);
+    const guardadas = localStorage.getItem(clavePreferencias());
     return guardadas ? JSON.parse(guardadas) : {};
   } catch (error) {
     return {};
   }
 }
 
-async function guardarPreferencias(cambios) {
+function guardarPreferencias(cambios) {
   const preferencias = { ...leerPreferencias(), ...cambios };
-  const idUsuario = sessionStorage.getItem("idUsuario");
-
-  if (!idUsuario) {
-    localStorage.setItem(CLAVE_PREFERENCIAS_INVITADO, JSON.stringify(preferencias));
-    return;
-  }
-
-  sessionStorage.setItem(CLAVE_PREFERENCIAS, JSON.stringify(preferencias));
   try {
-    await peticionApi(`/api/preferencias/${encodeURIComponent(idUsuario)}`, "PUT", {
-      tema: preferencias.tema || "claro",
-      tamano_letra: preferencias.tamfuente || "medium"
-    });
+    localStorage.setItem(clavePreferencias(), JSON.stringify(preferencias));
   } catch (error) {
     console.error("No se pudieron guardar las preferencias de accesibilidad.", error);
-    alert(`No se pudieron guardar tus preferencias: ${error.message}`);
   }
 }
 
@@ -91,14 +62,8 @@ function aplicarTamañoLetra(tamaño) {
   pantalla.classList.toggle("small", tamaño === "small");
 }
 
-async function aplicarPreferencias() {
-  let preferencias = leerPreferencias();
-
-  // Hay sesión pero no hay copia (por ejemplo, otra pestaña): se piden a la base de datos
-  const idUsuario = sessionStorage.getItem("idUsuario");
-  if (idUsuario && !sessionStorage.getItem(CLAVE_PREFERENCIAS)) {
-    preferencias = await cargarPreferenciasDeBD(idUsuario);
-  }
+function aplicarPreferencias() {
+  const preferencias = leerPreferencias();
 
   const tema = preferencias.tema || "claro";
   const tamfuente = preferencias.tamfuente || "medium";

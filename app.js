@@ -6,7 +6,7 @@ import cursosRouter from "./routes/cursos.api.js";
 import docentesRouter from "./routes/docentes.api.js";
 import usuariosRouter from "./routes/usuarios.api.js";
 import matriculasRouter from "./routes/matriculas.api.js";
-import preferenciasRouter from "./routes/preferencias.api.js";
+import aulasRouter from "./routes/aulas.api.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,13 +17,12 @@ const VIEWS_DIR = path.join(__dirname, "views");
 
 app.use(express.json());
 
-// Routers de la API
-app.use("/api", estadoRouter);          // /api/estado y /api/db/estado
-app.use("/api/cursos", cursosRouter);   // /api/cursos y /api/cursos/:id
+app.use("/api", estadoRouter);
+app.use("/api/cursos", cursosRouter);
 app.use("/api/docentes", docentesRouter);
 app.use("/api/usuarios", usuariosRouter);
 app.use("/api/matriculas", matriculasRouter);
-app.use("/api/preferencias", preferenciasRouter);
+app.use("/api/aulas", aulasRouter);
 
 app.get("/", (req, res) => {
   res.redirect("/index.html");
@@ -32,7 +31,6 @@ app.get("/", (req, res) => {
 app.use(express.static(PUBLIC_DIR));
 app.use(express.static(VIEWS_DIR));
 
-// 404 (igual que el tuyo)
 app.use((req, res) => {
   const esRutaApi = req.path === "/api" || req.path.startsWith("/api/");
   if (esRutaApi) {
@@ -43,7 +41,6 @@ app.use((req, res) => {
   );
 });
 
-// Manejador de errores (igual que el tuyo)
 app.use((error, req, res, next) => {
   console.error("Error interno del servidor:", error);
   if (res.headersSent) {
@@ -51,6 +48,9 @@ app.use((error, req, res, next) => {
   }
 
   const esRutaApi = req.path === "/api" || req.path.startsWith("/api/");
+  if (esRutaApi && error.type === "entity.parse.failed") {
+    return res.status(400).json({ ok: false, error: "El cuerpo de la petición no es un JSON válido." });
+  }
   if (req.path === "/api/db/estado") {
     return res.status(503).json({
       ok: false,

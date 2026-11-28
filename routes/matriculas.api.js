@@ -5,8 +5,6 @@ const router = Router();
 
 const ESTADOS = ["activa", "cancelada"];
 
-// GET /api/matriculas  ->  200 OK + array JSON
-// Filtros opcionales por query string: ?usuario=101&curso=1&estado=activa
 router.get("/", async (req, res) => {
   const { usuario, curso, estado } = req.query;
 
@@ -26,15 +24,13 @@ router.get("/", async (req, res) => {
       curso: curso !== undefined ? Number(curso) : undefined,
       estado
     });
-    res.json(matriculas); // 200 OK + JSON
+    res.json(matriculas);
   } catch (err) {
     console.error("Error en BD:", err);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// POST /api/matriculas  ->  201 Created
-// Cuerpo JSON: { id_usuario, id_curso, fecha_matricula?, estado? }
 router.post("/", async (req, res) => {
   const error = validarMatricula(req.body);
   if (error) {
@@ -49,14 +45,13 @@ router.post("/", async (req, res) => {
     }
 
     const id_matricula = await db.altaMatricula(matricula);
-    return res.status(201).json({ id_matricula }); // Creado
+    return res.status(201).json({ id_matricula });
   } catch (err) {
     console.error("Error en BD:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// PUT /api/matriculas/:id  ->  200 OK
 router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
   const error = validarId(id) || validarMatricula(req.body);
@@ -66,7 +61,6 @@ router.put("/:id", async (req, res) => {
 
   const matricula = datosMatricula(req.body);
   try {
-    // 404: la matrícula no existe
     if (!(await db.obtenerMatricula(id))) {
       return res.status(404).json({ error: "Matrícula no encontrada" });
     }
@@ -84,7 +78,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// PATCH /api/matriculas/:id  ->  200 OK (solo permite cancelar una matrícula)
 router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (validarId(id)) {
@@ -109,9 +102,6 @@ router.patch("/:id", async (req, res) => {
 
 export default router;
 
-// ----------------------------------------------------------- validaciones
-// Devuelven un texto con el error, o null si todo está bien.
-
 function validarId(id) {
   if (!Number.isSafeInteger(id) || id < 1) {
     return "El identificador no es válido";
@@ -135,7 +125,6 @@ function validarMatricula(datos) {
   return null;
 }
 
-// "2026-11-05" y que exista de verdad (no vale 2026-02-31)
 function esFecha(texto) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) {
     return false;
@@ -148,13 +137,11 @@ function datosMatricula(datos) {
   return {
     id_usuario: Number(datos.id_usuario),
     id_curso: Number(datos.id_curso),
-    fecha_matricula: datos.fecha_matricula ? datos.fecha_matricula : null, // null = ahora
+    fecha_matricula: datos.fecha_matricula ? datos.fecha_matricula : null,
     estado: datos.estado || "activa"
   };
 }
 
-// Reglas de negocio. Devuelve un texto con el problema, o null si todo está bien.
-// idActual = la matrícula que se está modificando (para no contarla dos veces).
 async function comprobarReglas(matricula, idActual = 0) {
   const usuario = await db.obtenerUsuario(matricula.id_usuario);
   if (!usuario) {
@@ -166,7 +153,6 @@ async function comprobarReglas(matricula, idActual = 0) {
     return "Selecciona un curso válido.";
   }
 
-  // Una matrícula cancelada no ocupa plaza: no hace falta comprobar nada más
   if (matricula.estado !== "activa") {
     return null;
   }

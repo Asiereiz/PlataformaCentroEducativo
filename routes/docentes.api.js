@@ -4,38 +4,38 @@ import { subirFoto, rutaFoto, borrarSubida } from "./imagenes.js";
 
 const router = Router();
 
-// Misma forma de ruta que usa el script SQL: sin "/" inicial (img/docentes/docente01.png)
 const IMAGEN_PREDETERMINADA = "img/icono_usuario.png";
 
-// GET /api/docentes  ->  200 OK + array JSON
 router.get("/", async (req, res) => {
   try {
     const docentes = await db.listarDocentes();
-    res.json(docentes); // 200 OK + JSON
+    res.json(docentes);
   } catch (err) {
     console.error("Error en BD:", err);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// POST /api/docentes  ->  201 Created
-// (multipart/form-data: los campos llegan en req.body y la imagen en req.file)
 router.post("/", subirFoto("foto", "docentes"), async (req, res) => {
-  const nueva = rutaFoto(req); // "img/docentes/xxxx.png" o null
+  const nueva = rutaFoto(req);
 
-  // 1) Validación de entrada -> 400
   const error = validarDocente(req.body);
   if (error) {
-    borrarSubida(nueva); // datos mal: no dejar la imagen huérfana
+    borrarSubida(nueva);
     return res.status(400).json({ error });
   }
 
   try {
+    if (await db.obtenerDocentePorEmail(datosDocente(req.body).email)) {
+      borrarSubida(nueva);
+      return res.status(400).json({ error: "Ya existe un docente con ese correo" });
+    }
+
     const id_docente = await db.altaDocente({
       ...datosDocente(req.body),
       foto: nueva || IMAGEN_PREDETERMINADA
     });
-    return res.status(201).json({ id_docente }); // Creado
+    return res.status(201).json({ id_docente });
   } catch (err) {
     borrarSubida(nueva);
     if (err.code === "ER_DUP_ENTRY") {
@@ -46,7 +46,6 @@ router.post("/", subirFoto("foto", "docentes"), async (req, res) => {
   }
 });
 
-// PUT /api/docentes/:id  ->  200 OK
 router.put("/:id", subirFoto("foto", "docentes"), async (req, res) => {
   const nueva = rutaFoto(req);
 
@@ -58,19 +57,24 @@ router.put("/:id", subirFoto("foto", "docentes"), async (req, res) => {
   }
 
   try {
-    // 404: el docente no existe
     const existente = await db.obtenerDocente(id);
     if (!existente) {
       borrarSubida(nueva);
       return res.status(404).json({ error: "Docente no encontrado" });
     }
 
+    const repetido = await db.obtenerDocentePorEmail(datosDocente(req.body).email);
+    if (repetido && repetido.id_docente !== id) {
+      borrarSubida(nueva);
+      return res.status(400).json({ error: "Ya existe un docente con ese correo" });
+    }
+
     await db.modificarDocente(id, {
       ...datosDocente(req.body),
-      foto: nueva || existente.foto // sin foto nueva se conserva la anterior
+      foto: nueva || existente.foto
     });
     if (nueva) {
-      borrarSubida(existente.foto); // la foto antigua ya no se usa
+      borrarSubida(existente.foto);
     }
     return res.json({ id_docente: id });
   } catch (err) {
@@ -83,7 +87,6 @@ router.put("/:id", subirFoto("foto", "docentes"), async (req, res) => {
   }
 });
 
-// PATCH /api/docentes/:id  ->  200 OK (solo permite desactivar un docente)
 router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (validarId(id)) {
@@ -109,9 +112,6 @@ router.patch("/:id", async (req, res) => {
 
 export default router;
 
-// ----------------------------------------------------------- validaciones
-// Devuelven un texto con el error, o null si todo está bien.
-
 function validarId(id) {
   if (!Number.isSafeInteger(id) || id < 1) {
     return "El identificador del docente no es válido";
@@ -133,8 +133,6 @@ function validarDocente(datos) {
   return null;
 }
 
-// Pasa los campos del formulario al formato que espera mariadb.js
-// (desde FormData todo llega como texto: activo "1" -> 1)
 function datosDocente(datos) {
   return {
     nombre: String(datos.nombre).trim(),

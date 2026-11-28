@@ -1,8 +1,5 @@
 import mariadb from "mariadb";
 
-// Pool de conexiones a MariaDB.
-// Los datos de conexión no están en el código: vienen del archivo .env
-// (se cargan con "node --env-file=.env app.js", ver package.json).
 const pool = mariadb.createPool({
   host: process.env.DB_HOST || "localhost",
   port: Number(process.env.DB_PORT || 3306),
@@ -10,11 +7,9 @@ const pool = mariadb.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   connectionLimit: 10,
-  dateStrings: true // las fechas llegan como "2026-09-01" y no como objeto Date
+  dateStrings: true
 });
 
-// Ejecuta una consulta parametrizada (los ? se sustituyen por params)
-// y devuelve la conexión al pool aunque la consulta falle.
 async function query(sql, params) {
   const conn = await pool.getConnection();
   try {
@@ -24,20 +19,15 @@ async function query(sql, params) {
   }
 }
 
-// ------------------------------------------------------------ cursos
-
-// Lista todos los cursos
 function listarCursos() {
   return query("SELECT * FROM cursos ORDER BY id_curso");
 }
 
-// Devuelve un curso por su id (o undefined si no existe)
 async function obtenerCurso(id) {
   const filas = await query("SELECT * FROM cursos WHERE id_curso = ?", [id]);
   return filas[0];
 }
 
-// Da de alta un curso y devuelve el id que le ha asignado MariaDB
 async function altaCurso(curso) {
   const resultado = await query(
     `INSERT INTO cursos
@@ -49,11 +39,9 @@ async function altaCurso(curso) {
       curso.max_plazas, curso.imagen, curso.estado
     ]
   );
-  // insertId llega como BigInt y res.json no sabe convertirlo: se pasa a Number
   return Number(resultado.insertId);
 }
 
-// Modifica todos los datos de un curso
 function modificarCurso(id, curso) {
   return query(
     `UPDATE cursos
@@ -68,26 +56,20 @@ function modificarCurso(id, curso) {
   );
 }
 
-// "Elimina" un curso: no se borra, se marca como inactivo
 function desactivarCurso(id) {
   return query("UPDATE cursos SET estado = 'inactivo' WHERE id_curso = ?", [id]);
 }
 
 
-// ---------------------------------------------------------- docentes
-
-// Lista todos los docentes
 function listarDocentes() {
   return query("SELECT * FROM docentes ORDER BY id_docente");
 }
 
-// Devuelve un docente por su id (o undefined si no existe)
 async function obtenerDocente(id) {
   const filas = await query("SELECT * FROM docentes WHERE id_docente = ?", [id]);
   return filas[0];
 }
 
-// Da de alta un docente y devuelve el id que le ha asignado MariaDB
 async function altaDocente(docente) {
   const resultado = await query(
     `INSERT INTO docentes
@@ -98,11 +80,9 @@ async function altaDocente(docente) {
       docente.telefono, docente.foto, docente.activo
     ]
   );
-  // insertId llega como BigInt y res.json no sabe convertirlo: se pasa a Number
   return Number(resultado.insertId);
 }
 
-// Modifica todos los datos de un docente
 function modificarDocente(id, docente) {
   return query(
     `UPDATE docentes
@@ -115,34 +95,70 @@ function modificarDocente(id, docente) {
   );
 }
 
-// "Elimina" un docente: no se borra, se marca como inactivo (activo = 0)
 function desactivarDocente(id) {
   return query("UPDATE docentes SET activo = 0 WHERE id_docente = ?", [id]);
 }
 
-// ---------------------------------------------------------- usuarios
+function listarAulas() {
+  return query("SELECT * FROM aulas ORDER BY id_aula");
+}
 
-// Devuelve un usuario por su correo (o undefined si no existe)
+async function obtenerAula(id) {
+  const filas = await query("SELECT * FROM aulas WHERE id_aula = ?", [id]);
+  return filas[0];
+}
+
+async function altaAula(aula) {
+  const resultado = await query(
+    `INSERT INTO aulas
+      (nombre, edificio, planta, capacidad, equipamiento, estado)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [aula.nombre, aula.edificio, aula.planta, aula.capacidad, aula.equipamiento, aula.estado]
+  );
+  return Number(resultado.insertId);
+}
+
+function modificarAula(id, aula) {
+  return query(
+    `UPDATE aulas
+     SET nombre = ?, edificio = ?, planta = ?, capacidad = ?, equipamiento = ?, estado = ?
+     WHERE id_aula = ?`,
+    [aula.nombre, aula.edificio, aula.planta, aula.capacidad, aula.equipamiento, aula.estado, id]
+  );
+}
+
+function desactivarAula(id) {
+  return query("UPDATE aulas SET estado = 'inactiva' WHERE id_aula = ?", [id]);
+}
+
+async function contarCursosActivosEnAula(id) {
+  const filas = await query(
+    "SELECT COUNT(*) AS total FROM cursos WHERE id_aula = ? AND estado = 'activo'",
+    [id]
+  );
+  return Number(filas[0].total);
+}
+
+async function obtenerDocentePorEmail(email) {
+  const filas = await query("SELECT * FROM docentes WHERE email = ?", [email]);
+  return filas[0];
+}
+
 async function obtenerUsuarioPorEmail(email) {
   const filas = await query("SELECT * FROM usuarios WHERE email = ?", [email]);
   return filas[0];
 }
 
-// Da de alta un usuario y devuelve el id que le ha asignado MariaDB
 async function altaUsuario(usuario) {
   const resultado = await query(
     `INSERT INTO usuarios
       (nombre, email, password, rol, fecha_registro, activo)
-     VALUES (?, ?, ?, ?, NOW(), 1)`,
-    [usuario.nombre, usuario.email, usuario.password, usuario.rol]
+     VALUES (?, ?, ?, ?, NOW(), ?)`,
+    [usuario.nombre, usuario.email, usuario.password, usuario.rol, usuario.activo ?? 1]
   );
-  // insertId llega como BigInt y res.json no sabe convertirlo: se pasa a Number
   return Number(resultado.insertId);
 }
 
-// ------------------------------------- usuarios (listado, perfil)
-
-// Lista los usuarios SIN la contraseña (opcionalmente solo los de un rol)
 function listarUsuarios(rol) {
   const columnas = "id_usuario, nombre, email, rol, fecha_registro, activo";
   if (rol) {
@@ -151,7 +167,6 @@ function listarUsuarios(rol) {
   return query(`SELECT ${columnas} FROM usuarios ORDER BY id_usuario`);
 }
 
-// Devuelve un usuario por su id, sin la contraseña (o undefined si no existe)
 async function obtenerUsuario(id) {
   const filas = await query(
     "SELECT id_usuario, nombre, email, rol, fecha_registro, activo FROM usuarios WHERE id_usuario = ?",
@@ -160,22 +175,21 @@ async function obtenerUsuario(id) {
   return filas[0];
 }
 
-// Modifica el nombre y el correo de un usuario
 function modificarUsuario(id, usuario) {
   return query(
-    "UPDATE usuarios SET nombre = ?, email = ? WHERE id_usuario = ?",
-    [usuario.nombre, usuario.email, id]
+    "UPDATE usuarios SET nombre = ?, email = ?, activo = COALESCE(?, activo) WHERE id_usuario = ?",
+    [usuario.nombre, usuario.email, usuario.activo ?? null, id]
   );
 }
 
-// Cambia la contraseña de un usuario
+function desactivarUsuario(id) {
+  return query("UPDATE usuarios SET activo = 0 WHERE id_usuario = ?", [id]);
+}
+
 function actualizarPassword(id, password) {
   return query("UPDATE usuarios SET password = ? WHERE id_usuario = ?", [password, id]);
 }
 
-// -------------------------------------------------------- matrículas
-
-// Matrícula + nombre del alumno + datos del curso (para no hacer 3 peticiones)
 const SELECT_MATRICULAS = `
   SELECT m.id_matricula, m.id_usuario, m.id_curso, m.fecha_matricula, m.estado,
          u.nombre AS nombre_alumno, c.nombre AS nombre_curso, c.descripcion AS descripcion_curso
@@ -183,7 +197,6 @@ const SELECT_MATRICULAS = `
   JOIN usuarios u ON u.id_usuario = m.id_usuario
   JOIN cursos c ON c.id_curso = m.id_curso`;
 
-// Lista matrículas. Filtros opcionales: { usuario, curso, estado }
 function listarMatriculas(filtros = {}) {
   const condiciones = [];
   const parametros = [];
@@ -203,22 +216,19 @@ function listarMatriculas(filtros = {}) {
   return query(`${SELECT_MATRICULAS}${where} ORDER BY m.id_matricula`, parametros);
 }
 
-// Devuelve una matrícula por su id (o undefined si no existe)
 async function obtenerMatricula(id) {
   const filas = await query(`${SELECT_MATRICULAS} WHERE m.id_matricula = ?`, [id]);
   return filas[0];
 }
 
-// Cuántas matrículas activas tiene un curso (se puede excluir una, al modificarla)
 async function contarMatriculasActivas(idCurso, excluirId = 0) {
   const filas = await query(
     "SELECT COUNT(*) AS total FROM matriculas WHERE id_curso = ? AND estado = 'activa' AND id_matricula <> ?",
     [idCurso, excluirId]
   );
-  return Number(filas[0].total); // COUNT llega como BigInt
+  return Number(filas[0].total);
 }
 
-// ¿Ya hay una matrícula activa de ese alumno en ese curso?
 async function existeMatriculaActiva(idUsuario, idCurso, excluirId = 0) {
   const filas = await query(
     `SELECT id_matricula FROM matriculas
@@ -228,7 +238,6 @@ async function existeMatriculaActiva(idUsuario, idCurso, excluirId = 0) {
   return filas.length > 0;
 }
 
-// Da de alta una matrícula y devuelve su id. Sin fecha se usa la de ahora.
 async function altaMatricula(matricula) {
   const resultado = await query(
     `INSERT INTO matriculas (id_usuario, id_curso, fecha_matricula, estado)
@@ -238,7 +247,6 @@ async function altaMatricula(matricula) {
   return Number(resultado.insertId);
 }
 
-// Modifica una matrícula (si no llega fecha, se conserva la anterior)
 function modificarMatricula(id, matricula) {
   return query(
     `UPDATE matriculas
@@ -248,39 +256,18 @@ function modificarMatricula(id, matricula) {
   );
 }
 
-// "Elimina" una matrícula: no se borra, se marca como cancelada
 function cancelarMatricula(id) {
   return query("UPDATE matriculas SET estado = 'cancelada' WHERE id_matricula = ?", [id]);
-}
-
-// ----------------------------------------- preferencias (accesibilidad)
-
-// Devuelve { tema, tamano_letra } de un usuario (o undefined si nunca las guardó)
-async function obtenerPreferencias(idUsuario) {
-  const filas = await query(
-    "SELECT tema, tamano_letra FROM preferencias WHERE id_usuario = ?",
-    [idUsuario]
-  );
-  return filas[0];
-}
-
-// Guarda las preferencias de un usuario: las crea o las actualiza
-function guardarPreferencias(idUsuario, preferencias) {
-  return query(
-    `INSERT INTO preferencias (id_usuario, tema, tamano_letra)
-     VALUES (?, ?, ?)
-     ON DUPLICATE KEY UPDATE tema = ?, tamano_letra = ?`,
-    [idUsuario, preferencias.tema, preferencias.tamano_letra, preferencias.tema, preferencias.tamano_letra]
-  );
 }
 
 export {
   query,
   listarCursos, obtenerCurso, altaCurso, modificarCurso, desactivarCurso,
   listarDocentes, obtenerDocente, altaDocente, modificarDocente, desactivarDocente,
+  obtenerDocentePorEmail,
+  listarAulas, obtenerAula, altaAula, modificarAula, desactivarAula, contarCursosActivosEnAula,
   obtenerUsuarioPorEmail, altaUsuario,
-  listarUsuarios, obtenerUsuario, modificarUsuario, actualizarPassword,
+  listarUsuarios, obtenerUsuario, modificarUsuario, desactivarUsuario, actualizarPassword,
   listarMatriculas, obtenerMatricula, contarMatriculasActivas, existeMatriculaActiva,
-  altaMatricula, modificarMatricula, cancelarMatricula,
-  obtenerPreferencias, guardarPreferencias
+  altaMatricula, modificarMatricula, cancelarMatricula
 };

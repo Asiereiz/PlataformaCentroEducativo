@@ -3,8 +3,6 @@ import * as db from "../db/mariadb.js";
 
 const router = Router();
 
-// POST /api/usuarios  ->  201 Created (registro de un alumno)
-// El rol NO se lee de la petición: todo usuario registrado es "alumno".
 router.post("/", async (req, res) => {
   const error = validarRegistro(req.body);
   if (error) {
@@ -22,9 +20,10 @@ router.post("/", async (req, res) => {
       nombre: String(req.body.nombre).trim(),
       email,
       password: String(req.body.password),
-      rol: "alumno"
+      rol: "alumno",
+      activo: leerActivo(req.body.activo)
     });
-    return res.status(201).json({ id_usuario }); // Creado
+    return res.status(201).json({ id_usuario });
   } catch (err) {
     if (err.code === "ER_DUP_ENTRY") {
       return res.status(400).json({ error: "Ya existe un usuario con ese correo" });
@@ -34,7 +33,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// POST /api/usuarios/login  ->  200 OK + datos del usuario (sin contraseña)
 router.post("/login", async (req, res) => {
   const email = String(req.body?.email ?? "").trim().toLowerCase();
   const password = String(req.body?.password ?? "");
@@ -45,12 +43,10 @@ router.post("/login", async (req, res) => {
   try {
     const usuario = await db.obtenerUsuarioPorEmail(email);
 
-    // Mismo mensaje si el correo no existe o la contraseña falla (401)
     if (!usuario || usuario.password !== password) {
       return res.status(401).json({ error: "Correo o contraseña incorrectos" });
     }
 
-    // 403: la contraseña es correcta pero la cuenta está desactivada
     if (Number(usuario.activo) !== 1) {
       return res.status(403).json({ error: "Tu cuenta está inactiva. Por favor, contacta con el administrador." });
     }
@@ -67,8 +63,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// GET /api/usuarios  ->  200 OK + array JSON (sin contraseñas)
-// Filtro opcional: ?rol=alumno
 router.get("/", async (req, res) => {
   const { rol } = req.query;
   if (rol !== undefined && !["admin", "alumno"].includes(rol)) {
@@ -83,7 +77,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/usuarios/:id  ->  200 OK + usuario (sin contraseña)
 router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (validarId(id)) {
@@ -102,9 +95,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// PUT /api/usuarios/:id  ->  200 OK (editar el perfil)
-// Cuerpo JSON: { nombre, email, password? }. Sin password se conserva la actual.
-// El rol y el estado NO se pueden cambiar desde aquí.
 router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
   const error = validarId(id) || validarPerfil(req.body);
@@ -115,17 +105,22 @@ router.put("/:id", async (req, res) => {
   const email = String(req.body.email).trim().toLowerCase();
 
   try {
-    if (!(await db.obtenerUsuario(id))) {
+    const existente = await db.obtenerUsuario(id);
+    if (!existente) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    // El correo no puede ser el de otro usuario
+    const activo = leerActivo(req.body.activo);
+    if (activo === 0 && existente.rol === "admin") {
+      return res.status(400).json({ error: "No se puede desactivar a un administrador" });
+    }
+
     const otro = await db.obtenerUsuarioPorEmail(email);
     if (otro && otro.id_usuario !== id) {
       return res.status(400).json({ error: "Ya existe un usuario con ese correo" });
     }
 
-    await db.modificarUsuario(id, { nombre: String(req.body.nombre).trim(), email });
+    await db.modificarUsuario(id, { nombre: String(req.body.nombre).trim(), email, activo });
     if (req.body.password) {
       await db.actualizarPassword(id, String(req.body.password));
     }
@@ -139,10 +134,33 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-export default router;
+router.patch("/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  if (validarId(id)) {
+    return res.status(400).json({ error: validarId(id) });
+  }
+  if (!req.body || leerActivo(req.body.activo) !== 0 || req.body.activo === "") {
+    return res.status(400).json({ error: "Solo se puede desactivar un usuario (activo: 0)" });
+  }
 
-// ----------------------------------------------------------- validaciones
-// Devuelven un texto con el error, o null si todo está bien.
+  try {
+    const existente = await db.obtenerUsuario(id);
+    if (!existente) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    if (existente.rol === "admin") {
+      return res.status(400).json({ error: "No se puede desactivar a un administrador" });
+    }
+
+    await db.desactivarUsuario(id);
+    return res.json({ id_usuario: id, activo: 0 });
+  } catch (err) {
+    console.error("Error en BD:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+export default router;
 
 function validarId(id) {
   if (!Number.isSafeInteger(id) || id < 1) {
@@ -151,7 +169,20 @@ function validarId(id) {
   return null;
 }
 
-// Para editar el perfil: la contraseña es opcional (solo se valida si llega)
+function leerActivo(valor) {
+  if (valor === undefined || valor === "") {
+    return undefined;
+  }
+  return Number(valor);
+}
+
+function validarActivo(datos) {
+  if (datos.activo !== undefined && !["0", "1"].includes(String(datos.activo))) {
+    return "El campo activo debe ser 0 o 1";
+  }
+  return null;
+}
+
 function validarPerfil(datos) {
   if (!datos || !String(datos.nombre ?? "").trim() || !String(datos.email ?? "").trim()) {
     return "Faltan datos obligatorios del usuario";
@@ -162,7 +193,7 @@ function validarPerfil(datos) {
   if (datos.password && String(datos.password).length < 8) {
     return "La contraseña debe tener al menos 8 caracteres";
   }
-  return null;
+  return validarActivo(datos);
 }
 
 function validarRegistro(datos) {
@@ -175,5 +206,5 @@ function validarRegistro(datos) {
   if (String(datos.password).length < 8) {
     return "La contraseña debe tener al menos 8 caracteres";
   }
-  return null;
+  return validarActivo(datos);
 }

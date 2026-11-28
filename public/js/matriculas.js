@@ -39,14 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-// La API guarda la fecha como "2026-11-05 10:00:00"; en pantalla solo se enseña el día
 function soloFecha(fecha) {
   return fecha ? String(fecha).slice(0, 10) : "";
 }
 
-// ---------------------------------------------------- gestión (admin)
-
-// Datos del formulario de alta o de modificación (sufijo: "alta_mat" o "mod_mat")
 function datosMatriculaFormulario(sufijo) {
   return {
     id_usuario: Number(document.getElementById(`alumno_${sufijo}`).value),
@@ -126,7 +122,6 @@ async function delMat(event) {
   }
 
   try {
-    // No se borra: se marca como cancelada
     await peticionApi(`/api/matriculas/${encodeURIComponent(idDel)}`, "PATCH", { estado: "cancelada" });
     updateSelect();
     alert("Matrícula cancelada correctamente.");
@@ -148,14 +143,12 @@ async function infoMat(event) {
 
   let encontradas;
   try {
-    // La API filtra por alumno y curso: GET /api/matriculas?usuario=..&curso=..
     encontradas = await obtenerMatriculasApi({ usuario: alumno, curso });
   } catch (error) {
     alert(`No se pudo consultar la matrícula: ${error.message}`);
     return;
   }
 
-  // Si el alumno se matriculó varias veces (canceló y volvió), se enseña la activa
   const matricula = encontradas.find(m => m.estado === "activa") || encontradas[0];
   if (!matricula) {
     alert("No se encontró una matrícula para ese alumno y curso.");
@@ -170,8 +163,6 @@ async function infoMat(event) {
     <li>Estado: ${matricula.estado}</li>
   `;
 }
-
-// ------------------------------------------------ zona del alumno
 
 async function mostrarMatriculas(){
   const contenedor = document.getElementById("ver_mis_matriculas");
@@ -189,7 +180,6 @@ async function mostrarMatriculas(){
     mensaje = "No se encontró el usuario. Cierra sesión y vuelve a iniciar sesión.";
   } else {
     try {
-      // Solo las matrículas activas del usuario que ha iniciado sesión
       listado = await obtenerMatriculasApi({ usuario: idUsuario, estado: "activa" });
     } catch (error) {
       console.error("No se pudieron cargar las matrículas.", error);
@@ -269,7 +259,6 @@ async function matricularme(event){
       return;
     }
 
-    // Sin fecha: el servidor pone la de hoy. Él también comprueba duplicados y plazas.
     await peticionApi("/api/matriculas", "POST", {
       id_usuario: Number(idUsuario),
       id_curso: Number(cursoSeleccionado)
