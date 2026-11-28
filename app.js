@@ -3,6 +3,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import estadoRouter from "./routes/estados.api.js";
 import cursosRouter from "./routes/cursos.api.js";
+import docentesRouter from "./routes/docentes.api.js";
+import usuariosRouter from "./routes/usuarios.api.js";
+import matriculasRouter from "./routes/matriculas.api.js";
+import preferenciasRouter from "./routes/preferencias.api.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,6 +20,10 @@ app.use(express.json());
 // Routers de la API
 app.use("/api", estadoRouter);          // /api/estado y /api/db/estado
 app.use("/api/cursos", cursosRouter);   // /api/cursos y /api/cursos/:id
+app.use("/api/docentes", docentesRouter);
+app.use("/api/usuarios", usuariosRouter);
+app.use("/api/matriculas", matriculasRouter);
+app.use("/api/preferencias", preferenciasRouter);
 
 app.get("/", (req, res) => {
   res.redirect("/index.html");

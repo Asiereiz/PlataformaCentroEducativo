@@ -1,147 +1,139 @@
 import { Router } from "express";
-import { obtenerPool } from "../database.js";
+import * as db from "../db/mariadb.js";
 import { subirFoto, rutaFoto, borrarSubida } from "./imagenes.js";
 
 const router = Router();
 
-// GET /api/cursos
-router.get("/", async (req, res, next) => {
-  try {
-    const cursos = await obtenerPool().query("SELECT * FROM cursos");
-    res.json(cursos);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // Misma forma de ruta que usa el script SQL: sin "/" inicial (img/cursos/curso01.png)
 const IMAGEN_PREDETERMINADA = "img/curso-ucm.png";
 
-// POST /api/cursos  (multipart/form-data, con la imagen en el campo "foto")
-router.post("/", subirFoto("foto", "cursos"), async (req, res, next) => {
-  const nueva = rutaFoto(req);                 // "img/cursos/xxxx.png" o null
-  const curso = validarCurso(req.body, res);
-  if (!curso) {
-    borrarSubida(nueva);                       // datos mal: no dejar la imagen huérfana
-    return;
-  }
-
+// GET /api/cursos  ->  200 OK + array JSON
+router.get("/", async (req, res) => {
   try {
-    const resultado = await obtenerPool().query(
-      `INSERT INTO cursos
-        (nombre, descripcion, id_docente, id_aula, fecha_inicio, fecha_fin, horario, plazas, imagen, estado)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        curso.nombre, curso.descripcion, curso.docente, curso.aula,
-        curso.fecha_inicio, curso.fecha_fin, curso.horario,
-        curso.max_plazas, nueva || IMAGEN_PREDETERMINADA, curso.estado
-      ]
-    );
-    res.status(201).json({ id_curso: Number(resultado.insertId) });
-  } catch (error) {
-    borrarSubida(nueva);
-    next(error);
+    const cursos = await db.listarCursos();
+    res.json(cursos); // 200 OK + JSON
+  } catch (err) {
+    console.error("Error en BD:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// PUT /api/cursos/:id
-router.put("/:id", subirFoto("foto", "cursos"), async (req, res, next) => {
+// POST /api/cursos  ->  201 Created
+// (multipart/form-data: los campos llegan en req.body y la imagen en req.file)
+router.post("/", subirFoto("foto", "cursos"), async (req, res) => {
+  const nueva = rutaFoto(req); // "img/cursos/xxxx.png" o null
+
+  // 1) Validación de entrada -> 400
+  const error = validarCurso(req.body);
+  if (error) {
+    borrarSubida(nueva); // datos mal: no dejar la imagen huérfana
+    return res.status(400).json({ error });
+  }
+
+  try {
+    const id_curso = await db.altaCurso({
+      ...datosCurso(req.body),
+      imagen: nueva || IMAGEN_PREDETERMINADA
+    });
+    return res.status(201).json({ id_curso }); // Creado
+  } catch (err) {
+    borrarSubida(nueva);
+    console.error("Error en BD:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+// PUT /api/cursos/:id  ->  200 OK
+router.put("/:id", subirFoto("foto", "cursos"), async (req, res) => {
   const nueva = rutaFoto(req);
-  const id = validarIdCurso(req.params.id, res);
-  const curso = id && validarCurso(req.body, res);
-  if (!curso) {
+
+  const id = Number(req.params.id);
+  const error = validarId(id) || validarCurso(req.body);
+  if (error) {
     borrarSubida(nueva);
-    return;
+    return res.status(400).json({ error });
   }
 
   try {
-    const pool = obtenerPool();
-    const existentes = await pool.query("SELECT imagen FROM cursos WHERE id_curso = ?", [id]);
-    if (existentes.length === 0) {
+    // 404: el curso no existe
+    const existente = await db.obtenerCurso(id);
+    if (!existente) {
       borrarSubida(nueva);
-      return res.status(404).json({ ok: false, error: "Curso no encontrado." });
+      return res.status(404).json({ error: "Curso no encontrado" });
     }
 
-    const anterior = existentes[0].imagen;
-    await pool.query(
-      `UPDATE cursos
-       SET nombre = ?, descripcion = ?, id_docente = ?, id_aula = ?, fecha_inicio = ?,
-           fecha_fin = ?, horario = ?, plazas = ?, imagen = ?, estado = ?
-       WHERE id_curso = ?`,
-      [
-        curso.nombre, curso.descripcion, curso.docente, curso.aula,
-        curso.fecha_inicio, curso.fecha_fin, curso.horario,
-        curso.max_plazas, nueva || anterior, curso.estado, id   // sin foto nueva se conserva la anterior
-      ]
-    );
+    await db.modificarCurso(id, {
+      ...datosCurso(req.body),
+      imagen: nueva || existente.imagen // sin foto nueva se conserva la anterior
+    });
     if (nueva) {
-      borrarSubida(anterior);                  // la foto antigua ya no se usa
+      borrarSubida(existente.imagen); // la foto antigua ya no se usa
     }
-    res.json({ id_curso: id });
-  } catch (error) {
+    return res.json({ id_curso: id });
+  } catch (err) {
     borrarSubida(nueva);
-    next(error);
+    console.error("Error en BD:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// PATCH /api/cursos/:id  (solo permite desactivar)
-router.patch("/:id", async (req, res, next) => {
-  const id = validarIdCurso(req.params.id, res);
-  if (!id) {
-    return;
+// PATCH /api/cursos/:id  ->  200 OK (solo permite desactivar un curso)
+router.patch("/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  if (validarId(id)) {
+    return res.status(400).json({ error: validarId(id) });
   }
-
   if (!req.body || req.body.estado !== "inactivo") {
-    return res.status(400).json({ ok: false, error: "El estado del curso debe ser inactivo." });
+    return res.status(400).json({ error: "El estado del curso debe ser inactivo" });
   }
 
   try {
-    const pool = obtenerPool();
-    const existentes = await pool.query("SELECT id_curso FROM cursos WHERE id_curso = ?", [id]);
-    if (existentes.length === 0) {
-      return res.status(404).json({ ok: false, error: "Curso no encontrado." });
+    const existente = await db.obtenerCurso(id);
+    if (!existente) {
+      return res.status(404).json({ error: "Curso no encontrado" });
     }
 
-    await pool.query("UPDATE cursos SET estado = ? WHERE id_curso = ?", ["inactivo", id]);
-    res.json({ id_curso: id, estado: "inactivo" });
-  } catch (error) {
-    next(error);
+    await db.desactivarCurso(id);
+    return res.json({ id_curso: id, estado: "inactivo" });
+  } catch (err) {
+    console.error("Error en BD:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
 export default router;
 
 // ----------------------------------------------------------- validaciones
+// Devuelven un texto con el error, o null si todo está bien.
 
-function validarIdCurso(valor, res) {
-  const id = Number(valor);
+function validarId(id) {
   if (!Number.isSafeInteger(id) || id < 1) {
-    res.status(400).json({ ok: false, error: "El identificador del curso no es válido." });
-    return null;
+    return "El identificador del curso no es válido";
   }
-  return id;
+  return null;
 }
 
-function validarCurso(datos, res) {
+function validarCurso(datos) {
   const campos = [
     "nombre", "descripcion", "docente", "aula", "fecha_inicio",
     "fecha_fin", "horario", "max_plazas", "estado"
   ];
   if (!datos || campos.some(campo => datos[campo] === undefined || datos[campo] === null)) {
-    res.status(400).json({ ok: false, error: "Faltan datos obligatorios del curso." });
-    return null;
+    return "Faltan datos obligatorios del curso";
   }
 
   const maxPlazas = Number(datos.max_plazas);
-  if (
-    !Number.isInteger(maxPlazas) ||
-    maxPlazas < 1 ||
-    !["activo", "inactivo"].includes(datos.estado)
-  ) {
-    res.status(400).json({ ok: false, error: "Los datos del curso no son válidos." });
-    return null;
+  if (!Number.isInteger(maxPlazas) || maxPlazas < 1) {
+    return "El máximo de plazas debe ser un número entero mayor que 0";
   }
+  if (!["activo", "inactivo"].includes(datos.estado)) {
+    return "El estado debe ser activo o inactivo";
+  }
+  return null;
+}
 
+// Pasa los campos del formulario al formato que espera el servicio
+function datosCurso(datos) {
   return {
     nombre: String(datos.nombre).trim(),
     descripcion: String(datos.descripcion).trim(),
@@ -150,7 +142,7 @@ function validarCurso(datos, res) {
     fecha_inicio: datos.fecha_inicio,
     fecha_fin: datos.fecha_fin,
     horario: String(datos.horario).trim(),
-    max_plazas: maxPlazas,
+    max_plazas: Number(datos.max_plazas),
     estado: datos.estado
   };
 }

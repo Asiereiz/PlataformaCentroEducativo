@@ -39,124 +39,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-
-function altaMat(event) {
-  event.preventDefault();
-
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-  const matricula = {
-    id: matriculas.length + 1,
-    alumno: document.getElementById("alumno_alta_mat").value,
-    curso: document.getElementById("curso_alta_mat").value.trim(),
-    fecha_matricula: document.getElementById("fecha_matricula_alta_mat").value,
-    estado: document.getElementById("estado_alta_mat").value
-  };
-
-  const cursos = leerDatos(DATOS_CURSOS);
-  const curso = cursos.find(c => String(c.id) === String(matricula.curso));
-  if (!curso) {
-    alert("Selecciona un curso válido.");
-    return;
-  }
-
-  const matriculado = matriculas.find(m => String(m.alumno) === String(matricula.alumno) && String(m.curso) === String(matricula.curso));
-  if (matriculado) {
-    alert("Este usuario ya está matriculado en este curso.");
-    return;
-  }
-
-  const plazasMaximas = Number(curso.max_plazas);
-  const plazasOcupadas = matriculas.filter(m =>
-    String(m.curso) === String(matricula.curso) && m.estado === "activo"
-  ).length;
-
-  if (matricula.estado === "activo" &&
-      (!String(curso.max_plazas).trim() || !Number.isFinite(plazasMaximas) || plazasOcupadas >= plazasMaximas)) {
-    alert("El curso ya ha alcanzado el número máximo de plazas.");
-    return;
-  }
-
-  matriculas.push(matricula);
-  guardarDatos(DATOS_MATRICULAS, matriculas);
-  updateSelect();
-  alert("Matrícula registrada correctamente.");
+// La API guarda la fecha como "2026-11-05 10:00:00"; en pantalla solo se enseña el día
+function soloFecha(fecha) {
+  return fecha ? String(fecha).slice(0, 10) : "";
 }
 
-function modMat(event) {
+// ---------------------------------------------------- gestión (admin)
+
+// Datos del formulario de alta o de modificación (sufijo: "alta_mat" o "mod_mat")
+function datosMatriculaFormulario(sufijo) {
+  return {
+    id_usuario: Number(document.getElementById(`alumno_${sufijo}`).value),
+    id_curso: Number(document.getElementById(`curso_${sufijo}`).value),
+    fecha_matricula: document.getElementById(`fecha_matricula_${sufijo}`).value,
+    estado: document.getElementById(`estado_${sufijo}`).value
+  };
+}
+
+async function altaMat(event) {
+  event.preventDefault();
+
+  try {
+    await peticionApi("/api/matriculas", "POST", datosMatriculaFormulario("alta_mat"));
+    updateSelect();
+    alert("Matrícula registrada correctamente.");
+  } catch (error) {
+    console.error("No se pudo registrar la matrícula.", error);
+    alert(`No se pudo registrar la matrícula: ${error.message}`);
+  }
+}
+
+async function modMat(event) {
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_mat").value;
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-  const matriculaAnterior = matriculas.find(m => String(m.id) === idMod);
-  const matricula = {
-    id: matriculaAnterior.id,
-    alumno: document.getElementById("alumno_mod_mat").value,
-    curso: document.getElementById("curso_mod_mat").value.trim(),
-    fecha_matricula: document.getElementById("fecha_matricula_mod_mat").value,
-    estado: document.getElementById("estado_mod_mat").value
-  };
-
-  const cursos = leerDatos(DATOS_CURSOS);
-  const curso = cursos.find(c => String(c.id) === String(matricula.curso));
-  if (!curso) {
-    alert("Selecciona un curso válido.");
+  if (!idMod) {
+    alert("Selecciona primero una matrícula.");
     return;
   }
 
-  const matriculado = matriculas.find(m =>
-    String(m.id) !== idMod &&
-    String(m.alumno) === String(matricula.alumno) &&
-    String(m.curso) === String(matricula.curso)
-  );
-  if (matriculado) {
-    alert("Este usuario ya está matriculado en este curso.");
-    return;
+  try {
+    await peticionApi(
+      `/api/matriculas/${encodeURIComponent(idMod)}`,
+      "PUT",
+      datosMatriculaFormulario("mod_mat")
+    );
+    updateSelect();
+    alert("Matrícula modificada correctamente.");
+  } catch (error) {
+    console.error("No se pudo modificar la matrícula.", error);
+    alert(`No se pudo modificar la matrícula: ${error.message}`);
   }
-
-  const plazasMaximas = Number(curso.max_plazas);
-  const plazasOcupadas = matriculas.filter(m =>
-    String(m.id) !== idMod &&
-    String(m.curso) === String(matricula.curso) &&
-    m.estado === "activo"
-  ).length;
-
-  if (matricula.estado === "activo" &&
-      (!String(curso.max_plazas).trim() || !Number.isFinite(plazasMaximas) || plazasOcupadas >= plazasMaximas)) {
-    alert("El curso ya ha alcanzado el número máximo de plazas.");
-    return;
-  }
-
-  const matriculasActualizadas = matriculas.map(m =>
-    String(m.id) === idMod ? matricula : m
-  );
-  guardarDatos(DATOS_MATRICULAS, matriculasActualizadas);
-  updateSelect();
-  alert("Matrícula modificada correctamente.");
 }
 
-function rellenarMat() {
+async function rellenarMat() {
   const idMod = document.getElementById("id_mod_mat").value;
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-  const matricula = matriculas.find(m => String(m.id) === idMod);
+  let matricula;
+  try {
+    matricula = (await obtenerMatriculasApi()).find(m => String(m.id) === idMod);
+  } catch (error) {
+    alert(`No se pudieron cargar las matrículas: ${error.message}`);
+    return;
+  }
 
   if (!matricula) {
     return;
   }
 
-  document.getElementById("alumno_mod_mat").value = matricula.alumno;
-  document.getElementById("curso_mod_mat").value = matricula.curso;
-  document.getElementById("fecha_matricula_mod_mat").value = matricula.fecha_matricula;
+  document.getElementById("alumno_mod_mat").value = matricula.id_usuario;
+  document.getElementById("curso_mod_mat").value = matricula.id_curso;
+  document.getElementById("fecha_matricula_mod_mat").value = soloFecha(matricula.fecha_matricula);
   document.getElementById("estado_mod_mat").value = matricula.estado;
 }
 
-function delMat(event) {
+async function delMat(event) {
   event.preventDefault();
 
   const idDel = document.getElementById("id_del_mat").value;
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-  const encontrada = matriculas.find(m => String(m.id) === idDel);
-
-  if (!encontrada) {
+  if (!idDel) {
     alert("Selecciona primero una matrícula.");
     return;
   }
@@ -165,59 +125,76 @@ function delMat(event) {
     return;
   }
 
-  const matriculasActualizadas = matriculas.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
-
-  guardarDatos(DATOS_MATRICULAS, matriculasActualizadas);
-  updateSelect();
-  alert("Matrícula desactivada correctamente.");
+  try {
+    // No se borra: se marca como cancelada
+    await peticionApi(`/api/matriculas/${encodeURIComponent(idDel)}`, "PATCH", { estado: "cancelada" });
+    updateSelect();
+    alert("Matrícula cancelada correctamente.");
+  } catch (error) {
+    console.error("No se pudo cancelar la matrícula.", error);
+    alert(`No se pudo cancelar la matrícula: ${error.message}`);
+  }
 }
 
-function infoMat(event) {
+async function infoMat(event) {
   event.preventDefault();
 
   const alumno = document.getElementById("alumno_info_mat").value;
-  const curso = document.getElementById("curso_info_mat").value.trim();
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-  const matricula = matriculas.find(m =>
-    String(m.alumno) === alumno && String(m.curso) === curso
-  );
+  const curso = document.getElementById("curso_info_mat").value;
+  if (!alumno || !curso) {
+    alert("Selecciona un alumno y un curso.");
+    return;
+  }
 
+  let encontradas;
+  try {
+    // La API filtra por alumno y curso: GET /api/matriculas?usuario=..&curso=..
+    encontradas = await obtenerMatriculasApi({ usuario: alumno, curso });
+  } catch (error) {
+    alert(`No se pudo consultar la matrícula: ${error.message}`);
+    return;
+  }
+
+  // Si el alumno se matriculó varias veces (canceló y volvió), se enseña la activa
+  const matricula = encontradas.find(m => m.estado === "activa") || encontradas[0];
   if (!matricula) {
     alert("No se encontró una matrícula para ese alumno y curso.");
     return;
   }
 
   document.getElementById("listado_mat").innerHTML = `
-    <li>Identificador: ${matricula.id}</li>
-    <li>Alumno: ${matricula.alumno}</li>
-    <li>Curso: ${matricula.curso}</li>
-    <li>Fecha de matrícula: ${matricula.fecha_matricula}</li>
+    <li>Identificador: ${matricula.id_matricula}</li>
+    <li>Alumno: ${matricula.nombre_alumno}</li>
+    <li>Curso: ${matricula.nombre_curso}</li>
+    <li>Fecha de matrícula: ${soloFecha(matricula.fecha_matricula)}</li>
     <li>Estado: ${matricula.estado}</li>
   `;
 }
 
-function mostrarMatriculas(){
+// ------------------------------------------------ zona del alumno
+
+async function mostrarMatriculas(){
   const contenedor = document.getElementById("ver_mis_matriculas");
   const select = document.getElementById("cancelarmat_select");
-  const correoActual = sessionStorage.getItem("correoActual");
-  const nombreActual = sessionStorage.getItem("usuarioActual");
-  const usuarioActual = leerDatos(DATOS_USER).find(usuario =>
-    correoActual
-      ? usuario.Correo === correoActual
-      : usuario.Nombre === nombreActual
-  );
-  const listado = leerDatos(DATOS_MATRICULAS).filter(matricula => {
-    const alumno = String(matricula.alumno);
-    const perteneceAlUsuario =
-      (nombreActual && alumno === nombreActual) ||
-      (correoActual && alumno === correoActual) ||
-      (usuarioActual && alumno === String(usuarioActual.id));
-    return perteneceAlUsuario && matricula.estado === "activo";
-  });
-  const cursos = leerDatos(DATOS_CURSOS);
 
   if (!contenedor && !select) {
     return;
+  }
+
+  const idUsuario = sessionStorage.getItem("idUsuario");
+  let listado = [];
+  let mensaje = "No tienes matrículas.";
+
+  if (!idUsuario) {
+    mensaje = "No se encontró el usuario. Cierra sesión y vuelve a iniciar sesión.";
+  } else {
+    try {
+      // Solo las matrículas activas del usuario que ha iniciado sesión
+      listado = await obtenerMatriculasApi({ usuario: idUsuario, estado: "activa" });
+    } catch (error) {
+      console.error("No se pudieron cargar las matrículas.", error);
+      mensaje = "No se pudieron cargar tus matrículas. Inténtalo de nuevo más tarde.";
+    }
   }
 
   if (contenedor) {
@@ -226,29 +203,25 @@ function mostrarMatriculas(){
     if (listado.length > 0) {
       listado.forEach(matricula => {
         const tarjeta = document.createElement("article");
-        const curso = cursos.find(c =>
-          String(c.id) === String(matricula.curso) ||
-          c.nombre === String(matricula.curso)
-        );
 
         const nombre = document.createElement("p");
-        nombre.textContent = `Curso: ${curso ? curso.nombre : matricula.curso}`;
+        nombre.textContent = `Curso: ${matricula.nombre_curso}`;
         tarjeta.appendChild(nombre);
 
-        if (curso && curso.descripcion) {
+        if (matricula.descripcion_curso) {
           const descripcion = document.createElement("p");
-          descripcion.textContent = `Descripción: ${curso.descripcion}`;
+          descripcion.textContent = `Descripción: ${matricula.descripcion_curso}`;
           tarjeta.appendChild(descripcion);
         }
 
         const fecha = document.createElement("p");
-        fecha.textContent = `Fecha de matrícula: ${matricula.fecha_matricula || "No disponible"}`;
+        fecha.textContent = `Fecha de matrícula: ${soloFecha(matricula.fecha_matricula) || "No disponible"}`;
         tarjeta.appendChild(fecha);
 
         contenedor.appendChild(tarjeta);
       });
     } else {
-      contenedor.textContent = "No tienes matrículas.";
+      contenedor.textContent = mensaje;
     }
   }
 
@@ -262,63 +235,33 @@ function mostrarMatriculas(){
     select.appendChild(opcionInicial);
 
     listado.forEach(matricula => {
-      const curso = cursos.find(c =>
-        String(c.id) === String(matricula.curso) ||
-        c.nombre === String(matricula.curso)
-      );
       const opcion = document.createElement("option");
-      opcion.value = `${matricula.id}|${matricula.curso}|${matricula.alumno}|${matricula.fecha_matricula}`;
-      opcion.textContent = curso
-        ? `${curso.nombre}`
-        : `Curso ${matricula.curso}`;
+      opcion.value = matricula.id_matricula;
+      opcion.textContent = matricula.nombre_curso;
       select.appendChild(opcion);
     });
   }
 }
 
-function matricularme(event){
+async function matricularme(event){
   event.preventDefault();
 
+  const idUsuario = sessionStorage.getItem("idUsuario");
+  if (!idUsuario) {
+    alert("No se encontró el usuario. Cierra sesión y vuelve a iniciar sesión.");
+    return;
+  }
+
   const cursoSeleccionado = document.getElementById("curso_matricula").value;
-  const curso = leerDatos(DATOS_CURSOS).find(c =>
-    String(c.id) === String(cursoSeleccionado) && c.estado === "activo"
-  );
-  if (!curso) {
+  if (!cursoSeleccionado) {
     alert("Selecciona un curso activo.");
     return;
   }
 
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-
-  const nuevaMat = {
-    id: matriculas.length + 1,
-    alumno: sessionStorage.getItem("usuarioActual"),
-    curso: cursoSeleccionado,
-    fecha_matricula: new Date().toISOString().split("T")[0],
-    estado: "activo"
-    };
-
-    const existe = matriculas.some(m =>
-      m.estado === "activo" &&
-      String(m.curso) === String(nuevaMat.curso) &&
-      String(m.alumno) === String(nuevaMat.alumno)
-    );
-
-    if(existe){
-      alert("Ya te has matriculado en este curso.");
-      updateSelect();
-      return;
-    }
-
-    const plazasMaximas = Number(curso.max_plazas);
-    const plazasOcupadas = matriculas.filter(m =>
-      String(m.curso) === String(curso.id) && m.estado === "activo"
-    ).length;
-
-    if (!String(curso.max_plazas).trim() ||
-        !Number.isFinite(plazasMaximas) ||
-        plazasOcupadas >= plazasMaximas) {
-      alert("El curso ya ha alcanzado el número máximo de plazas.");
+  try {
+    const curso = (await obtenerCursosApi()).find(c => String(c.id) === String(cursoSeleccionado));
+    if (!curso || String(curso.estado).toLowerCase() !== "activo") {
+      alert("Selecciona un curso activo.");
       return;
     }
 
@@ -326,14 +269,20 @@ function matricularme(event){
       return;
     }
 
-    matriculas.push(nuevaMat);
-    guardarDatos(DATOS_MATRICULAS, matriculas);
-
+    // Sin fecha: el servidor pone la de hoy. Él también comprueba duplicados y plazas.
+    await peticionApi("/api/matriculas", "POST", {
+      id_usuario: Number(idUsuario),
+      id_curso: Number(cursoSeleccionado)
+    });
     updateSelect();
     mostrarMatriculas();
+  } catch (error) {
+    console.error("No se pudo realizar la matrícula.", error);
+    alert(error.message);
+  }
 }
 
-function cancelarMatriculas(event){
+async function cancelarMatriculas(event){
   event.preventDefault();
 
   const seleccion = document.getElementById("cancelarmat_select").value;
@@ -342,25 +291,13 @@ function cancelarMatriculas(event){
     return;
   }
 
-  const matriculas = leerDatos(DATOS_MATRICULAS);
-  const matricula = matriculas.find(m =>
-    m.estado === "activo" &&
-    `${m.id}|${m.curso}|${m.alumno}|${m.fecha_matricula}` === seleccion
-  );
-
-  if (!matricula) {
-    alert("No se encontró una matrícula activa con esa selección.");
+  try {
+    await peticionApi(`/api/matriculas/${encodeURIComponent(seleccion)}`, "PATCH", { estado: "cancelada" });
+    await mostrarMatriculas();
+    alert("Matrícula cancelada correctamente.");
+  } catch (error) {
+    console.error("No se pudo cancelar la matrícula.", error);
+    alert(`No se pudo cancelar la matrícula: ${error.message}`);
     mostrarMatriculas();
-    return;
   }
-
-  const matriculasActualizadas = matriculas.map(m =>
-    m.estado === "activo" &&
-    `${m.id}|${m.curso}|${m.alumno}|${m.fecha_matricula}` === seleccion
-      ? { ...m, estado: "inactivo" }
-      : m
-  );
-  guardarDatos(DATOS_MATRICULAS, matriculasActualizadas);
-  mostrarMatriculas();
-  alert("Matrícula cancelada correctamente.");
 }

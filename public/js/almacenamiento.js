@@ -10,37 +10,25 @@ const DATOS_MATRICULAS = "datos_matriculas";
 const FOTOGRAFIA_PREDETERMINADA = "../img/usuario-predeterminado.jpg";
 const IMAGEN_CURSO_PREDETERMINADA = "../img/curso-ucm.png";
 let promesaCursosApi;
+let promesaDocentesApi;
+let promesaUsuariosApi;
 
 function updateSelect() {
     const aulas = leerDatos(DATOS_AULAS);
-    const docentes = leerDatos(DATOS_DOCENTES);
-    const matriculas = leerDatos(DATOS_MATRICULAS);
     const usuarios = leerDatos(DATOS_USER);
 
     actualizarOpciones("id_mod_aula", aulas, "nombre");
     actualizarOpciones("id_del_aula", aulas, "nombre");
     actualizarOpciones("id_info_aula", aulas, "nombre");
-    actualizarOpciones("id_mod_doc", docentes, "Nombre");
-    actualizarOpciones("id_del_doc", docentes, "Nombre");
-    actualizarOpciones("id_info_doc", docentes, "Nombre");
-    actualizarOpciones("id_mod_mat", matriculas, "alumno");
-    actualizarOpciones("id_del_mat", matriculas, "alumno");
     actualizarOpciones("id_mod_user", usuarios, "Nombre");
     actualizarOpciones("id_del_user", usuarios, "Nombre");
     actualizarOpciones("id_info_user", usuarios, "Nombre");
-    actualizarOpciones("docente_alta_curso", docentes, "Nombre");
-    actualizarOpciones("docente_mod_curso", docentes, "Nombre");
     actualizarOpciones("aula_alta_curso", aulas.filter(aula => aula.estado === "activo"), "nombre", "Selecciona un aula");
     actualizarOpciones("aula_mod_curso", aulas.filter(aula => aula.estado === "activo"), "nombre", "Selecciona un aula");
 
-    const alumnos = usuarios.filter(usuario =>
-        usuario.rol === "alumno" ||
-        (!usuario.rol && usuario.Correo !== "admin@centroeducativo.com")
-    );
-    actualizarOpciones("alumno_alta_mat", alumnos, "Nombre", "Selecciona un alumno");
-    actualizarOpciones("alumno_mod_mat", alumnos, "Nombre", "Selecciona un alumno");
-    actualizarOpciones("alumno_info_mat", alumnos, "Nombre", "Selecciona un alumno");
     actualizarSelectoresCursos();
+    actualizarSelectoresDocentes();
+    actualizarSelectoresMatriculas();
 }
 
 function obtenerCursosApi() {
@@ -72,6 +60,125 @@ function obtenerCursosApi() {
   }
 
   return promesaCursosApi;
+}
+
+// Petición a la API con cuerpo JSON. Devuelve el JSON de la respuesta y,
+// si el servidor responde con un error, lanza un Error con el texto de { error }.
+async function peticionApi(url, metodo = "GET", cuerpo) {
+  const opciones = { method: metodo };
+  if (cuerpo !== undefined) {
+    opciones.headers = { "Content-Type": "application/json" };
+    opciones.body = JSON.stringify(cuerpo);
+  }
+
+  const respuesta = await fetch(url, opciones);
+  const resultado = await respuesta.json();
+  if (!respuesta.ok) {
+    throw new Error(resultado.error || `La petición terminó con HTTP ${respuesta.status}.`);
+  }
+  return resultado;
+}
+
+// Matrículas de la API. Filtros opcionales: { usuario, curso, estado }
+// No se guardan en memoria: cambian a menudo y se piden cada vez.
+async function obtenerMatriculasApi(filtros = {}) {
+  const parametros = new URLSearchParams(filtros).toString();
+  const filas = await peticionApi("/api/matriculas" + (parametros ? "?" + parametros : ""));
+  return filas.map(matricula => ({
+    ...matricula,
+    id: matricula.id_matricula,
+    etiqueta: `${matricula.nombre_alumno} · ${matricula.nombre_curso}`
+  }));
+}
+
+function obtenerUsuariosApi() {
+  if (!promesaUsuariosApi) {
+    promesaUsuariosApi = peticionApi("/api/usuarios")
+      .then(filas => filas.map(usuario => ({ ...usuario, id: usuario.id_usuario })))
+      .catch(error => {
+        promesaUsuariosApi = null;
+        throw error;
+      });
+  }
+
+  return promesaUsuariosApi;
+}
+
+// Rellena los desplegables de la gestión de matrículas (admin) con datos de la API
+async function actualizarSelectoresMatriculas() {
+  const selectoresMatriculas = ["id_mod_mat", "id_del_mat"];
+  const selectoresAlumnos = ["alumno_alta_mat", "alumno_mod_mat", "alumno_info_mat"];
+  const todos = [...selectoresMatriculas, ...selectoresAlumnos];
+
+  // Si la página no tiene ninguno de estos selectores, no hace falta pedir nada
+  if (!todos.some(id => document.getElementById(id))) {
+    return;
+  }
+
+  try {
+    const [matriculas, usuarios] = await Promise.all([
+      obtenerMatriculasApi(),
+      obtenerUsuariosApi()
+    ]);
+    const alumnos = usuarios.filter(usuario => usuario.rol === "alumno");
+
+    selectoresMatriculas.forEach(id => actualizarOpciones(id, matriculas, "etiqueta"));
+    selectoresAlumnos.forEach(id => actualizarOpciones(id, alumnos, "nombre", "Selecciona un alumno"));
+  } catch (error) {
+    console.error("No se pudieron cargar las matrículas ni los alumnos.", error);
+    todos.forEach(id => {
+      const select = document.getElementById(id);
+      if (select) {
+        select.innerHTML = '<option value="">No se pudieron cargar los datos</option>';
+      }
+    });
+  }
+}
+
+function obtenerDocentesApi() {
+  if (!promesaDocentesApi) {
+    promesaDocentesApi = fetch("/api/docentes")
+      .then(async respuesta => {
+        if (!respuesta.ok) {
+          throw new Error(`La petición terminó con HTTP ${respuesta.status}.`);
+        }
+
+        const filas = await respuesta.json();
+        if (!Array.isArray(filas)) {
+          throw new Error("La respuesta de /api/docentes no es una lista.");
+        }
+
+        return filas.map(docente => ({ ...docente, id: docente.id_docente }));
+      })
+      .catch(error => {
+        promesaDocentesApi = null;
+        throw error;
+      });
+  }
+
+  return promesaDocentesApi;
+}
+
+async function actualizarSelectoresDocentes() {
+  const selectores = ["id_mod_doc", "id_del_doc", "id_info_doc", "docente_alta_curso", "docente_mod_curso"];
+
+  // Si la página no tiene ninguno de estos selectores, no hace falta pedir los docentes
+  if (!selectores.some(id => document.getElementById(id))) {
+    return;
+  }
+
+  try {
+    const docentes = await obtenerDocentesApi();
+    selectores.forEach(id => actualizarOpciones(id, docentes, "nombre"));
+  } catch (error) {
+    console.error("No se pudieron cargar los docentes para los selectores.", error);
+    selectores.forEach(id => {
+      const select = document.getElementById(id);
+      if (select) {
+        select.innerHTML = '<option value="">No se pudieron cargar los docentes</option>';
+      }
+    });
+  }
 }
 
 async function actualizarSelectoresCursos() {
@@ -184,4 +291,4 @@ function guardarDatosConImagen(clave, datos) {
 
     throw error;
   }
-}
+}

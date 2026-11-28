@@ -9,7 +9,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function mostrarPerfil() {
+// Pide a la API los datos del usuario que ha iniciado sesión
+function obtenerUsuarioActual() {
+  const idUsuario = sessionStorage.getItem("idUsuario");
+  if (!idUsuario) {
+    return Promise.reject(new Error("No se encontró el usuario. Cierra sesión y vuelve a iniciar sesión."));
+  }
+  return peticionApi(`/api/usuarios/${encodeURIComponent(idUsuario)}`);
+}
+
+async function mostrarPerfil() {
   const tarjeta = document.getElementById("miperfil");
   if (!tarjeta) {
     return;
@@ -17,29 +26,19 @@ function mostrarPerfil() {
 
   tarjeta.innerHTML = "";
 
-  const correoActual = sessionStorage.getItem("correoActual");
-  const nombreActual = sessionStorage.getItem("usuarioActual");
-  const usuarios = leerDatos(DATOS_USER);
-  const usuario = correoActual
-    ? usuarios.find(u => u.Correo === correoActual)
-    : usuarios.find(u => u.Nombre === nombreActual);
-
-  if (usuario == null) {
-    tarjeta.textContent = "No se encontró el usuario. Cierra sesión y vuelve a iniciar sesión.";
+  let usuario;
+  try {
+    usuario = await obtenerUsuarioActual();
+  } catch (error) {
+    console.error("No se pudo cargar el perfil.", error);
+    tarjeta.textContent = error.message;
     return;
   }
 
-  agregarImagen(tarjeta, usuario.Fotografia, `Fotografía de ${usuario.Nombre}`);
-  const imagenPerfil = tarjeta.querySelector(".imagen-tarjeta");
-  if (imagenPerfil) {
-    imagenPerfil.classList.add("imagen-perfil");
-  }
-
   const detalles = [
-    `Nombre: ${usuario.Nombre || ""}`,
-    `Primer apellido: ${usuario.Primer_apellido || ""}`,
-    `Segundo apellido: ${usuario.Segundo_apellido || ""}`,
-    `Correo: ${usuario.Correo || ""}`
+    `Nombre: ${usuario.nombre}`,
+    `Correo: ${usuario.email}`,
+    `Fecha de registro: ${String(usuario.fecha_registro || "").slice(0, 10) || "No disponible"}`
   ];
 
   detalles.forEach(detalle => {
@@ -52,86 +51,42 @@ function mostrarPerfil() {
 async function editarPerfil(event) {
   event.preventDefault();
 
-  const correoActual = sessionStorage.getItem("correoActual");
-  const nombreActual = sessionStorage.getItem("usuarioActual");
-  const usuarios = leerDatos(DATOS_USER);
-  const indiceUsuarioActual = usuarios.findIndex(usuario =>
-    correoActual
-      ? usuario.Correo === correoActual
-      : usuario.Nombre === nombreActual
-  );
-  const usuarioActual = usuarios[indiceUsuarioActual];
-
-  if (indiceUsuarioActual === -1) {
-    alert("No se encontró el usuario actual. Cierra sesión y vuelve a iniciar sesión.");
-    return;
-  }
-
   const formulario = document.getElementById("editProfile");
   if (!formulario.checkValidity()) {
     formulario.reportValidity();
     return;
   }
 
-  const nuevoCorreo = obtenerValor("correo_editar", usuarioActual.Correo);
-  const nuevaContraseña = document.getElementById("contraseña_editar").value.trim();
-  const confirmarContraseña = document.getElementById("confirmarContraseña_editar").value.trim();
-
+  const nuevaContraseña = document.getElementById("contraseña_editar").value;
+  const confirmarContraseña = document.getElementById("confirmarContraseña_editar").value;
   if (nuevaContraseña !== confirmarContraseña) {
     alert("Las contraseñas no coinciden.");
     return;
   }
 
-  const normalizarCorreo = correo => String(correo || "").trim().toLowerCase();
-  const correoNormalizado = normalizarCorreo(nuevoCorreo);
-  const correoEnUso = usuarios.some((usuario, indice) =>
-    indice !== indiceUsuarioActual &&
-    normalizarCorreo(usuario.Correo) === correoNormalizado
-  );
-  if (correoEnUso) {
-    alert("Ya existe un usuario con ese correo.");
-    return;
-  }
-
-  let fotografiaNueva;
   try {
-    fotografiaNueva = await leerImagen(document.getElementById("fotografia_editar"));
+    const usuarioActual = await obtenerUsuarioActual();
+
+    // Los campos que se dejan vacíos conservan su valor actual
+    const cambios = {
+      nombre: obtenerValor("nombre_editar", usuarioActual.nombre),
+      email: obtenerValor("correo_editar", usuarioActual.email)
+    };
+    if (nuevaContraseña) {
+      cambios.password = nuevaContraseña;
+    }
+
+    await peticionApi(`/api/usuarios/${encodeURIComponent(usuarioActual.id_usuario)}`, "PUT", cambios);
+
+    sessionStorage.setItem("usuarioActual", cambios.nombre);
+    sessionStorage.setItem("correoActual", cambios.email.toLowerCase());
+    formulario.reset();
+    await mostrarPerfil();
+    alert("Perfil actualizado correctamente.");
   } catch (error) {
-    alert(`No se pudo leer la fotografía: ${error.message}`);
-    return;
+    console.error("No se pudo actualizar el perfil.", error);
+    alert(`No se pudo actualizar el perfil: ${error.message}`);
   }
-
-  const usuarioActualizado = {
-    ...usuarioActual,
-    Nombre: obtenerValor("nombre_editar", usuarioActual.Nombre),  Primer_apellido: obtenerValor("primerApellido_editar", usuarioActual.Primer_apellido),
-    Segundo_apellido: obtenerValor("segundoApellido_editar",usuarioActual.Segundo_apellido ),
-    Correo: nuevoCorreo,
-    Contraseña: nuevaContraseña || usuarioActual.Contraseña,
-    Confirmar_contraseña:
-      confirmarContraseña || usuarioActual.Confirmar_contraseña,
-    Telefono: obtenerValor(
-      "telefono_editar",
-      usuarioActual.Telefono || ""
-    ),
-    Fotografia:
-      fotografiaNueva ||
-      usuarioActual.Fotografia ||
-      FOTOGRAFIA_PREDETERMINADA
-  };
-
-  const usuariosActualizados = usuarios.map(usuario =>
-    usuario === usuarioActual ? usuarioActualizado : usuario
-  );
-
-  if (!guardarDatosConImagen(DATOS_USER, usuariosActualizados)) {
-    return;
-  }
-
-  sessionStorage.setItem("usuarioActual", usuarioActualizado.Nombre);
-  sessionStorage.setItem("correoActual", nuevoCorreo);
-  document.getElementById("fotografia_editar").value = "";
-  mostrarPerfil();
-  alert("Perfil actualizado correctamente.");
 }
 
 const obtenerValor = (id, valorActual) =>

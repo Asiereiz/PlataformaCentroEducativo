@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.removeItem("loggeado");
         sessionStorage.removeItem("usuarioActual");
         sessionStorage.removeItem("correoActual");
+        sessionStorage.removeItem("idUsuario");
+        sessionStorage.removeItem("preferencias");
         });
     });
 
@@ -252,58 +254,73 @@ function inicializarDatos() {
   updateSelect();
 }
 
-function registrarUsuario(event) {
-  
-  event.preventDefault();
-  const user = {
-    id: leerDatos(DATOS_USER).length + 1,
-    Nombre: document.getElementById("Nombre").value.trim(),
-    Primer_apellido: document.getElementById("Primer_apellido").value.trim(),
-    Segundo_apellido: document.getElementById("Segundo_apellido").value.trim(),
-    Correo: document.getElementById("Correo").value.trim(),
-    Contraseña: document.getElementById("Contraseña").value.trim(),
-    Confirmar_contraseña: document.getElementById("Confirmar_contraseña").value.trim(),
-    rol: "alumno",
-    estado: "activo",
-    Fotografia: FOTOGRAFIA_PREDETERMINADA
+async function enviarJson(url, cuerpo) {
+  const respuesta = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(cuerpo)
+  });
+  const resultado = await respuesta.json();
+  if (!respuesta.ok) {
+    throw new Error(resultado.error || `La petición terminó con HTTP ${respuesta.status}.`);
   }
-
-  const usuarios = leerDatos(DATOS_USER);
-  usuarios.push(user);
-  guardarDatos(DATOS_USER, usuarios);
-
+  return resultado;
 }
 
-function iniciarSesion(event) {
+async function registrarUsuario(event) {
+  event.preventDefault();
+
+  const contraseña = document.getElementById("Contraseña").value;
+  const confirmar = document.getElementById("Confirmar_contraseña").value;
+  if (contraseña !== confirmar) {
+    alert("Las contraseñas no coinciden.");
+    return;
+  }
+
+  // La tabla usuarios tiene una sola columna nombre: se juntan nombre y apellidos
+  const nombre = [
+    document.getElementById("Nombre").value,
+    document.getElementById("Primer_apellido").value,
+    document.getElementById("Segundo_apellido").value
+  ].map(texto => texto.trim()).filter(texto => texto).join(" ");
+
+  try {
+    await enviarJson("/api/usuarios", {
+      nombre,
+      email: document.getElementById("Correo").value.trim(),
+      password: contraseña
+    });
+    alert("Usuario registrado correctamente. Ya puedes iniciar sesión.");
+    window.location.href = "login.html";
+  } catch (error) {
+    console.error("No se pudo registrar el usuario.", error);
+    alert(`No se pudo registrar el usuario: ${error.message}`);
+  }
+}
+
+async function iniciarSesion(event) {
     event.preventDefault();
 
     const correo = document.getElementById("Correo").value.trim();
-    const contraseña = document.getElementById("Contraseña").value.trim();
-    
-    const usuarios = leerDatos(DATOS_USER);
-    const usuario = usuarios.find(u => u.Correo === correo && u.Contraseña === contraseña);
+    const contraseña = document.getElementById("Contraseña").value;
 
-    if (!usuario) {
-      alert("Correo o contraseña incorrectos.");
+    let usuario;
+    try {
+      usuario = await enviarJson("/api/usuarios/login", { email: correo, password: contraseña });
+    } catch (error) {
+      alert(error.message);
       return;
     }
 
-    if(usuario.estado === "inactivo") {
-      alert("Tu cuenta está inactiva. Por favor, contacta con el administrador.");
-      return;
-    }
-
-    sessionStorage.setItem("usuarioActual", usuario.Nombre);
-    sessionStorage.setItem("correoActual", usuario.Correo);
-
-    if (usuario.Correo === "admin@centroeducativo.com" || usuario.rol === "admin") {
-      sessionStorage.setItem("tipoUsuario", "admin");
-    } else {
-      sessionStorage.setItem("tipoUsuario", "alumno");
-    }
+    sessionStorage.setItem("usuarioActual", usuario.nombre);
+    sessionStorage.setItem("correoActual", usuario.email);
+    sessionStorage.setItem("idUsuario", usuario.id_usuario);
+    // El rol lo decide la base de datos: solo "admin" tiene permisos de administrador
+    sessionStorage.setItem("tipoUsuario", usuario.rol === "admin" ? "admin" : "alumno");
     sessionStorage.setItem("loggeado", "true");
+    // Tema y tamaño de letra del usuario, guardados en la base de datos
+    await cargarPreferenciasDeBD(usuario.id_usuario);
     window.location.href = "portal.html";
-
 }
 
 function mostrarSesion() {
@@ -347,6 +364,8 @@ function cerrarSesion(){
   sessionStorage.removeItem("loggeado");
   sessionStorage.removeItem("usuarioActual");
   sessionStorage.removeItem("correoActual");
+  sessionStorage.removeItem("idUsuario");
+  sessionStorage.removeItem("preferencias");
   window.location.href = "index.html";
 }
 

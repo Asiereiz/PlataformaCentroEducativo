@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node --env-file=.env app.js",
+    "dev": "node --env-file=.env --watch app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,7 +13,6 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "dotenv": "^18.0.10",
     "express": "^5.3.0",
     "mariadb": "^3.5.5",
     "multer": "^2.5.0"

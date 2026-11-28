@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verificarConexionMariaDB } from "../database.js";
+import { query } from "../db/mariadb.js";
 
 const router = Router();
 
@@ -11,10 +11,10 @@ router.get("/estado", (req, res) => {
 // GET /api/db/estado
 router.get("/db/estado", async (req, res, next) => {
   try {
-    await verificarConexionMariaDB();
+    await query("SELECT 1");
     res.json({ ok: true, mensaje: "Conexión con MariaDB establecida." });
   } catch (error) {
-    next(error);
+    next(error); // lo recoge el middleware de errores de app.js
   }
 });
 

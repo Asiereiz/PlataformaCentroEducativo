@@ -12,47 +12,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.addEventListener("pageshow", aplicarPreferencias);
 
-function obtenerUsuarioPreferencias(usuarios = leerDatos(DATOS_USER)) {
-  const correoActual = sessionStorage.getItem("correoActual");
-  const nombreActual = sessionStorage.getItem("usuarioActual");
-  if (!correoActual && !nombreActual) {
-    return null;
-  }
+// Las preferencias de un usuario con sesión viven en la base de datos (tabla preferencias).
+// Para no pedirlas en cada página, al iniciar sesión se guarda una copia en sessionStorage.
+// Quien no ha iniciado sesión no tiene usuario: sus preferencias se quedan en este navegador.
+const CLAVE_PREFERENCIAS = "preferencias";
+const CLAVE_PREFERENCIAS_INVITADO = "preferencias_invitado";
 
-  return usuarios.find(usuario =>
-    correoActual
-      ? usuario.Correo === correoActual
-      : usuario.Nombre === nombreActual
-  ) || null;
+// La API usa { tema, tamano_letra }; en la página se usa { tema, tamfuente }
+function desdeApi(preferencias) {
+  return { tema: preferencias.tema, tamfuente: preferencias.tamano_letra };
+}
+
+// Pide a la API las preferencias del usuario y las guarda en sessionStorage
+async function cargarPreferenciasDeBD(idUsuario) {
+  try {
+    const preferencias = desdeApi(await peticionApi(`/api/preferencias/${encodeURIComponent(idUsuario)}`));
+    sessionStorage.setItem(CLAVE_PREFERENCIAS, JSON.stringify(preferencias));
+    return preferencias;
+  } catch (error) {
+    console.error("No se pudieron cargar las preferencias de accesibilidad.", error);
+    return {};
+  }
 }
 
 function leerPreferencias() {
-  const usuario = obtenerUsuarioPreferencias();
-  if (usuario) {
-    return usuario.Preferencias || {};
+  try {
+    const guardadas = sessionStorage.getItem("idUsuario")
+      ? sessionStorage.getItem(CLAVE_PREFERENCIAS)
+      : localStorage.getItem(CLAVE_PREFERENCIAS_INVITADO);
+    return guardadas ? JSON.parse(guardadas) : {};
+  } catch (error) {
+    return {};
   }
-
-  const preferenciasInvitado = localStorage.getItem("preferencias_invitado");
-  return preferenciasInvitado ? JSON.parse(preferenciasInvitado) : {};
 }
 
-function guardarPreferencias(cambios) {
-  const usuarios = leerDatos(DATOS_USER);
-  const usuario = obtenerUsuarioPreferencias(usuarios);
-  if (!usuario) {
-    const preferencias = { ...leerPreferencias(), ...cambios };
-    localStorage.setItem("preferencias_invitado", JSON.stringify(preferencias));
+async function guardarPreferencias(cambios) {
+  const preferencias = { ...leerPreferencias(), ...cambios };
+  const idUsuario = sessionStorage.getItem("idUsuario");
+
+  if (!idUsuario) {
+    localStorage.setItem(CLAVE_PREFERENCIAS_INVITADO, JSON.stringify(preferencias));
     return;
   }
 
-  const usuarioActualizado = {
-    ...usuario,
-    Preferencias: { ...usuario.Preferencias, ...cambios }
-  };
-  const usuariosActualizados = usuarios.map(otroUsuario =>
-    otroUsuario === usuario ? usuarioActualizado : otroUsuario
-  );
-  guardarDatos(DATOS_USER, usuariosActualizados);
+  sessionStorage.setItem(CLAVE_PREFERENCIAS, JSON.stringify(preferencias));
+  try {
+    await peticionApi(`/api/preferencias/${encodeURIComponent(idUsuario)}`, "PUT", {
+      tema: preferencias.tema || "claro",
+      tamano_letra: preferencias.tamfuente || "medium"
+    });
+  } catch (error) {
+    console.error("No se pudieron guardar las preferencias de accesibilidad.", error);
+    alert(`No se pudieron guardar tus preferencias: ${error.message}`);
+  }
 }
 
 function cambiarColorPantalla() {
@@ -79,8 +91,15 @@ function aplicarTamañoLetra(tamaño) {
   pantalla.classList.toggle("small", tamaño === "small");
 }
 
-function aplicarPreferencias() {
-  const preferencias = leerPreferencias();
+async function aplicarPreferencias() {
+  let preferencias = leerPreferencias();
+
+  // Hay sesión pero no hay copia (por ejemplo, otra pestaña): se piden a la base de datos
+  const idUsuario = sessionStorage.getItem("idUsuario");
+  if (idUsuario && !sessionStorage.getItem(CLAVE_PREFERENCIAS)) {
+    preferencias = await cargarPreferenciasDeBD(idUsuario);
+  }
+
   const tema = preferencias.tema || "claro";
   const tamfuente = preferencias.tamfuente || "medium";
 

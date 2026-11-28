@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function mostrarEstadisticas() {
+async function mostrarEstadisticas() {
     const cursos = leerDatos(DATOS_CURSOS).filter(curso => curso.estado === "activo").length;
     const usuarios = leerDatos(DATOS_USER).filter(usuario => usuario.rol === "alumno").length;
-    const docentes = leerDatos(DATOS_DOCENTES).filter(docente => docente.estado === "activo").length;
+    const docentes = (await obtenerDocentesApi().catch(() => [])).filter(docente => Number(docente.activo) === 1).length;
     const ocupacion = calcularOcupacionAulas();
     const topCursos = cursosConMasMatriculados();
 

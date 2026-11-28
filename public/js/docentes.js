@@ -29,14 +29,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-function mostrarDocentes() {
+async function mostrarDocentes() {
   const listado = document.getElementById("lista_docentes");
   if (!listado) {
     return;
   }
 
   listado.innerHTML = "";
-  const docentes = leerDatos(DATOS_DOCENTES).filter(docente => docente.estado === "activo");
+
+  let docentes;
+  try {
+    docentes = (await obtenerDocentesApi()).filter(docente => Number(docente.activo) === 1);
+  } catch (error) {
+    console.error("No se pudieron cargar los docentes desde MariaDB.", error);
+    listado.textContent = "No se pudieron cargar los docentes. Comprueba la conexión e inténtalo de nuevo.";
+    return;
+  }
 
   if (docentes.length === 0) {
     listado.textContent = "No hay docentes disponibles.";
@@ -45,20 +53,18 @@ function mostrarDocentes() {
 
   docentes.forEach(d => {
     const tarjeta = document.createElement("article");
-    agregarImagen(tarjeta, d.Fotografia, `Fotografía de ${d.Nombre}`);
+    agregarImagen(tarjeta, d.foto, `Fotografía de ${d.nombre}`);
     const nombre = document.createElement("h4");
-    nombre.textContent = d.Nombre;
+    nombre.textContent = d.nombre;
     tarjeta.appendChild(nombre);
     listado.appendChild(tarjeta);
 
     const detalles = [
-      `Nombre: ${d.Nombre}`,
-      `Primer apellido: ${d.Primer_apellido}`,
-      `Segundo apellido: ${d.Segundo_apellido}`,
-      `Correo: ${d.Correo}`,
-      `Teléfono: ${d.Telefono}`,
-      `Especialidad: ${d.Especialidad}`,
-      `Estado: ${d.estado}`
+      `Nombre: ${d.nombre}`,
+      `Correo: ${d.email}`,
+      `Teléfono: ${d.telefono}`,
+      `Especialidad: ${d.especialidad}`,
+      `Estado: ${d.activo ? "activo" : "inactivo"}`
     ];
 
     detalles.forEach(detalle => {
@@ -70,134 +76,154 @@ function mostrarDocentes() {
 
 }
 
+function datosDocenteFormulario(sufijo, inputFoto) {
+  // La imagen viaja como archivo (multipart/form-data): la guarda Multer en el servidor
+  const datos = new FormData();
+  datos.append("nombre", document.getElementById(`nombre_${sufijo}`).value.trim());
+  datos.append("email", document.getElementById(`correo_${sufijo}`).value.trim());
+  datos.append("especialidad", document.getElementById(`especialidad_${sufijo}`).value.trim());
+  datos.append("telefono", document.getElementById(`telefono_${sufijo}`).value.trim());
+  // La columna activo es 1 / 0; el desplegable del formulario es "activo" / "inactivo"
+  datos.append("activo", document.getElementById(`estado_${sufijo}`).value === "activo" ? 1 : 0);
+  if (inputFoto && inputFoto.files[0]) {
+    datos.append("foto", inputFoto.files[0]);
+  }
+  return datos;
+}
+
+async function enviarDocente(url, metodo, cuerpo) {
+  const opciones = { method: metodo };
+  if (cuerpo instanceof FormData) {
+    // Sin Content-Type: el navegador lo añade solo, con el "boundary" del multipart
+    opciones.body = cuerpo;
+  } else {
+    opciones.headers = { "Content-Type": "application/json" };
+    opciones.body = JSON.stringify(cuerpo); // por ejemplo, el PATCH de desactivar
+  }
+
+  const respuesta = await fetch(url, opciones);
+  const resultado = await respuesta.json();
+  if (!respuesta.ok) {
+    throw new Error(resultado.error || `La petición terminó con HTTP ${respuesta.status}.`);
+  }
+}
+
+async function refrescarDocentes() {
+  promesaDocentesApi = null;
+  await obtenerDocentesApi();
+  updateSelect();
+  mostrarDocentes();
+}
+
 async function altaDoc(event) {
   event.preventDefault();
 
-  let fotografia;
   try {
-    fotografia = await leerImagen(document.getElementById("foto_alta_doc"));
+    await enviarDocente(
+      "/api/docentes",
+      "POST",
+      datosDocenteFormulario("alta_doc", document.getElementById("foto_alta_doc"))
+    );
+    await refrescarDocentes();
+    alert("Docente registrado correctamente.");
   } catch (error) {
-    alert(`No se pudo leer la fotografía: ${error.message}`);
-    return;
+    console.error("No se pudo registrar el docente.", error);
+    alert(`No se pudo registrar el docente: ${error.message}`);
   }
-
-  const docentes = leerDatos(DATOS_DOCENTES);
-  const docente = {
-    id: docentes.length + 1,
-    Nombre: document.getElementById("nombre_alta_doc").value.trim(),
-    Primer_apellido: document.getElementById("primer_apellido_alta_doc").value.trim(),
-    Segundo_apellido: document.getElementById("segundo_apellido_alta_doc").value.trim(),
-    Correo: document.getElementById("correo_alta_doc").value.trim(),
-    Especialidad: document.getElementById("especialidad_alta_doc").value.trim(),
-    Telefono: document.getElementById("telefono_alta_doc").value.trim(),
-    Fotografia: fotografia || FOTOGRAFIA_PREDETERMINADA,
-    estado: document.getElementById("estado_alta_doc").value
-  };
-
-  docentes.push(docente);
-  if (!guardarDatosConImagen(DATOS_DOCENTES, docentes)) {
-    return;
-  }
-  updateSelect();
-  alert("Docente registrado correctamente.");
 }
 
 async function modDoc(event) {
   event.preventDefault();
 
   const idMod = document.getElementById("id_mod_doc").value;
-  const docentes = leerDatos(DATOS_DOCENTES);
-  const docenteAnterior = docentes.find(docente => String(docente.id) === idMod);
-  if (!docenteAnterior) {
+  if (!idMod) {
     alert("Selecciona primero un docente.");
     return;
   }
 
-  let fotografiaNueva;
   try {
-    fotografiaNueva = await leerImagen(document.getElementById("foto_mod_doc"));
+    await enviarDocente(
+      `/api/docentes/${encodeURIComponent(idMod)}`,
+      "PUT",
+      datosDocenteFormulario("mod_doc", document.getElementById("foto_mod_doc"))
+    );
+    await refrescarDocentes();
+    alert("Docente modificado correctamente.");
   } catch (error) {
-    alert(`No se pudo leer la fotografía: ${error.message}`);
-    return;
+    console.error("No se pudo modificar el docente.", error);
+    alert(`No se pudo modificar el docente: ${error.message}`);
   }
-
-  const docenteModificado = {
-    id: docenteAnterior.id,
-    Nombre: document.getElementById("nombre_mod_doc").value.trim(),
-    Primer_apellido: document.getElementById("primer_apellido_mod_doc").value.trim(),
-    Segundo_apellido: document.getElementById("segundo_apellido_mod_doc").value.trim(),
-    Correo: document.getElementById("correo_mod_doc").value.trim(),
-    Especialidad: document.getElementById("especialidad_mod_doc").value.trim(),
-    Telefono: document.getElementById("telefono_mod_doc").value.trim(),
-    Fotografia: fotografiaNueva || docenteAnterior.Fotografia || FOTOGRAFIA_PREDETERMINADA,
-    estado: document.getElementById("estado_mod_doc").value
-  };
-
-  const docentesActualizados = docentes.map(docente =>
-    String(docente.id) === idMod ? docenteModificado : docente
-  );
-  if (!guardarDatosConImagen(DATOS_DOCENTES, docentesActualizados)) {
-    return;
-  }
-  updateSelect();
-  alert("Docente modificado correctamente.");
 }
 
-function rellenarDoc() {
+async function rellenarDoc() {
   const idMod = document.getElementById("id_mod_doc").value;
-  const docentes = leerDatos(DATOS_DOCENTES);
-  const docente = docentes.find(d => String(d.id) === idMod);
+  let docente;
+  try {
+    docente = (await obtenerDocentesApi()).find(d => String(d.id) === idMod);
+  } catch (error) {
+    alert(`No se pudieron cargar los docentes: ${error.message}`);
+    return;
+  }
 
   if (!docente) {
     return;
   }
 
-  document.getElementById("nombre_mod_doc").value = docente.Nombre;
-  document.getElementById("primer_apellido_mod_doc").value = docente.Primer_apellido;
-  document.getElementById("segundo_apellido_mod_doc").value = docente.Segundo_apellido;
-  document.getElementById("correo_mod_doc").value = docente.Correo;
-  document.getElementById("especialidad_mod_doc").value = docente.Especialidad;
-  document.getElementById("telefono_mod_doc").value = docente.Telefono;
-  document.getElementById("estado_mod_doc").value = docente.estado;
+  document.getElementById("nombre_mod_doc").value = docente.nombre;
+  document.getElementById("correo_mod_doc").value = docente.email;
+  document.getElementById("especialidad_mod_doc").value = docente.especialidad;
+  document.getElementById("telefono_mod_doc").value = docente.telefono;
+  document.getElementById("estado_mod_doc").value = docente.activo ? "activo" : "inactivo";
 }
 
-function delDoc(event) {
+async function delDoc(event) {
   event.preventDefault();
 
   const idDel = document.getElementById("id_del_doc").value;
-  const docentes = leerDatos(DATOS_DOCENTES);
-  const encontrado = docentes.find(docente => String(docente.id) === idDel);
-
-  if (!encontrado) {
+  if (!idDel) {
     alert("Selecciona primero un docente.");
     return;
   }
 
-  const asignacion = leerDatos(DATOS_CURSOS).find(curso =>
-    String(curso.docente) === idDel && curso.estado === "activo"
-  );
-  if (asignacion) {
-    alert("No se puede eliminar este docente porque está asignado a un curso. Reasigna o elimina el curso antes de eliminar al docente.");
-    return;
+  try {
+    // Un docente asignado a un curso activo no se puede eliminar
+    const cursos = await obtenerCursosApi();
+    const asignacion = cursos.find(curso =>
+      String(curso.docente) === idDel && curso.estado === "activo"
+    );
+    if (asignacion) {
+      alert("No se puede eliminar este docente porque está asignado a un curso. Reasigna o elimina el curso antes de eliminar al docente.");
+      return;
+    }
+
+    if (!confirm("¿Seguro que quieres eliminar este docente?")) {
+      return;
+    }
+
+    await enviarDocente(
+      `/api/docentes/${encodeURIComponent(idDel)}`,
+      "PATCH",
+      { activo: 0 }
+    );
+    await refrescarDocentes();
+    alert("Docente desactivado correctamente.");
+  } catch (error) {
+    console.error("No se pudo desactivar el docente.", error);
+    alert(`No se pudo desactivar el docente: ${error.message}`);
   }
-
-  if (!confirm("¿Seguro que quieres eliminar este docente?")) {
-    return;
-  }
-
-  const datosActualizados = docentes.map(m => String(m.id) === idDel ? { ...m, estado: "inactivo" } : m);
-
-  guardarDatos(DATOS_DOCENTES, datosActualizados);
-  updateSelect();
-  alert("Docente desactivado correctamente.");
 }
 
-function infoDoc(event) {
+async function infoDoc(event) {
   event.preventDefault();
 
   const idInfo = document.getElementById("id_info_doc").value;
-  const docentes = leerDatos(DATOS_DOCENTES);
-  const docente = docentes.find(d => String(d.id) === idInfo);
+  let docente;
+  try {
+    docente = (await obtenerDocentesApi()).find(d => String(d.id) === idInfo);
+  } catch (error) {
+    alert(`No se pudieron cargar los docentes: ${error.message}`);
+    return;
+  }
 
   if (!docente) {
     alert("Selecciona primero un docente.");
@@ -205,13 +231,11 @@ function infoDoc(event) {
   }
 
   document.getElementById("listado_doc").innerHTML = `
-    <li>Nombre: ${docente.Nombre}</li>
-    <li>Primer apellido: ${docente.Primer_apellido}</li>
-    <li>Segundo apellido: ${docente.Segundo_apellido}</li>
-    <li>Correo: ${docente.Correo}</li>
-    <li>Especialidad: ${docente.Especialidad}</li>
-    <li>Teléfono: ${docente.Telefono}</li>
-    <li>Fotografía: ${docente.Fotografia ? "Disponible" : "No disponible"}</li>
-    <li>Estado: ${docente.estado}</li>
+    <li>Nombre: ${docente.nombre}</li>
+    <li>Correo: ${docente.email}</li>
+    <li>Especialidad: ${docente.especialidad}</li>
+    <li>Teléfono: ${docente.telefono}</li>
+    <li>Fotografía: ${docente.foto ? "Disponible" : "No disponible"}</li>
+    <li>Estado: ${docente.activo ? "activo" : "inactivo"}</li>
   `;
 }

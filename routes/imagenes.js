@@ -53,7 +53,7 @@ export function subirFoto(campo, carpeta) {
       const mensaje = error.code === "LIMIT_FILE_SIZE"
         ? "La imagen supera los 2 MB."
         : error.message;
-      res.status(400).json({ ok: false, error: mensaje });
+      res.status(400).json({ error: mensaje });
     });
   };
 }
